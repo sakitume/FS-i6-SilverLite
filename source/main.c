@@ -51,45 +51,46 @@
 #include "flysky.h"
 
 #define BACKLIGHT_LED_GPIO GPIOB
-#define BACKLIGHT_LED_PIN  0
+#define BACKLIGHT_LED_PIN 0
 
 void delay(void)
 {
-  volatile uint32_t i = 0;
-  for (i = 0; i < 800000; ++i)
-  {
-    __asm("NOP"); /* delay */
-  }
+    volatile uint32_t i = 0;
+    for (i = 0; i < 800000; ++i)
+    {
+        __asm("NOP"); /* delay */
+    }
 }
 
 /*!
  * @brief Application entry point.
  */
-int main(void) {
-  gpio_pin_config_t led_config = {
-    kGPIO_DigitalOutput, 0,
-  };
+int main(void)
+{
+    /* Init board hardware. */
+    BOARD_InitPins();
+    BOARD_BootClockRUN();
+    BOARD_SysTick();
+    BOARD_InitDebugConsole();
 
-  /* Init board hardware. */
-  BOARD_InitPins();
-  BOARD_BootClockRUN();
-  BOARD_SysTick();
+    lcd_init();
+    screen_init();
+    console_init();
+    debug_init();
+    adc_init();
+    backlightInit();
 
-  lcd_init();
-  for(int i =0; i < 1024; i++) screen_buffer[i]= 0;
-  console_init();
-  adc_init();
-  
-  BOARD_InitDebugConsole();
-  
-  backlightInit();
-  debug_init();
+    //  screen_test();
 
-  /* Init output LED GPIO. */
-  GPIO_PinInit(BACKLIGHT_LED_GPIO, BACKLIGHT_LED_PIN, &led_config);
-  
-  while(1) {
-    delay();
-    GPIO_TogglePinsOutput(BACKLIGHT_LED_GPIO, (1U << BACKLIGHT_LED_PIN));
-  }
+    /* Init output LED GPIO. */
+    gpio_pin_config_t led_config = {
+        kGPIO_DigitalOutput,
+        0,
+    };
+    GPIO_PinInit(BACKLIGHT_LED_GPIO, BACKLIGHT_LED_PIN, &led_config);
+    while (1)
+    {
+        delay();
+        GPIO_TogglePinsOutput(BACKLIGHT_LED_GPIO, (1U << BACKLIGHT_LED_PIN));
+    }
 }
