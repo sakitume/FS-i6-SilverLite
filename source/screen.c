@@ -34,7 +34,7 @@ static uint8_t  screen_font_color;
 
 void screen_init(void) {
     screen_clear();
-    led_backlight_on();
+//XXX    led_backlight_on();
 }
 
 void screen_clear(void) {
@@ -57,7 +57,7 @@ void screen_test(void) {
             screen_puts_xy(90, x+3, 1, "3 ABC");
             screen_update();
 
-            delay_ms(100);
+            _delay_ms(100);
         }
     }
 }
