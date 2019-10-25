@@ -74,23 +74,19 @@ int main(void)
     BOARD_InitDebugConsole();
 
     lcd_init();
+    backlightInit();
     screen_init();
     console_init();
     debug_init();
     adc_init();
-    backlightInit();
 
+//    led_backlight_on();
     //  screen_test();
 
-    /* Init output LED GPIO. */
-    gpio_pin_config_t led_config = {
-        kGPIO_DigitalOutput,
-        0,
-    };
-    GPIO_PinInit(BACKLIGHT_LED_GPIO, BACKLIGHT_LED_PIN, &led_config);
     while (1)
     {
-        delay();
-        GPIO_TogglePinsOutput(BACKLIGHT_LED_GPIO, (1U << BACKLIGHT_LED_PIN));
+        adc_test();
+        adc_test2();
+//        delay();
     }
 }

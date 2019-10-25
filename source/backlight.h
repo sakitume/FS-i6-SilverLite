@@ -13,4 +13,7 @@
 
 void __attribute__((section (".TestCODE"))) backlightInit(void);
 
+void led_backlight_on();
+void led_backlight_off();
+
 #endif /* SOURCE_BACKLIGHT_H_ */
