@@ -35,7 +35,20 @@
 #include "board.h"
 #include "pin_mux.h"
 #include "clock_config.h"
+#include "delay.h"
 #include "fsl_gpio.c"
+#include "lcd.h"
+#include "console.h"
+#include "screen.h"
+#include "debug.h"
+#include "adc.h"
+#include "backlight.h"
+#include "MKL16Z4.h"
+#include "fsl_common.h"
+#include "fsl_dma.h"
+#include "fsl_dmamux.h"
+#include "fsl_uart.h"
+#include "flysky.h"
 
 #define BACKLIGHT_LED_GPIO GPIOB
 #define BACKLIGHT_LED_PIN  0
@@ -60,7 +73,17 @@ int main(void) {
   /* Init board hardware. */
   BOARD_InitPins();
   BOARD_BootClockRUN();
+  BOARD_SysTick();
+
+  lcd_init();
+  for(int i =0; i < 1024; i++) screen_buffer[i]= 0;
+  console_init();
+  adc_init();
+  
   BOARD_InitDebugConsole();
+  
+  backlightInit();
+  debug_init();
 
   /* Init output LED GPIO. */
   GPIO_PinInit(BACKLIGHT_LED_GPIO, BACKLIGHT_LED_PIN, &led_config);

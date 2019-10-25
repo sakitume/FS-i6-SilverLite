@@ -1,0 +1,5 @@
+*.o
+*.d
+*i6.bin
+*i6.elf
+*i6.map
