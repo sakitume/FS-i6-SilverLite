@@ -99,9 +99,6 @@ void adc_test(void){
 }
 
 void adc_test2(void) {
-//	    debug("adc: test2\n"); 
-// Note: This debug_flush() is necessary for anything to be displayed!?!
-debug_flush();
         console_clear();
         debug("ADC TEST");
         debug_put_newline();
@@ -117,7 +114,8 @@ debug_flush();
                 debug(" ");
             }
         }
-        console_render();
+        debug_flush();
+        //console_render();
         //screen_update();
         //led_button_r_toggle();
 
