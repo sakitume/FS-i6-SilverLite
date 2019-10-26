@@ -1,0 +1,31 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Launch Debug config",
+            "type": "cortex-debug",
+            "request": "launch",
+            "servertype": "openocd",
+            "cwd": "${workspaceRoot}",
+            "executable": "./Debug/i6.elf",
+            "device": "Kinetis",
+            "configFiles": [
+                "interface/stlink.cfg",
+                "target/klx.cfg",
+            ]
+        },
+        {
+            "name": "Attach Debug config",
+            "type": "cortex-debug",
+            "request": "attach",
+            "servertype": "openocd",
+            "cwd": "${workspaceRoot}",
+            "executable": "./Debug/i6.elf",
+            "device": "Kinetis",
+            "configFiles": [
+                "interface/stlink.cfg",
+                "target/klx.cfg",
+            ]
+        }
+    ]
+}

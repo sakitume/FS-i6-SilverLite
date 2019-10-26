@@ -1,0 +1,97 @@
+{
+    // See https://go.microsoft.com/fwlink/?LinkId=733558
+    // for the documentation about the tasks.json format
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "Clean Debug",
+            "type": "shell",
+            "command": "make clean",
+            "windows": {
+                "command": "mingw32-make clean",
+            },
+            "options": {
+                "cwd": "${workspaceRoot}/Debug"
+            }, 
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "Clean Release",
+            "type": "shell",
+            "command": "make clean",
+            "windows": {
+                "command": "mingw32-make clean",
+            },
+            "options": {
+                "cwd": "${workspaceRoot}/Release"
+            }, 
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "Make Debug Firmware",
+            "type": "shell",
+            "command": "make -j8 all",
+            "windows": {
+                "command": "mingw32-make -j8 all",
+            },
+            "options": {
+                "cwd": "${workspaceRoot}/Debug"
+            }, 
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "Make Release Firmware",
+            "type": "shell",
+            "command": "make -j8 all",
+            "windows": {
+                "command": "mingw32-make -j8 all",
+            },
+            "options": {
+                "cwd": "${workspaceRoot}/Release"
+            }, 
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "Load Debug Firmware",
+            "type": "shell",
+            "command": "openocd -f interface/stlink.cfg -f target/klx.cfg -c \"program i6.elf verify reset exit\"",
+            "options": {
+                "cwd": "${workspaceRoot}/Debug"
+            },
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "Load Release Firmware",
+            "type": "shell",
+            "command": "openocd -f interface/stlink.cfg -f target/klx.cfg -c \"program fs-i6.elf verify reset exit\"",
+            "options": {
+                "cwd": "${workspaceRoot}/Release"
+            },
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "problemMatcher": []
+        }
+    ]
+}

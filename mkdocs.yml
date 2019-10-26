@@ -1,0 +1,15 @@
+site_name: FS-i6 SilverLite
+nav:
+    - Home: index.md
+    - Setup: devEnvSetup.md
+
+
+
+theme:
+  name: 'material'
+
+# So that the sidebar links work correctly when using *file* server rather than a real web server
+# we neeed to set `use_directory_urls` to False (default is True)
+# IOW, comment out the following line if you're going to use a server to host the documentation
+#use_directory_urls: False
+

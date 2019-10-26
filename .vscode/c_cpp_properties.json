@@ -1,0 +1,29 @@
+{
+    "configurations": [
+        {
+            "name": "Debug",
+            "includePath": [
+                "${env:VSARM}/armcc/arm-none-eabi/include/c++/8.3.1",
+                "${env:VSARM}/armcc/arm-none-eabi/include/c++/8.3.1/arm-none-eabi",
+                "${env:VSARM}/armcc/arm-none-eabi/include/c++/8.3.1/backward",
+                "${env:VSARM}/armcc/lib/gcc/arm-none-eabi/8.3.1/include",
+                "${env:VSARM}/armcc/lib/gcc/arm-none-eabi/8.3.1/include-fixed",
+                "${env:VSARM}/armcc/arm-none-eabi/include",
+
+                "${workspaceFolder}/**"
+            ],
+            "defines": [
+            ],
+            "intelliSenseMode": "clang-x64",
+            "browse": {
+                "path": [
+                    "${workspaceFolder}",
+                    "${env:VSARM}/armcc"
+                ],
+                "limitSymbolsToIncludedHeaders": false,
+                "databaseFilename": ""
+            }
+        }
+    ],
+    "version": 4
+}
