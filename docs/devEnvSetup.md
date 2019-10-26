@@ -412,6 +412,7 @@ Replace it with this:
             "cwd": "${workspaceRoot}",
             "executable": "./Debug/i6.elf",
             "device": "Kinetis",
+            "svdFile": "${workspaceRoot}/.vscode/MKL16Z4.svd",
             "configFiles": [
                 "interface/stlink.cfg",
                 "target/klx.cfg",
@@ -425,6 +426,7 @@ Replace it with this:
             "cwd": "${workspaceRoot}",
             "executable": "./Debug/i6.elf",
             "device": "Kinetis",
+            "svdFile": "${workspaceRoot}/.vscode/MKL16Z4.svd",
             "configFiles": [
                 "interface/stlink.cfg",
                 "target/klx.cfg",
@@ -437,6 +439,9 @@ Replace it with this:
 Some useful info about these configs can be found here: <https://marcelball.ca/projects/cortex-debug/cortex-debug-launch-configurations/>
 
 After these additions have been made you can click on the Debug icon on the left of VSCode and be able to execute one of these configurations. 
+
+Regarding the `.svd` file in the above config. A Google search for `kinetis svd files` led me to this: <https://github.com/posborne/cmsis-svd/issues/29>
+which in turn led me to this: <https://github.com/hackrid/KDS_SVD/blob/master/KDS_3_2/MKL16Z4.svd>. 
 
 ### "semihosting"
 It is possible to direct `printf` messages (`stdout`) to the debug interface. This capability is known as *semihosting*.

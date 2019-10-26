@@ -9,6 +9,7 @@
             "cwd": "${workspaceRoot}",
             "executable": "./Debug/i6.elf",
             "device": "Kinetis",
+            "svdFile": "${workspaceRoot}/.vscode/MKL16Z4.svd",
             "configFiles": [
                 "interface/stlink.cfg",
                 "target/klx.cfg",
@@ -22,6 +23,7 @@
             "cwd": "${workspaceRoot}",
             "executable": "./Debug/i6.elf",
             "device": "Kinetis",
+            "svdFile": "${workspaceRoot}/.vscode/MKL16Z4.svd",
             "configFiles": [
                 "interface/stlink.cfg",
                 "target/klx.cfg",
