@@ -47,7 +47,7 @@ endif
 
 # Add inputs and outputs from these tool invocations to the build variables 
 SECONDARY_FLASH += \
-i6.hex \
+i6.bin \
 
 SECONDARY_SIZE += \
 i6.siz \
@@ -64,9 +64,9 @@ i6.elf: $(OBJS) $(USER_OBJS)
 	@echo 'Finished building target: $@'
 	@echo ' '
 
-i6.hex: i6.elf
+i6.bin: i6.elf
 	@echo 'Invoking: Cross ARM GNU Create Flash Image'
-	arm-none-eabi-objcopy -O ihex "i6.elf"  "i6.hex"
+	arm-none-eabi-objcopy -O binary "i6.elf"  "i6.bin"
 	@echo 'Finished building: $@'
 	@echo ' '
 
