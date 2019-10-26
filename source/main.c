@@ -48,7 +48,6 @@
 #include "fsl_dma.h"
 #include "fsl_dmamux.h"
 #include "fsl_uart.h"
-#include "flysky.h"
 
 #define BACKLIGHT_LED_GPIO GPIOB
 #define BACKLIGHT_LED_PIN 0

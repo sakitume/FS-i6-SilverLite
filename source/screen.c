@@ -34,7 +34,6 @@ static uint8_t  screen_font_color;
 
 void screen_init(void) {
     screen_clear();
-    led_backlight_on();
 }
 
 void screen_clear(void) {

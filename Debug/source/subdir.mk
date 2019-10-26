@@ -11,7 +11,6 @@ C_SRCS += \
 ../source/font.c \
 ../source/lcd.c \
 ../source/main.c \
-../source/print.c \
 ../source/screen.c \
 ../source/uart.c
 
@@ -23,7 +22,6 @@ OBJS += \
 ./source/font.o \
 ./source/lcd.o \
 ./source/main.o \
-./source/print.o \
 ./source/screen.o \
 ./source/uart.o
 
@@ -35,7 +33,6 @@ C_DEPS += \
 ./source/font.d \
 ./source/lcd.d \
 ./source/main.d \
-./source/print.d \
 ./source/screen.d \
 ./source/uart.d
 
@@ -43,7 +40,7 @@ C_DEPS += \
 source/%.o: ../source/%.c
 	@echo 'Building file: $<'
 	@echo 'Invoking: Cross ARM C Compiler'
-	arm-none-eabi-gcc -mcpu=cortex-m0plus -mthumb -Os $(PARAMS) -fmessage-length=0 -fsigned-char -ffunction-sections -fdata-sections -Wall  -g -D"CPU_MKL16Z64VLH4" -I../startup -I../board -I../utilities -I../CMSIS -I../drivers -std=gnu99 -MMD -MP -MF"$(@:%.o=%.d)" -MT"$@" -c -o "$@" "$<"
+	arm-none-eabi-gcc -mcpu=cortex-m0plus -mthumb -Os $(PARAMS) -fmessage-length=0 -fsigned-char -ffunction-sections -fdata-sections -Wall -Werror=implicit-function-declaration -g -D"CPU_MKL16Z64VLH4" -I../startup -I../board -I../utilities -I../CMSIS -I../drivers -std=gnu99 -MMD -MP -MF"$(@:%.o=%.d)" -MT"$@" -c -o "$@" "$<"
 	@echo 'Finished building: $<'
 	@echo ' '
 
