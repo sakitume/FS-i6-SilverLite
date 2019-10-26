@@ -8,15 +8,12 @@
             "type": "shell",
             "command": "make clean",
             "windows": {
-                "command": "mingw32-make clean",
+                "command": "mingw32-make clean"
             },
             "options": {
                 "cwd": "${workspaceRoot}/Debug"
-            }, 
-            "group": {
-                "kind": "build",
-                "isDefault": true
             },
+            "group": "build",
             "problemMatcher": []
         },
         {
@@ -24,15 +21,12 @@
             "type": "shell",
             "command": "make clean",
             "windows": {
-                "command": "mingw32-make clean",
+                "command": "mingw32-make clean"
             },
             "options": {
                 "cwd": "${workspaceRoot}/Release"
-            }, 
-            "group": {
-                "kind": "build",
-                "isDefault": true
             },
+            "group": "build",
             "problemMatcher": []
         },
         {
@@ -40,14 +34,18 @@
             "type": "shell",
             "command": "make -j8 all",
             "windows": {
-                "command": "mingw32-make -j8 all",
+                "command": "mingw32-make -j8 all"
             },
             "options": {
                 "cwd": "${workspaceRoot}/Debug"
-            }, 
+            },
             "group": {
                 "kind": "build",
                 "isDefault": true
+            },
+            "presentation": {
+                "reveal": "always",
+                "clear": true
             },
             "problemMatcher": []
         },
@@ -56,15 +54,12 @@
             "type": "shell",
             "command": "make -j8 all",
             "windows": {
-                "command": "mingw32-make -j8 all",
+                "command": "mingw32-make -j8 all"
             },
             "options": {
                 "cwd": "${workspaceRoot}/Release"
-            }, 
-            "group": {
-                "kind": "build",
-                "isDefault": true
             },
+            "group": "build",
             "problemMatcher": []
         },
         {
@@ -74,10 +69,7 @@
             "options": {
                 "cwd": "${workspaceRoot}/Debug"
             },
-            "group": {
-                "kind": "build",
-                "isDefault": true
-            },
+            "group": "build",
             "problemMatcher": []
         },
         {
@@ -87,10 +79,7 @@
             "options": {
                 "cwd": "${workspaceRoot}/Release"
             },
-            "group": {
-                "kind": "build",
-                "isDefault": true
-            },
+            "group": "build",
             "problemMatcher": []
         }
     ]

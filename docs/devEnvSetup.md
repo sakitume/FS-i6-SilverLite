@@ -261,15 +261,12 @@ Replace the contents of this file with the following:
             "type": "shell",
             "command": "make clean",
             "windows": {
-                "command": "mingw32-make clean",
+                "command": "mingw32-make clean"
             },
             "options": {
                 "cwd": "${workspaceRoot}/Debug"
-            }, 
-            "group": {
-                "kind": "build",
-                "isDefault": true
             },
+            "group": "build",
             "problemMatcher": []
         },
         {
@@ -277,15 +274,12 @@ Replace the contents of this file with the following:
             "type": "shell",
             "command": "make clean",
             "windows": {
-                "command": "mingw32-make clean",
+                "command": "mingw32-make clean"
             },
             "options": {
                 "cwd": "${workspaceRoot}/Release"
-            }, 
-            "group": {
-                "kind": "build",
-                "isDefault": true
             },
+            "group": "build",
             "problemMatcher": []
         },
         {
@@ -293,14 +287,18 @@ Replace the contents of this file with the following:
             "type": "shell",
             "command": "make -j8 all",
             "windows": {
-                "command": "mingw32-make -j8 all",
+                "command": "mingw32-make -j8 all"
             },
             "options": {
                 "cwd": "${workspaceRoot}/Debug"
-            }, 
+            },
             "group": {
                 "kind": "build",
                 "isDefault": true
+            },
+            "presentation": {
+                "reveal": "always",
+                "clear": true
             },
             "problemMatcher": []
         },
@@ -309,15 +307,12 @@ Replace the contents of this file with the following:
             "type": "shell",
             "command": "make -j8 all",
             "windows": {
-                "command": "mingw32-make -j8 all",
+                "command": "mingw32-make -j8 all"
             },
             "options": {
                 "cwd": "${workspaceRoot}/Release"
-            }, 
-            "group": {
-                "kind": "build",
-                "isDefault": true
             },
+            "group": "build",
             "problemMatcher": []
         },
         {
@@ -327,10 +322,7 @@ Replace the contents of this file with the following:
             "options": {
                 "cwd": "${workspaceRoot}/Debug"
             },
-            "group": {
-                "kind": "build",
-                "isDefault": true
-            },
+            "group": "build",
             "problemMatcher": []
         },
         {
@@ -340,10 +332,7 @@ Replace the contents of this file with the following:
             "options": {
                 "cwd": "${workspaceRoot}/Release"
             },
-            "group": {
-                "kind": "build",
-                "isDefault": true
-            },
+            "group": "build",
             "problemMatcher": []
         }
     ]
@@ -449,3 +438,32 @@ It is possible to direct `printf` messages (`stdout`) to the debug interface. Th
 > Note: I discovered this via Google and reading about this: <https://dzone.com/articles/semihosting-gnu-arm-embedded> and also <https://bgamari.github.io/posts/2014-10-31-semihosting.html>
 
 I have not yet attempted using this feature but will investigate this soon.
+
+## Add "Shortcuts" extension to VSCode
+The ["Shortcuts"](https://marketplace.visualstudio.com/items?itemName=gizak.shortcuts) extension will install clickable icons on the bottom status bar of VSCode. Each icon is a shortcut to a vscode command.
+
+Setting this up was tricky. There's no clear documentation that I could find. 
+Press `F1` key and type `preferences workspace`. Select `Preferences: Open Workspace Settings`. Enter `shortcuts` in the search bar. Hover your mouse cursor over "Shortcuts: Buttons" and a gear icon will appear. Click on the gear icon and choose "Copy Setting as JSON" (this will ), then click on "Edit in settings.json". Position the cursor between the curly brackets and then paste (`Ctrl+V`/`Cmd+V`) the copied setting into the file. 
+
+The file should look like this:
+```
+"shortcuts.buttons": [
+  "file-binary , workbench.action.tasks.build , Run build task",
+  "beaker , workbench.action.tasks.test , Run test task",
+  "terminal , workbench.action.terminal.toggleTerminal , Toggle terminal panel",
+  "telescope , workbench.action.showCommands , Show command palette",
+  "bug, workbench.action.debug.start, Launch debug"
+]
+```
+
+This will create 5 new icons on the bottom status bar. I'd prefer to customize these to just 3. So replace the above contents with the following:
+
+```
+"shortcuts.buttons": [
+  "file-binary , workbench.action.tasks.build , Run Build Task",
+  "rocket , workbench.action.tasks.runTask , Run Task",
+  "bug, workbench.action.debug.start, Launch Debug"
+]
+```
+
+The first icon ("file-binary") should launch the "Make Debug Firmware" task (because that is the only one marked as the default build task). The second icon will execute the "Tasks: Run Task" command which reveals a dropdown menu of the available tasks. And the third icon will launch a debugging session.

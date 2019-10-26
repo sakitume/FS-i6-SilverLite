@@ -1,0 +1,8 @@
+{
+    // Go here to see the available icons: https://octicons.github.com/icon/rocket/
+    "shortcuts.buttons": [
+        "file-binary , workbench.action.tasks.build , Run Build Task",
+        "rocket , workbench.action.tasks.runTask , Run Task",
+        "bug, workbench.action.debug.start, Launch Debug"
+      ]
+}
