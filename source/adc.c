@@ -28,15 +28,15 @@ static uint16_t adc_data[ADC_CHANNEL_COUNT];
 static uint16_t adc_battery_voltage_raw_filtered;
 
 static const uint8_t adac_channels[] = {
-	7,
-	6,
-	5,
-	11,
-	3,
-	7,
-	4,
-	14,
-	15,
+	7,  // ADC0_SE7b, Ch1 Roll
+	6,  // ADC0_SE6b, Ch2 Pitch
+	5,  // ADC0_SE5b, Ch3 Throttle
+	11, // ADC0_SE11, Ch4 Yaw
+	3,  // ADC0_SE3,  Ch5 VrA
+	7,  // ADC0_SE7a, Ch6 VrB
+	4,  // ADC0_SE4b, Battery Voltage
+	14, // ADC0_SE14, SwC
+	15, // ADC0_SE15, SwB
 };
 
 
