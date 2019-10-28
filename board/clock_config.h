@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2015, Freescale Semiconductor, Inc.
- * All rights reserved.
+ * Copyright 2016-2017 NXP
  *
  * Redistribution and use in source and binary forms, with or without modification,
  * are permitted provided that the following conditions are met:
@@ -12,7 +12,7 @@
  *   list of conditions and the following disclaimer in the documentation and/or
  *   other materials provided with the distribution.
  *
- * o Neither the name of Freescale Semiconductor, Inc. nor the names of its
+ * o Neither the name of the copyright holder nor the names of its
  *   contributors may be used to endorse or promote products derived from this
  *   software without specific prior written permission.
  *
@@ -68,6 +68,41 @@ extern "C" {
  *
  */
 void BOARD_BootClockRUN(void);
+
+#if defined(__cplusplus)
+}
+#endif /* __cplusplus*/
+
+/*******************************************************************************
+ ********************* Configuration BOARD_BootClockVLPR ***********************
+ ******************************************************************************/
+/*******************************************************************************
+ * Definitions for BOARD_BootClockVLPR configuration
+ ******************************************************************************/
+#define BOARD_BOOTCLOCKVLPR_CORE_CLOCK              4000000U  /*!< Core clock frequency: 4000000Hz */
+
+/*! @brief MCG set for BOARD_BootClockVLPR configuration.
+ */
+extern const mcg_config_t mcgConfig_BOARD_BootClockVLPR;
+/*! @brief SIM module set for BOARD_BootClockVLPR configuration.
+ */
+extern const sim_clock_config_t simConfig_BOARD_BootClockVLPR;
+/*! @brief OSC set for BOARD_BootClockVLPR configuration.
+ */
+extern const osc_config_t oscConfig_BOARD_BootClockVLPR;
+
+/*******************************************************************************
+ * API for BOARD_BootClockVLPR configuration
+ ******************************************************************************/
+#if defined(__cplusplus)
+extern "C" {
+#endif /* __cplusplus*/
+
+/*!
+ * @brief This function executes configuration of clocks.
+ *
+ */
+void BOARD_BootClockVLPR(void);
 
 #if defined(__cplusplus)
 }
