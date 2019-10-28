@@ -12,6 +12,7 @@ C_SRCS += \
 ../source/lcd.c \
 ../source/main.c \
 ../source/screen.c \
+../source/drv_time.c \
 ../source/uart.c
 
 OBJS += \
@@ -23,6 +24,7 @@ OBJS += \
 ./source/lcd.o \
 ./source/main.o \
 ./source/screen.o \
+./source/drv_time.o \
 ./source/uart.o
 
 C_DEPS += \
@@ -34,6 +36,7 @@ C_DEPS += \
 ./source/lcd.d \
 ./source/main.d \
 ./source/screen.d \
+./source/drv_time.d \
 ./source/uart.d
 
 # Each subdirectory must supply rules for building sources it contributes

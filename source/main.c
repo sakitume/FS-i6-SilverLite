@@ -43,23 +43,12 @@
 #include "debug.h"
 #include "adc.h"
 #include "backlight.h"
+#include "drv_time.h"
 #include "MKL16Z4.h"
 #include "fsl_common.h"
 #include "fsl_dma.h"
 #include "fsl_dmamux.h"
 #include "fsl_uart.h"
-
-#define BACKLIGHT_LED_GPIO GPIOB
-#define BACKLIGHT_LED_PIN 0
-
-void delay(void)
-{
-    volatile uint32_t i = 0;
-    for (i = 0; i < 800000; ++i)
-    {
-        __asm("NOP"); /* delay */
-    }
-}
 
 /*!
  * @brief Application entry point.
@@ -71,6 +60,7 @@ int main(void)
     BOARD_BootClockRUN();
     BOARD_SysTick();
     BOARD_InitDebugConsole();
+
 
     lcd_init();
     backlightInit();
@@ -84,8 +74,32 @@ int main(void)
 
     while (1)
     {
+        unsigned long totalMicros = micros();  // Should be called at least once every 16ms
+
+#if 0  
+        // Test delay()
+        delay_us(5432);
+        unsigned long delta = micros() - totalMicros;
+        screen_clear();
+        screen_put_uint14(10, 10, 1, delta);
+        screen_update();
+        _delay_ms(100);
+#endif        
+
+#if 1        
         adc_test();
         adc_test2();
-//        delay();
+#endif
+
+#if 0
+        screen_test();        
+#endif        
+
+#if 0   // Test micros()
+        screen_clear();
+        screen_put_time(10, 10, 1, totalMicros / 1000000);
+        screen_update();
+         _delay_ms(100);
+#endif         
     }
 }
