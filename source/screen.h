@@ -25,8 +25,7 @@
 #include "lcd.h"
 
 #define SCREEN_BUFFER_SIZE ((LCD_WIDTH * LCD_HEIGHT) / 8)
-uint8_t __attribute__((section (".screenBuffer"))) screen_buffer[SCREEN_BUFFER_SIZE];
-//unsigned uint8_t __attribute__((section (".GFX_ARRAY"))) screen_buffer[SCREEN_BUFFER_SIZE];
+extern uint8_t __attribute__((section (".screenBuffer"))) screen_buffer[SCREEN_BUFFER_SIZE];
 
 void screen_init(void);
 void screen_clear(void);
