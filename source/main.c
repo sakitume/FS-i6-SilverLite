@@ -57,7 +57,7 @@ int main(void)
 
 
     lcd_init();
-    backlightInit();
+    led_backlight_init();
     screen_init();
     console_init();
     debug_init();
@@ -75,7 +75,7 @@ int main(void)
         uart_test();
 #endif
 
-#if 0       
+#if 1       
         buttons_test();
 #endif        
 
