@@ -9,24 +9,23 @@
 #include "backlight.h"
 #include "MKL16Z4.h"
 #include "fsl_gpio.h"
+#include "pin_mux.h"
 
-static gpio_pin_config_t led_config = {
-	kGPIO_DigitalOutput, 0,
-};
-
-void backlightInit(void)
+void led_backlight_init(void)
 {
+	gpio_pin_config_t led_config = {
+		kGPIO_DigitalOutput, 1,
+	};
 	/* Init output LED GPIO. */
-	GPIO_PinInit(BACKLIGHT_LED_GPIO, BACKLIGHT_LED_PIN, &led_config);
-	GPIO_SetPinsOutput(BACKLIGHT_LED_GPIO, (1U << BACKLIGHT_LED_PIN));
+	GPIO_PinInit(BOARD_INITPINS_LED_BACKLIGHT_GPIO, BOARD_INITPINS_LED_BACKLIGHT_PIN, &led_config);
 }
 
 void led_backlight_on()
 {
-	GPIO_SetPinsOutput(BACKLIGHT_LED_GPIO, (1U << BACKLIGHT_LED_PIN));
+	GPIO_WritePinOutput(BOARD_INITPINS_LED_BACKLIGHT_GPIO, BOARD_INITPINS_LED_BACKLIGHT_PIN, 1);
 }
 
 void led_backlight_off()
 {
-	GPIO_ClearPinsOutput(BACKLIGHT_LED_GPIO, (1U << BACKLIGHT_LED_PIN));
+	GPIO_WritePinOutput(BOARD_INITPINS_LED_BACKLIGHT_GPIO, BOARD_INITPINS_LED_BACKLIGHT_PIN, 0);
 }
