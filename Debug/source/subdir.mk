@@ -6,6 +6,7 @@
 C_SRCS += \
 ../source/adc.c \
 ../source/backlight.c \
+../source/buttons.cpp \
 ../source/console.c \
 ../source/debug.c \
 ../source/font.c \
@@ -18,6 +19,7 @@ C_SRCS += \
 OBJS += \
 ./source/adc.o \
 ./source/backlight.o \
+./source/buttons.o \
 ./source/console.o \
 ./source/debug.o \
 ./source/font.o \
@@ -30,6 +32,7 @@ OBJS += \
 C_DEPS += \
 ./source/adc.d \
 ./source/backlight.d \
+./source/buttons.d \
 ./source/console.d \
 ./source/debug.d \
 ./source/font.d \
