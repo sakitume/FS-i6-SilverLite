@@ -2,6 +2,7 @@
 #include "drv_time.h"
 #include "board.h"
 #include "clock_config.h"
+#include "screen.h"
 
 static unsigned long lastticks;
 static unsigned long globalticks;
@@ -118,3 +119,23 @@ void delay_ms(uint32_t ms)
     }
 }
 
+void delay_test(void)
+{
+    unsigned long startTime = micros();
+    // Test delay()
+    delay_us(5432);
+    unsigned long delta = micros() - startTime;
+    screen_clear();
+    screen_put_uint14(10, 10, 1, delta);
+    screen_update();
+    delay_ms(100);
+}
+
+void delay_test2(void)
+{
+    unsigned long totalMicros = micros();
+    screen_clear();
+    screen_put_time(10, 10, 1, totalMicros / 1000000);
+    screen_update();
+    delay_ms(100);
+}

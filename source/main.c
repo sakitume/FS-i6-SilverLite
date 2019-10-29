@@ -79,19 +79,15 @@ int main(void)
         buttons_test();
 #endif        
 
-#if 0
-        uart_test();
-#endif        
-
 #if 0  
-        // Test delay()
-        delay_us(5432);
-        unsigned long delta = micros() - totalMicros;
-        screen_clear();
-        screen_put_uint14(10, 10, 1, delta);
-        screen_update();
-        _delay_ms(100);
+        extern void delay_test(void);
+        delay_test();
 #endif        
+#if 0   
+        // Test micros()
+        extern void delay_test2(void);
+        delay_test2();
+#endif         
 
 #if 0        
         adc_test();
@@ -101,12 +97,5 @@ int main(void)
 #if 0
         screen_test();        
 #endif        
-
-#if 0   // Test micros()
-        screen_clear();
-        screen_put_time(10, 10, 1, totalMicros / 1000000);
-        screen_update();
-         _delay_ms(100);
-#endif         
     }
 }
