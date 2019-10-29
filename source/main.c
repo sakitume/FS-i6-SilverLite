@@ -35,24 +35,18 @@
 #include "board.h"
 #include "pin_mux.h"
 #include "clock_config.h"
+
 #include "delay.h"
-#include "fsl_gpio.c"
 #include "lcd.h"
 #include "console.h"
 #include "screen.h"
 #include "debug.h"
 #include "adc.h"
 #include "backlight.h"
+#include "buttons.h"
 #include "drv_time.h"
-#include "MKL16Z4.h"
-#include "fsl_common.h"
-#include "fsl_dma.h"
-#include "fsl_dmamux.h"
-#include "fsl_uart.h"
+#include "uart.h"
 
-/*!
- * @brief Application entry point.
- */
 int main(void)
 {
     /* Init board hardware. */
@@ -68,13 +62,26 @@ int main(void)
     console_init();
     debug_init();
     adc_init();
-
-//    led_backlight_on();
-    //  screen_test();
+    uart_init();
+    buttons_init();
 
     while (1)
     {
         unsigned long totalMicros = micros();  // Should be called at least once every 16ms
+        buttons_update();
+        uart_update();
+
+#if 0
+        uart_test();
+#endif
+
+#if 0       
+        buttons_test();
+#endif        
+
+#if 0
+        uart_test();
+#endif        
 
 #if 0  
         // Test delay()
@@ -86,7 +93,7 @@ int main(void)
         _delay_ms(100);
 #endif        
 
-#if 1        
+#if 0        
         adc_test();
         adc_test2();
 #endif

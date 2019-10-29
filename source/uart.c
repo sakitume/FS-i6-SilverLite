@@ -1,75 +1,110 @@
-#include "uart.h"
 #include "MKL16Z4.h"
 #include "fsl_common.h"
 #include "fsl_dma.h"
 #include "fsl_dmamux.h"
 #include "fsl_uart.h"
-const char testdata[]={"test"};
 
-void sendDataDMA3(const char *buf, uint32_t length){
+/*******************************************************************************
+ * Definitions
+ ******************************************************************************/
+/* UART instance and clock */
+#define DEMO_UART UART2
+#define DEMO_UART_CLKSRC BUS_CLK
+#define DEMO_UART_CLK_FREQ CLOCK_GetFreq(BUS_CLK)
+#define DEMO_UART_IRQn UART2_IRQn
+#define DEMO_UART_IRQHandler UART2_IRQHandler
 
-	SIM->SCGC6 |= SIM_SCGC6_DMAMUX_MASK;
-	SIM->SCGC7 |= SIM_SCGC7_DMA_MASK;
+/*! @brief Ring buffer size (Unit: Byte). */
+#define DEMO_RING_BUFFER_SIZE 16
 
-	DMAMUX0->CHCFG[3] = 0x00;
-	DMAMUX0->CHCFG[3] |= 0x7;
+/*! @brief Ring buffer to save received data. */
 
-	DMA0->DMA[3].DCR &= ~(DMA_DCR_SSIZE_MASK | DMA_DCR_DSIZE_MASK);
-	DMA0->DMA[3].DAR = (uint32_t)&UART2->D;
-	DMA0->DMA[3].DCR = DMA_DCR_EINT_MASK|DMA_DCR_CS_MASK|DMA_DCR_SINC_MASK|DMA_DCR_SSIZE(1)|DMA_DCR_DSIZE(1);
-	DMA0->DMA[3].SAR = (uint32_t) buf;
-	DMA0->DMA[3].DSR_BCR = DMA_DSR_BCR_BCR(length);
-	DMA0->DMA[3].DCR |= DMA_DCR_ERQ_MASK;
-	//DMA0->DMA[3].DCR |= DMA_DCR_START_MASK;
-	//disabled for debug
-	//NVIC->ISER[0U] = (uint32_t)(1UL << 3);
-	DMAMUX0->CHCFG[3] |= DMAMUX_CHCFG_ENBL_MASK;
+/*******************************************************************************
+ * Prototypes
+ ******************************************************************************/
 
+/*******************************************************************************
+ * Variables
+ ******************************************************************************/
+
+uint8_t g_tipString[] =
+    "Uart functional API interrupt example\r\nBoard receives characters then sends them out\r\nNow please input:\r\n";
+
+/*
+  Ring buffer for data input and output, in this example, input data are saved
+  to ring buffer in IRQ handler. The main function polls the ring buffer status,
+  if there are new data, then send them out.
+  Ring buffer full: (((rxIndex + 1) % DEMO_RING_BUFFER_SIZE) == txIndex)
+  Ring buffer empty: (rxIndex == txIndex)
+*/
+uint8_t demoRingBuffer[DEMO_RING_BUFFER_SIZE];
+volatile uint16_t txIndex; /* Index of the data to send out. */
+volatile uint16_t rxIndex; /* Index of the memory to save new arrived data. */
+
+/*******************************************************************************
+ * Code
+ ******************************************************************************/
+
+void DEMO_UART_IRQHandler(void)
+{
+    uint8_t data;
+
+    /* If new data arrived. */
+    if ((kUART_RxDataRegFullFlag | kUART_RxOverrunFlag) & UART_GetStatusFlags(DEMO_UART))
+    {
+        data = UART_ReadByte(DEMO_UART);
+
+        /* If ring buffer is not full, add data to ring buffer. */
+        if (((rxIndex + 1) % DEMO_RING_BUFFER_SIZE) != txIndex)
+        {
+            demoRingBuffer[rxIndex] = data;
+            rxIndex++;
+            rxIndex %= DEMO_RING_BUFFER_SIZE;
+        }
+    }
 }
-void DMA3_IRQHandler(void){
-	volatile uint32_t* dma_dsr_bcr0_reg = &DMA0->DMA[3].DSR_BCR;
-	uint32_t dma_dsr_bcr0_val = *dma_dsr_bcr0_reg;
 
-	if (((dma_dsr_bcr0_val & DMA_DSR_BCR_DONE_MASK) == DMA_DSR_BCR_DONE_MASK)
-	     | ((dma_dsr_bcr0_val & DMA_DSR_BCR_BES_MASK) == DMA_DSR_BCR_BES_MASK)
-	     | ((dma_dsr_bcr0_val & DMA_DSR_BCR_BED_MASK) == DMA_DSR_BCR_BED_MASK)
-	     | ((dma_dsr_bcr0_val & DMA_DSR_BCR_CE_MASK) == DMA_DSR_BCR_CE_MASK))
+//------------------------------------------------------------------------------
+void uart_init()
+{
+    uart_config_t config;
+
+    /*
+     * config.baudRate_Bps = 115200U;
+     * config.parityMode = kUART_ParityDisabled;
+     * config.stopBitCount = kUART_OneStopBit;
+     * config.txFifoWatermark = 0;
+     * config.rxFifoWatermark = 1;
+     * config.enableTx = false;
+     * config.enableRx = false;
+     */
+    UART_GetDefaultConfig(&config);
+    config.baudRate_Bps = 115200;
+    config.enableTx = true;
+    config.enableRx = true;
+
+    UART_Init(DEMO_UART, &config, DEMO_UART_CLK_FREQ);
+
+    /* Send g_tipString out. */
+    UART_WriteBlocking(DEMO_UART, g_tipString, sizeof(g_tipString) / sizeof(g_tipString[0]));
+
+    /* Enable RX interrupt. */
+    UART_EnableInterrupts(DEMO_UART, kUART_RxDataRegFullInterruptEnable | kUART_RxOverrunInterruptEnable);
+    EnableIRQ(DEMO_UART_IRQn);
+}
+
+void uart_update(void)
+{
+	/* Send data only when UART TX register is empty and ring buffer has data to send out. */
+	while ((kUART_TxDataRegEmptyFlag & UART_GetStatusFlags(DEMO_UART)) && (rxIndex != txIndex))
 	{
-		DMA0->DMA[3].DSR_BCR |= DMA_DSR_BCR_DONE_MASK;                //Clear Done bit
-		DMA0->DMA[3].DSR_BCR= DMA_DSR_BCR_BCR(0);      //Reset BC
-		DMA0->DMA[3].DCR &= ~DMA_DCR_ERQ_MASK;
+		UART_WriteByte(DEMO_UART, demoRingBuffer[txIndex]);
+		txIndex++;
+		txIndex %= DEMO_RING_BUFFER_SIZE;
 	}
-
-	DMAMUX0->CHCFG[3] &= ~(DMAMUX_CHCFG_ENBL_MASK);
-	NVIC->ISER[0U] = (uint32_t)(1UL << 3);
-	sendDataDMA3(testdata, 10);
 }
 
-//#define UART_CLOCK /()
-void rxTest2(void){
-	SIM->SCGC4 |=  SIM_SCGC4_UART2_MASK;
-	SIM->SCGC5 |=  SIM_SCGC5_PORTE_MASK;
-	PORTE->PCR[16] |= 3 << 8; //4004D040
-	PORTE->PCR[17] |= 3 << 8; //4004D044
-
-	// 48000000 / (115200 * 16) = 26 115384
-	// 48000000 / (9600 * 16) = 312
-	//uint32_t targetRate = 9600; //115200
-	//uint32_t srcClock_Hz = 48000000;
-
-	/* Calculate the baud rate modulo divisor, sbr*/
-	//uint16_t sbr = 48000000 / (targetRate * 16); = 26
-	//uint16_t sbr = 11;
-	uint16_t sbr = 26;
-	UART2->C2 &= ~(UART_C2_TE_MASK | UART_C2_RE_MASK);
-	UART2->BDH = (UART2->BDH & ~UART_BDH_SBR_MASK) | (uint8_t)(sbr >> 8);
-	UART2->BDL = (uint8_t)sbr;
-	/* Set bit count and parity mode. */
-	UART2->C1 = UART2->C1 & ~(UART_C1_PE_MASK | UART_C1_PT_MASK | UART_C1_M_MASK);
-	UART2->BDH = (UART2->BDH & ~UART_BDH_SBNS_MASK) | UART_BDH_SBNS((uint8_t)0);
-
-	UART2->C2 |= UART_C2_TE_MASK | UART_C2_TIE_MASK;
-	UART2->C4 |= UART_C4_TDMAS_MASK;
-	//disabled for debug
-	sendDataDMA3(testdata, (uint32_t)2U);
+void uart_test(void)
+{
+	// NOTHING
 }
