@@ -22,10 +22,11 @@
 #include <stdbool.h>
 #include <stdint.h>
 #define ADC_CHANNEL_COUNT 9
+
 void adc_init(void);
+void adc_update(void);  // currently takes 183 microseconds
 void adc_test(void);
-void adc_test2(void);
-void adc_init_internal(void);
+
 /*
 static void adc_init_rcc(void);
 static void adc_init_gpio(void);

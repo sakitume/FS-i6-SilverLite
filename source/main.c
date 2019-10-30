@@ -91,7 +91,9 @@ int main(void)
     {
         // Call time_update() once at start of every loop
         unsigned long totalMillis = time_update();
+        unsigned long us_now = micros_this_frame();
         buttons_update();
+        adc_update();
 #if defined(__USE_TRAINER_PORT_UART__)
         uart_update();
 #endif        
@@ -117,12 +119,11 @@ int main(void)
 
 #if 0
         adc_test();
-        adc_test2();
 #endif
 
-#if 1
+#if 0
         unsigned long us_now = micros_realtime();
-        adc_test();
+        adc_update();
         unsigned long delta = micros_realtime() - us_now;
         console_clear();
         debug("ADC Update: ");
@@ -135,5 +136,7 @@ int main(void)
 #if 0
         screen_test();        
 #endif        
+
+        PRINTF("loop time: %d\n", micros_realtime() - us_now);
     }
 }

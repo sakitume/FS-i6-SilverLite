@@ -39,6 +39,7 @@ static const uint8_t adac_channels[] = {
 	15, // ADC0_SE15, SwB
 };
 
+static void adc_init_internal(void);
 
 void adc_init(void){
 	debug("adc: init\n"); debug_flush();
@@ -50,7 +51,8 @@ void adc_init(void){
     adc_init_internal();
 }
 
-void adc_init_internal(void){
+static void adc_init_internal(void)
+{
 	CLOCK_EnableClock(kCLOCK_Adc0);
 	CLOCK_EnableClock(kCLOCK_PortC);
 	CLOCK_EnableClock(kCLOCK_PortD);
@@ -86,7 +88,7 @@ void adc_init_internal(void){
 	ADC16_DoAutoCalibration(ADC0);
 }
 
-void adc_test(void){
+void adc_update(void){
 	for(int i =0; i < ADC_CHANNEL_COUNT; i++){
 		if(i == 5) ADC0->CFG2 &= 0xFFFFFFEF; //select ADxxa
 		else ADC0->CFG2 |= 0x10; //select ADxxb
@@ -98,7 +100,7 @@ void adc_test(void){
 	}
 }
 
-void adc_test2(void) {
+void adc_test(void) {
         console_clear();
         debug("ADC TEST");
         debug_put_newline();
@@ -486,7 +488,7 @@ void adc_process(void) {
     }
 }
 
-void adc_test(void) {
+void adc_update(void) {
     while (1) {
         console_clear();
         debug("ADC TEST  BAT: ");
