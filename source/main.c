@@ -62,7 +62,7 @@ int main(void)
     console_init();
     debug_init();
     adc_init();
-    uart_init();
+//XXX    uart_init();
     buttons_init();
 
     while (1)
@@ -70,7 +70,7 @@ int main(void)
         // Call time_update() once at start of every loop
         unsigned long totalMillis = time_update();
         buttons_update();
-        uart_update();
+//XXX        uart_update();
 
 #if 0
         uart_test();

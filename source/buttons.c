@@ -17,6 +17,10 @@ struct ButtonState_t
 };
 static struct ButtonState_t buttons[4][3];  // only takes 12 bytes
 
+#ifdef __MEASURE_UPDATE_TIME__
+static unsigned long updateTime;
+#endif
+
 //------------------------------------------------------------------------------
 // Buttons are configured as a 4x3 matrix. L1-L4 are rows, R1-R3 are columns
 //
@@ -35,28 +39,50 @@ static struct ButtonState_t buttons[4][3];  // only takes 12 bytes
 //
 void buttons_init(void)
 {
-    // Must configure R1 thru R3 input pins to use internal pulldown and not pullup    
-    port_pin_config_t port_pin_config = {
+    // Configure R1 thru R3 as input pins with internal pulldown
+    port_pin_config_t input_pulldown = {
         kPORT_PullDown,
         kPORT_FastSlewRate,
         kPORT_PassiveFilterDisable,
         kPORT_LowDriveStrength,
         kPORT_MuxAsGpio,
     };
+#if 0    
+    PORT_SetPinConfig(BOARD_INITPINS_BUTTON_R1_PORT, BOARD_INITPINS_BUTTON_R1_PIN, &input_pulldown); // PORTB, 1
+    PORT_SetPinConfig(BOARD_INITPINS_BUTTON_R2_PORT, BOARD_INITPINS_BUTTON_R2_PIN, &input_pulldown); // PORTB, 2
+    PORT_SetPinConfig(BOARD_INITPINS_BUTTON_R3_PORT, BOARD_INITPINS_BUTTON_R3_PIN, &input_pulldown); // PORTB, 3
+#else
+    PORT_SetMultiplePinsConfig(BOARD_INITPINS_BUTTON_R1_PORT, 0
+        | (1 << BOARD_INITPINS_BUTTON_R1_PIN)
+        | (1 << BOARD_INITPINS_BUTTON_R2_PIN)
+        | (1 << BOARD_INITPINS_BUTTON_R3_PIN),
+        &input_pulldown
+    );        
+#endif    
 
-    PORT_SetPinConfig(BOARD_INITPINS_BUTTON_R1_PORT, BOARD_INITPINS_BUTTON_R1_PIN, &port_pin_config);
-    PORT_SetPinConfig(BOARD_INITPINS_BUTTON_R1_PORT, BOARD_INITPINS_BUTTON_R1_PIN, &port_pin_config); // PORTB, 1
-    PORT_SetPinConfig(BOARD_INITPINS_BUTTON_R2_PORT, BOARD_INITPINS_BUTTON_R2_PIN, &port_pin_config); // PORTB, 2
-    PORT_SetPinConfig(BOARD_INITPINS_BUTTON_R3_PORT, BOARD_INITPINS_BUTTON_R3_PIN, &port_pin_config); // PORTB, 3
-
-    // Configure L1 thru L4 as output pins with initial state of HIGH
-    gpio_pin_config_t pin_config_output = {
-        kGPIO_DigitalOutput, 1
+    // Configure L1 thru L4 as input pins with no pullup/pulldown
+    port_pin_config_t input_pulldisabled = {
+        kPORT_PullDisable,
+        kPORT_FastSlewRate,
+        kPORT_PassiveFilterDisable,
+        kPORT_LowDriveStrength,
+        kPORT_MuxAsGpio,
     };
-    GPIO_PinInit(BOARD_INITPINS_BUTTON_L1_GPIO, BOARD_INITPINS_BUTTON_L1_PIN, &pin_config_output); // PORTB, 16
-    GPIO_PinInit(BOARD_INITPINS_BUTTON_L2_GPIO, BOARD_INITPINS_BUTTON_L2_PIN, &pin_config_output); // PORTB, 17
-    GPIO_PinInit(BOARD_INITPINS_BUTTON_L3_GPIO, BOARD_INITPINS_BUTTON_L3_PIN, &pin_config_output); // PORTB, 18
-    GPIO_PinInit(BOARD_INITPINS_BUTTON_L4_GPIO, BOARD_INITPINS_BUTTON_L4_PIN, &pin_config_output); // PORTB, 19
+#if 0    
+    PORT_SetPinConfig(BOARD_INITPINS_BUTTON_L1_PORT, BOARD_INITPINS_BUTTON_L1_PIN, &input_pulldisabled);   // PORTB, 16
+    PORT_SetPinConfig(BOARD_INITPINS_BUTTON_L2_PORT, BOARD_INITPINS_BUTTON_L2_PIN, &input_pulldisabled);   // PORTB, 17
+    PORT_SetPinConfig(BOARD_INITPINS_BUTTON_L3_PORT, BOARD_INITPINS_BUTTON_L3_PIN, &input_pulldisabled);   // PORTB, 18
+    PORT_SetPinConfig(BOARD_INITPINS_BUTTON_L4_PORT, BOARD_INITPINS_BUTTON_L4_PIN, &input_pulldisabled);   // PORTB, 19
+#else
+    PORT_SetMultiplePinsConfig(BOARD_INITPINS_BUTTON_L1_PORT, 0
+        | (1 << BOARD_INITPINS_BUTTON_L1_PIN)
+        | (1 << BOARD_INITPINS_BUTTON_L2_PIN)
+        | (1 << BOARD_INITPINS_BUTTON_L3_PIN)
+        | (1 << BOARD_INITPINS_BUTTON_L4_PIN),
+        &input_pulldisabled
+    );        
+#endif    
+
 
     // Configure Bind, SwA and SwD pins as input (with internal pullup, but pulldown would also work)
     gpio_pin_config_t pin_config_input = {
@@ -85,15 +111,24 @@ void buttons_init(void)
 // If Down, Up, Ok or Cancel buttons are depressed then R3 goes high
 //
 //------------------------------------------------------------------------------
-static unsigned long updateTime;
 void buttons_update(void)
 {
+#ifdef __MEASURE_UPDATE_TIME__
     unsigned long usNow = micros_realtime();
+#endif    
 
     static unsigned long lastUpdate;
     unsigned long now = millis_this_frame();
     unsigned long elapsed = now - lastUpdate;
     lastUpdate = now;
+
+    // Reset toggled and currState for all buttons
+    struct ButtonState_t *pButton = &buttons[0][0];
+    for (int i=0; i<sizeof(buttons)/sizeof(buttons[0][0]); i++, pButton++)
+    {
+        pButton->toggled    = 0;
+        pButton->currState  = 0;
+    }
 
     // R1 is at bit 1, R2 is at bit 2, R3 is at bit 3
     // R1 bit mask would be: 0x02
@@ -112,12 +147,15 @@ void buttons_update(void)
     // For each row of the matrix (L1 thru L4 pins)
     for (int row=0; row<4; row++)
     {
-        // Set row pin LOW
-        const int pin = BOARD_INITPINS_BUTTON_L1_PIN + row;
-        BOARD_INITPINS_BUTTON_L1_GPIO->PCOR = 1 << pin;
+        // Set row pin to be output being low
+        gpio_pin_config_t pin_config_output = {
+            kGPIO_DigitalOutput, 0
+        };
+        GPIO_PinInit(BOARD_INITPINS_BUTTON_L1_GPIO, BOARD_INITPINS_BUTTON_L1_PIN + row, &pin_config_output);
 
         // We must have a slight delay for pin inputs to stabilize before trying to read
-        delay_us(1);
+// No: This is no longer needed now that I fixed row pins to not use internal pullups        
+//        __NOP();
 
         // Read state of R1, R2, R3 pins and see if anything changed
         const uint32_t testR1R2R3 = BOARD_INITPINS_BUTTON_R1_GPIO->PDIR & (kR1_Mask|kR2_Mask|kR3_Mask);
@@ -134,24 +172,18 @@ void buttons_update(void)
                 pButton->currState = (bit & diff) ? 1 : 0;
             }
         }
-        else
-        {
-            for (int col=0; col<3; col++)
-            {
-                buttons[row][col].currState = 0;
-            }
-        }
 
-        // Set pin back to HIGH
-        BOARD_INITPINS_BUTTON_L1_GPIO->PSOR = 1 << pin;
+        // Set row pin back to being an input
+        gpio_pin_config_t pin_config_input = {
+            kGPIO_DigitalInput, 0
+        };
+        GPIO_PinInit(BOARD_INITPINS_BUTTON_L1_GPIO, BOARD_INITPINS_BUTTON_L1_PIN + row, &pin_config_input);
     }
 
     // For each button
-    struct ButtonState_t *pButton = &buttons[0][0];
+    pButton = &buttons[0][0];
     for (int i=0; i<sizeof(buttons)/sizeof(buttons[0][0]); i++, pButton++)
     {
-        pButton->toggled    = 0;
-
         // If state has toggled then reload debounce countdown timer
         if (pButton->lastState != pButton->currState)
         {
@@ -178,7 +210,10 @@ void buttons_update(void)
         }
     }
 
+#ifdef __MEASURE_UPDATE_TIME__
+    // Testing reveals it takes 28us
     updateTime = micros_realtime() - usNow;
+#endif    
 }
 
 //------------------------------------------------------------------------------
@@ -204,8 +239,6 @@ void buttons_test(void)
         }
         debug("\n");
     }
-    debug("\n");
-
     debug("Bind: ");
     debug_putc('0'+GPIO_ReadPinInput(BOARD_INITPINS_Bind_GPIO, BOARD_INITPINS_Bind_PIN));
     debug("\n");
@@ -218,9 +251,12 @@ void buttons_test(void)
     debug_putc('0'+GPIO_ReadPinInput(BOARD_INITPINS_SwD_GPIO, BOARD_INITPINS_SwD_PIN));
     debug("\n");
 
+#ifdef __MEASURE_UPDATE_TIME__
+    // Previous runs of this test code show button_update() taking about 28 to 30 microseconds
     debug("Update: ");
     debug_put_hex16(updateTime);
     debug("\n");
+#endif
 
     debug_flush();
 }
