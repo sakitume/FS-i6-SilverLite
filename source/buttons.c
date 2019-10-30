@@ -31,12 +31,10 @@ static unsigned long updateTime;
 // L4   Pitch-D Yaw-L       Cancel
 //
 // R1-R3 button pins must be configured for input with an internal pulldown resistor.
-// L1-L4 are pulled high with external 10k pullup resistors and configured for output
 //
-// If any of the Throttle or Yaw trim buttons are depressed, then R2 goes high.
-// If any of the Roll or Pitch trim buttons are depressed, then R1 goes high.
-// If Down, Up, Ok or Cancel buttons are depressed then R3 goes high
-//
+// L1-L4 are pulled high with external 10k pullup resistors and configured for floating input
+// (no pulldown or pullup). During button scan we'll temporarily switch them to output low.
+// 
 void buttons_init(void)
 {
     // Configure R1 thru R3 as input pins with internal pulldown
@@ -83,7 +81,6 @@ void buttons_init(void)
     );        
 #endif    
 
-
     // Configure Bind, SwA and SwD pins as input (with internal pullup, but pulldown would also work)
     gpio_pin_config_t pin_config_input = {
         kGPIO_DigitalInput, 0
@@ -101,14 +98,6 @@ void buttons_init(void)
 // L2   Roll-L  Throttle-U  Up
 // L3   Pitch-U Yaw-R       Ok
 // L4   Pitch-D Yaw-L       Cancel
-//
-// R1-R3 button pins must be configured for input with an internal pulldown resistor.
-// L1-L4 are pulled high with external 10k pullup resistors and configured for output
-//
-// 
-// If any of the Throttle or Yaw trim buttons are depressed, then R2 goes high.
-// If any of the Roll or Pitch trim buttons are depressed, then R1 goes high.
-// If Down, Up, Ok or Cancel buttons are depressed then R3 goes high
 //
 //------------------------------------------------------------------------------
 void buttons_update(void)
@@ -259,4 +248,22 @@ void buttons_test(void)
 #endif
 
     debug_flush();
+}
+
+int button_toggled(e_BtnIndex btnIndex)
+{
+    // Note: Treating buttons[][] as a single dimensional array
+    return buttons[0][btnIndex].toggled;
+}
+
+int button_toggledActive(e_BtnIndex btnIndex)
+{
+    // Note: Treating buttons[][] as a single dimensional array
+    return buttons[0][btnIndex].toggled && buttons[0][btnIndex].debounceState;
+}
+
+int button_active(e_BtnIndex btnIndex)
+{
+    // Note: Treating buttons[][] as a single dimensional array
+    return buttons[0][btnIndex].debounceState;
 }

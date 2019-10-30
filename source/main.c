@@ -87,6 +87,7 @@ int main(void)
 #endif    
     buttons_init();
 
+    int testNumber = 0;
     while (1)
     {
         // Call time_update() once at start of every loop
@@ -96,8 +97,38 @@ int main(void)
         adc_update();
 #if defined(__USE_TRAINER_PORT_UART__)
         uart_update();
-#endif        
+#endif
 
+        if (button_toggledActive(kBtn_Down))
+        {
+            testNumber++;
+            if (testNumber >= 2)
+            {
+                testNumber = 0;
+            }
+        }
+
+        switch (testNumber)
+        {
+            case 0:
+                buttons_test();
+                break;
+
+            case 1:
+                adc_test();
+                break;
+            
+            default:
+                break;
+        }
+
+        PRINTF("loop time: %d\n", micros_realtime() - us_now);
+    }
+}
+
+//------------------------------------------------------------------------------
+void tests()
+{
 #if 0
     #if defined(__USE_TRAINER_PORT_UART__)
         uart_test();
@@ -136,7 +167,4 @@ int main(void)
 #if 0
         screen_test();        
 #endif        
-
-        PRINTF("loop time: %d\n", micros_realtime() - us_now);
-    }
 }

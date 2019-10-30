@@ -4,9 +4,40 @@
 extern "C" {
 #endif /* __cplusplus */
 
+//------------------------------------------------------------------------------
+// Buttons are configured as a 4x3 matrix. L1-L4 are rows, R1-R3 are columns
+//
+//      R1      R2          R3
+// L1   Roll-R  Throttle-U  Down
+// L1   Roll-L  Throttle-D  Up
+// L3   Pitch-U Yaw-R       Ok
+// L4   Pitch-D Yaw-L       Cancel
+//
+
+typedef enum e_BtnIndex
+{
+    kBtn_RollR,
+    kBtn_ThrottleU,
+    kBtn_Down,
+    kBtn_RollL,
+    kBtn_ThrottleD,
+    kBtn_Up,
+    kBtn_PitchU,
+    kBtn_YawR,
+    kBtn_Ok,
+    kBtn_PitchD,
+    kBtn_YawL,
+    kBtn_Cancel
+} e_BtnIndex;
+
+
 void buttons_init(void);
 void buttons_update(void);
 void buttons_test(void);
+
+int button_toggled(e_BtnIndex btnIndex);
+int button_toggledActive(e_BtnIndex btnIndex);
+int button_active(e_BtnIndex btnIndex);
 
 #if defined(__cplusplus)
 }
