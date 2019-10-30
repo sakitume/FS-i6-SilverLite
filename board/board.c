@@ -32,11 +32,27 @@
 
 #include <stdint.h>
 #include "board.h"
+#include "fsl_debug_console.h"
+#include "fsl_common.h"
+
+/* The LPSCI to use for debug messages. */
+#define BOARD_DEBUG_UART_TYPE DEBUG_CONSOLE_DEVICE_TYPE_UART
+#define BOARD_DEBUG_UART_BASEADDR (uint32_t) UART2
+#define BOARD_DEBUG_UART_CLKSRC BUS_CLK
+#define BOARD_DEBUG_UART_CLK_FREQ CLOCK_GetFreq(BUS_CLK)
+#define BOARD_UART_IRQ UART2_IRQn
+#define BOARD_UART_IRQ_HANDLER UART2_IRQHandler
+
+#ifndef BOARD_DEBUG_UART_BAUDRATE
+#define BOARD_DEBUG_UART_BAUDRATE 115200
+#endif /* BOARD_DEBUG_UART_BAUDRATE */
 
 /*!
  * @brief initialize debug console to enable printf for this demo/example
  */
 void BOARD_InitDebugConsole(void) {
-	/* The user initialization should be placed here */
+    uint32_t uartClkSrcFreq;
+    uartClkSrcFreq = BOARD_DEBUG_UART_CLK_FREQ;
+    DbgConsole_Init(BOARD_DEBUG_UART_BASEADDR, BOARD_DEBUG_UART_BAUDRATE, BOARD_DEBUG_UART_TYPE, uartClkSrcFreq);
 }
 

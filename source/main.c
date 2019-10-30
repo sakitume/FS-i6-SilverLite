@@ -45,16 +45,36 @@
 #include "backlight.h"
 #include "buttons.h"
 #include "drv_time.h"
-#include "uart.h"
 
+//------------------------------------------------------------------------------
+//#define __USE_TRAINER_PORT_UART__
+#define __USE_DEBUG_CONSOLE__
+
+#if defined(__USE_TRAINER_PORT_UART__)
+    #if defined(__USE_DEBUG_CONSOLE__)
+        #error
+    #endif
+    #include "uart.h"
+#endif
+
+#if defined(__USE_DEBUG_CONSOLE__)    
+    #if defined(__USE_TRAINER_PORT_UART__)
+        #error
+    #endif
+    #include "fsl_debug_console.h"
+#endif
+
+//------------------------------------------------------------------------------
 int main(void)
 {
     /* Init board hardware. */
     BOARD_InitPins();
     BOARD_BootClockRUN();
     BOARD_SysTick();
-    BOARD_InitDebugConsole();
 
+#if defined(__USE_DEBUG_CONSOLE__)    
+    BOARD_InitDebugConsole();
+#endif    
 
     lcd_init();
     led_backlight_init();
@@ -62,7 +82,9 @@ int main(void)
     console_init();
     debug_init();
     adc_init();
-//XXX    uart_init();
+#if defined(__USE_TRAINER_PORT_UART__)
+    uart_init();
+#endif    
     buttons_init();
 
     while (1)
@@ -70,13 +92,17 @@ int main(void)
         // Call time_update() once at start of every loop
         unsigned long totalMillis = time_update();
         buttons_update();
-//XXX        uart_update();
+#if defined(__USE_TRAINER_PORT_UART__)
+        uart_update();
+#endif        
 
 #if 0
+    #if defined(__USE_TRAINER_PORT_UART__)
         uart_test();
+    #endif
 #endif
 
-#if 1       
+#if 0
         buttons_test();
 #endif        
 
@@ -89,9 +115,21 @@ int main(void)
         millis_test();
 #endif         
 
-#if 0        
+#if 0
         adc_test();
         adc_test2();
+#endif
+
+#if 1
+        unsigned long us_now = micros_realtime();
+        adc_test();
+        unsigned long delta = micros_realtime() - us_now;
+        console_clear();
+        debug("ADC Update: ");
+        debug_put_uint16(delta);
+        debug_put_newline();
+        debug_flush();
+        PRINTF("ADC Update: %d\n", delta);
 #endif
 
 #if 0
