@@ -67,7 +67,8 @@ int main(void)
 
     while (1)
     {
-        unsigned long totalMicros = micros();  // Should be called at least once every 16ms
+        // Call time_update() once at start of every loop
+        unsigned long totalMillis = time_update();
         buttons_update();
         uart_update();
 
@@ -75,7 +76,7 @@ int main(void)
         uart_test();
 #endif
 
-#if 1       
+#if 0       
         buttons_test();
 #endif        
 
@@ -84,9 +85,8 @@ int main(void)
         delay_test();
 #endif        
 #if 0   
-        // Test micros()
-        extern void delay_test2(void);
-        delay_test2();
+        extern void millis_test(void);
+        millis_test();
 #endif         
 
 #if 0        

@@ -4,14 +4,24 @@
 #include "clock_config.h"
 #include "screen.h"
 
-static unsigned long lastticks;
-static unsigned long globalticks;
-static volatile unsigned long systickcount = 0;
+//------------------------------------------------------------------------------
+// Total number of elapsed microseconds
+// Overflows in 71 minutes
+// Updated on every call to time_update()
+static unsigned long gTotalMicros;  
 
+// Total number of elapsed milliseconds
+// Overflows in 49.7 days
+// Updated on every call to time_update()
+static unsigned long gTotalMillis;
+
+//------------------------------------------------------------------------------
+// This handler is executed every 2000000 microseconds (2 seconds)
 void SysTick_Handler(void)
 {
 }
 
+//------------------------------------------------------------------------------
 // See section 3.3.1.3 of NXP reference manual for KL16: 
 //  https://www.nxp.com/files-static/microcontrollers/doc/ref_manual/KL16P80M48SF4RM.pdf
 //
@@ -23,6 +33,9 @@ void SysTick_Handler(void)
 //
 // This means if we run at 48Mhz then the timing reference will be 48Mhz/16 => 3Mhz
 // In other words the timing reference is 3Mhz.
+//
+// We set SysTick LOAD register to 6000000. This means the countdown timer will
+// become zero (and then be reloaded) every 2000000 microseconds.
 //
 static __INLINE uint32_t SysTick_Config2(uint32_t ticks)
 {
@@ -38,9 +51,10 @@ static __INLINE uint32_t SysTick_Config2(uint32_t ticks)
     return (0);                              /* Function successful */
 }
 
+//------------------------------------------------------------------------------
 int BOARD_SysTick(void)
 {
-    if (SysTick_Config2(SystemCoreClock / 8))
+    if (SysTick_Config2(SystemCoreClock / 8))   // 48000000 / 8 => 6000000 ticks
     {
         while (1)
             ;
@@ -48,14 +62,17 @@ int BOARD_SysTick(void)
     return 0;
 }
 
-// called at least once per 16ms or time will overflow
-unsigned long time_update(void)
+//------------------------------------------------------------------------------
+// This must be called at least every 2 seconds to avoid underflow of SysTick
+// counter
+unsigned long micros_realtime(void)
 {
     unsigned long maxticks = SysTick->LOAD;
     unsigned long ticks = SysTick->VAL;
     unsigned long quotient;
     unsigned long elapsedticks;
     static unsigned long remainder = 0; // carry forward the remainder ticks;
+    static unsigned long lastticks;
 
     if (ticks < lastticks)
     {
@@ -73,29 +90,51 @@ unsigned long time_update(void)
 #if 0
     quotient = elapsedticks / 3;
     remainder = elapsedticks - quotient * 3;
-    globalticks = globalticks + quotient;
-    return globalticks;
+    gTotalMicros = gTotalMicros + quotient;
 #else
     // faster divide by 3
     quotient = elapsedticks * (43691*2) >> 18;
     remainder = elapsedticks - quotient * 3;
-    globalticks = globalticks + quotient;
-    return globalticks;
+    gTotalMicros = gTotalMicros + quotient;
 #endif
+
+
+    return gTotalMicros;
 }
 
-// return time in uS from start ( micros())
-unsigned long micros()
+//------------------------------------------------------------------------------
+// Call time_update() once at start of every main loop. It must be called at
+// least every 2000000 microseconds to avoid error.
+//
+// Updates the following global time accumulators:
+//  gTotalMicros
+//  gTotalMillis
+unsigned long time_update()
 {
-    return time_update();
+    static unsigned long lastMicros;
+    static unsigned long remainder;
+
+    unsigned long now = micros_realtime();
+    unsigned long elapsed = now - lastMicros;
+    lastMicros = now;
+    elapsed += remainder;
+    while (elapsed >= 1000)
+    {
+        gTotalMillis++;
+        elapsed -= 1000;
+    }
+    remainder = elapsed;
+
+    return gTotalMillis;
 }
 
+//------------------------------------------------------------------------------
 // delay in uS
 // The 'data * 6' was obtained empircally thru trial and error
 // using this test code:
 //    while (1) {
 //        delay_us(1234);
-//        unsigned long delta = micros() - totalMicros;
+//        unsigned long delta = micros_realtime() - totalMicros;
 //        screen_clear();
 //        screen_put_uint14(10, 10, 1, delta);
 //        screen_update();
@@ -109,33 +148,52 @@ void delay_us(uint32_t us)
         ;
 }
 
+//------------------------------------------------------------------------------
 void delay_ms(uint32_t ms)
 {
-    unsigned long startTime = micros();
+    unsigned long startTime = micros_realtime();
     ms *= 1000;
     // wait (doing nothing) until enough time has expired
-    while ((micros() - startTime) < ms)
+    while ((micros_realtime() - startTime) < ms)
     {
     }
 }
 
+//------------------------------------------------------------------------------
+// Returns number of elapsed microseconds since startup. This value is for the
+// the current main-loop/update frame
+unsigned long micros_this_frame(void)
+{
+    return gTotalMicros;
+}
+
+//------------------------------------------------------------------------------
+// Returns number of elapsed milliseconds since startup. This value is for the
+// the current main-loop/update frame
+unsigned long millis_this_frame(void)
+{
+    return gTotalMillis;
+}
+
+//------------------------------------------------------------------------------
 void delay_test(void)
 {
-    unsigned long startTime = micros();
+    unsigned long startTime = micros_realtime();
     // Test delay()
     delay_us(5432);
-    unsigned long delta = micros() - startTime;
+    unsigned long delta = micros_realtime() - startTime;
     screen_clear();
     screen_put_uint14(10, 10, 1, delta);
     screen_update();
     delay_ms(100);
 }
 
-void delay_test2(void)
+//------------------------------------------------------------------------------
+void millis_test(void)
 {
-    unsigned long totalMicros = micros();
+    unsigned long totalMillis = time_update();
     screen_clear();
-    screen_put_time(10, 10, 1, totalMicros / 1000000);
+    screen_put_time(10, 10, 1, totalMillis / 1000);
     screen_update();
     delay_ms(100);
 }
