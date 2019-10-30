@@ -76,7 +76,7 @@ int main(void)
         uart_test();
 #endif
 
-#if 0       
+#if 1       
         buttons_test();
 #endif        
 
