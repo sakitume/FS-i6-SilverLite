@@ -32,7 +32,7 @@
         <meta name="lang:search.tokenizer" content="[\s\-]+">
       
       <link rel="shortcut icon" href="../assets/images/favicon.png">
-      <meta name="generator" content="mkdocs-1.0.4, mkdocs-material-4.4.1">
+      <meta name="generator" content="mkdocs-1.0.4, mkdocs-material-3.2.0">
     
     
       
@@ -40,25 +40,22 @@
       
     
     
-      <link rel="stylesheet" href="../assets/stylesheets/application.30686662.css">
+      <link rel="stylesheet" href="../assets/stylesheets/application.572ca0f0.css">
       
       
     
     
-      <script src="../assets/javascripts/modernizr.74668098.js"></script>
+      <script src="../assets/javascripts/modernizr.8c900955.js"></script>
     
     
       
         <link href="https://fonts.gstatic.com" rel="preconnect" crossorigin>
-        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,400i,700|Roboto+Mono&display=fallback">
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,400i,700|Roboto+Mono">
         <style>body,input{font-family:"Roboto","Helvetica Neue",Helvetica,Arial,sans-serif}code,kbd,pre{font-family:"Roboto Mono","Courier New",Courier,monospace}</style>
       
     
     <link rel="stylesheet" href="../assets/fonts/material-icons.css">
     
-    
-    
-      
     
     
   </head>
@@ -96,21 +93,22 @@
       <div class="md-flex__cell md-flex__cell--stretch">
         <div class="md-flex__ellipsis md-header-nav__title" data-md-component="title">
           
-            <span class="md-header-nav__topic">
-              FS-i6 SilverLite
-            </span>
-            <span class="md-header-nav__topic">
-              
+            
+              <span class="md-header-nav__topic">
+                FS-i6 SilverLite
+              </span>
+              <span class="md-header-nav__topic">
                 Setup
-              
-            </span>
+              </span>
+            
           
         </div>
       </div>
       <div class="md-flex__cell md-flex__cell--shrink">
         
-          <label class="md-icon md-icon--search md-header-nav__button" for="__search"></label>
           
+            <label class="md-icon md-icon--search md-header-nav__button" for="__search"></label>
+            
 <div class="md-search" data-md-component="search" role="dialog">
   <label class="md-search__overlay" for="__search"></label>
   <div class="md-search__inner" role="search">
@@ -133,6 +131,7 @@
     </div>
   </div>
 </div>
+          
         
       </div>
       
@@ -295,11 +294,24 @@ and also configure VSCode slightly.</p>
 <p>Note: The <code>${env:VSARM}</code> is refrencing an enviornment variable that we'll create shortly</p>
 </blockquote>
 <p>For the remaining tools I recommend installing them into into a single folder. On my Windows machine I use <code>C:\Tools</code>. You could also choose to use <code>C:\VSARM</code>. Keep it simple and avoid having spaces in the path. </p>
-<p>On a Mac or Linux machine you could use:: <code>~/vsarm</code>. </p>
-<p>Create an environment variable named <code>VSARM</code> and set its value to the <code>C:\Tools</code> (or <code>$HOME/vsarm</code>) folder.</p>
+<p>On a Mac or Linux machine you could create a subfolder in your home folder.</p>
+<pre><code>mkdir ~/vsarm
+</code></pre>
+
+<p>Create an environment variable named <code>VSARM</code> and set its value to this folder.</p>
+<p>For example on my Mac I added this line to my <code>~/.zshrc</code> file:</p>
+<pre><code># VSARM
+export VSARM=&quot;$HOME/vsarm&quot;
+</code></pre>
+
+<blockquote>
+<p>Note: If you use <code>bash</code> (the default shell for Mac OS) then you would instead add that to your <code>~/.bash_profile</code> file.</p>
+</blockquote>
 <h3 id="install-arm-gnu-toolchain">Install arm gnu toolchain</h3>
 <p>Go to: <a href="https://developer.arm.com/tools-and-software/open-source-software/developer-tools/gnu-toolchain/gnu-rm/downloads">https://developer.arm.com/tools-and-software/open-source-software/developer-tools/gnu-toolchain/gnu-rm/downloads</a>
-Download the appropriate installer. There are several available. For my Windows development PC I chose:</p>
+Download the appropriate installer. There are several available. </p>
+<h4 id="windows-installation">Windows installation</h4>
+<p>For my Windows development PC I chose:</p>
 <pre><code>gcc-arm-none-eabi-8-2019-q3-update-win32-sha2.exe
 Windows 32-bit Installer (Signed for Windows 7 and later)
 MD5: d44f44b258b203bdd6808752907754be
@@ -318,7 +330,28 @@ from:</p>
 <pre><code>C:\Tools\armcc\bin
 </code></pre>
 
+<h4 id="mac-os-installation">Mac OS installation</h4>
+<p>For my old MacBook I chose to download this version:</p>
+<pre><code>Mac OS X 64-bit
+File: gcc-arm-none-eabi-8-2019-q3-update-mac.tar.bz2 (105.72 MB)
+</code></pre>
+
+<p>Using a Finder window I then double-clicked on the downloaded <code>.bz2</code> file which unpacked the contents into a new folder named:</p>
+<pre><code>gcc-arm-none-eabi-8-2019-q3-update
+</code></pre>
+
+<p>I then renamed that folder to <code>armcc</code> and then moved this <code>armcc</code> folder into my <code>~/vsarm</code> folder.</p>
+<p>Finally I adjusted my path by editing my <code>.zshrc</code> file and added this to the bottom of it:</p>
+<pre><code># vsarm tools
+export PATH=&quot;$HOME/vsarm/armcc/bin:$PATH&quot;
+
+</code></pre>
+
+<blockquote>
+<p>Note: If you use <code>bash</code> for your shell (which is the default for Mac OS) then add the above to your <code>~/.bash_profile</code> instead.</p>
+</blockquote>
 <h3 id="install-mingw-w64-for-windows-machines-only">Install MinGW-W64 (for Windows machines only)</h3>
+<p>This step is only needed for Windows development machines.</p>
 <p>We need MinGW-W64 for the <code>mingw32-make.exe</code> program. If you have already have a <code>make</code> utility on your machine then you could skip this</p>
 <p>Go to: <a href="https://sourceforge.net/projects/mingw-w64/">https://sourceforge.net/projects/mingw-w64/</a>
 Change the install location to:</p>
@@ -329,10 +362,7 @@ Change the install location to:</p>
 <pre><code>C:\Tools\mingw\mingw32\bin
 </code></pre>
 
-<h3 id="install-openocd">Install OpenOCD</h3>
-<p>For Mac/Linux users (I believe) the OpenOCD project maintainers recommend you build it yourself using the latest version
-of the source code available from the repository. An easier solution may be to obtain pre-built versions from: <a href="https://xpack.github.io/openocd/">https://xpack.github.io/openocd/</a></p>
-<p>For Mac OS: the <code>README.md</code> file from <code>https://github.com/Marus/cortex-debug</code> mentions not using the default version of OpenOCD provided by Homebrew. Instead you may be able to build OpenOCD from source using Homebrew (<code>brew install open-ocd --HEAD</code>). </p>
+<h3 id="installing-openocd-on-windows">Installing OpenOCD on Windows</h3>
 <p>For Windows users I recommend obtaining a version of OpenOCD from here: <a href="https://gnutoolchains.com/arm-eabi/openocd/">https://gnutoolchains.com/arm-eabi/openocd/</a></p>
 <p>Download the most recent 7zip file: <code>openocd-20190828.7z</code>
 Decompress it into <code>C:\Tools</code> folder. Rename the resultant <code>OpenOCD-20190828-0.10.0</code> folder to just <code>OpenOCD</code>.</p>
@@ -344,6 +374,18 @@ Decompress it into <code>C:\Tools</code> folder. Rename the resultant <code>Open
 <p>Note: There are several binary versions of OpenOCD available for installation. The one from SysProgs (gnutoolchains.com)
 seems to be updated regularly and also provides drivers that may be helpful to you.</p>
 </blockquote>
+<h3 id="installing-openocd-on-mac-os">Installing OpenOCD on Mac OS</h3>
+<p>While it may be possible to install a prebuilt version of OpenOCD using Homebrew, I've learned that 
+the OpenOCD project maintainers recommend Mac/Linux users to build it themselves using the latest version
+of the source code available from the repository. </p>
+<blockquote>
+<p>Note: We will be using the "Cortex Debug" extension for VSCode. The <code>README.md</code> file from <code>https://github.com/Marus/cortex-debug</code> mentions not using the default version of OpenOCD provided by Homebrew. So...even more reason for us to build it from source.</p>
+</blockquote>
+<p>So to be safe, we'll use Homebrew to <strong><em>build</em></strong> and install OpenOCD using the latest available source code. Using Terminal, enter the following:</p>
+<pre><code>brew install open-ocd --HEAD
+</code></pre>
+
+<p>This took a little while to complete, but once it finished I found it was immmediately available for use at <code>/usr/local/bin/openocd</code>. No adjustments to my path were needed.</p>
 <h1 id="setup-visual-studio-code-project">Setup Visual Studio Code Project</h1>
 <p>This git repo already contains the necessary configurations we need (see the various files in the <code>.vscode</code> folder). </p>
 <p>Howver I'm going to document how I created these configs
@@ -444,15 +486,12 @@ you actually have installed (hint: the <code>8.3.1</code> might need to be chang
             &quot;type&quot;: &quot;shell&quot;,
             &quot;command&quot;: &quot;make clean&quot;,
             &quot;windows&quot;: {
-                &quot;command&quot;: &quot;mingw32-make clean&quot;,
+                &quot;command&quot;: &quot;mingw32-make clean&quot;
             },
             &quot;options&quot;: {
                 &quot;cwd&quot;: &quot;${workspaceRoot}/Debug&quot;
-            }, 
-            &quot;group&quot;: {
-                &quot;kind&quot;: &quot;build&quot;,
-                &quot;isDefault&quot;: true
             },
+            &quot;group&quot;: &quot;build&quot;,
             &quot;problemMatcher&quot;: []
         },
         {
@@ -460,15 +499,12 @@ you actually have installed (hint: the <code>8.3.1</code> might need to be chang
             &quot;type&quot;: &quot;shell&quot;,
             &quot;command&quot;: &quot;make clean&quot;,
             &quot;windows&quot;: {
-                &quot;command&quot;: &quot;mingw32-make clean&quot;,
+                &quot;command&quot;: &quot;mingw32-make clean&quot;
             },
             &quot;options&quot;: {
                 &quot;cwd&quot;: &quot;${workspaceRoot}/Release&quot;
-            }, 
-            &quot;group&quot;: {
-                &quot;kind&quot;: &quot;build&quot;,
-                &quot;isDefault&quot;: true
             },
+            &quot;group&quot;: &quot;build&quot;,
             &quot;problemMatcher&quot;: []
         },
         {
@@ -476,14 +512,18 @@ you actually have installed (hint: the <code>8.3.1</code> might need to be chang
             &quot;type&quot;: &quot;shell&quot;,
             &quot;command&quot;: &quot;make -j8 all&quot;,
             &quot;windows&quot;: {
-                &quot;command&quot;: &quot;mingw32-make -j8 all&quot;,
+                &quot;command&quot;: &quot;mingw32-make -j8 all&quot;
             },
             &quot;options&quot;: {
                 &quot;cwd&quot;: &quot;${workspaceRoot}/Debug&quot;
-            }, 
+            },
             &quot;group&quot;: {
                 &quot;kind&quot;: &quot;build&quot;,
                 &quot;isDefault&quot;: true
+            },
+            &quot;presentation&quot;: {
+                &quot;reveal&quot;: &quot;always&quot;,
+                &quot;clear&quot;: true
             },
             &quot;problemMatcher&quot;: []
         },
@@ -492,15 +532,12 @@ you actually have installed (hint: the <code>8.3.1</code> might need to be chang
             &quot;type&quot;: &quot;shell&quot;,
             &quot;command&quot;: &quot;make -j8 all&quot;,
             &quot;windows&quot;: {
-                &quot;command&quot;: &quot;mingw32-make -j8 all&quot;,
+                &quot;command&quot;: &quot;mingw32-make -j8 all&quot;
             },
             &quot;options&quot;: {
                 &quot;cwd&quot;: &quot;${workspaceRoot}/Release&quot;
-            }, 
-            &quot;group&quot;: {
-                &quot;kind&quot;: &quot;build&quot;,
-                &quot;isDefault&quot;: true
             },
+            &quot;group&quot;: &quot;build&quot;,
             &quot;problemMatcher&quot;: []
         },
         {
@@ -510,10 +547,7 @@ you actually have installed (hint: the <code>8.3.1</code> might need to be chang
             &quot;options&quot;: {
                 &quot;cwd&quot;: &quot;${workspaceRoot}/Debug&quot;
             },
-            &quot;group&quot;: {
-                &quot;kind&quot;: &quot;build&quot;,
-                &quot;isDefault&quot;: true
-            },
+            &quot;group&quot;: &quot;build&quot;,
             &quot;problemMatcher&quot;: []
         },
         {
@@ -523,10 +557,7 @@ you actually have installed (hint: the <code>8.3.1</code> might need to be chang
             &quot;options&quot;: {
                 &quot;cwd&quot;: &quot;${workspaceRoot}/Release&quot;
             },
-            &quot;group&quot;: {
-                &quot;kind&quot;: &quot;build&quot;,
-                &quot;isDefault&quot;: true
-            },
+            &quot;group&quot;: &quot;build&quot;,
             &quot;problemMatcher&quot;: []
         }
     ]
@@ -536,7 +567,7 @@ you actually have installed (hint: the <code>8.3.1</code> might need to be chang
 <blockquote>
 <p>Note: Be sure to adjust the <code>-j</code> parameter to the <code>make</code> if needed.</p>
 </blockquote>
-<p>To run any of these tasks you can use <code>Ctrl-Alt-T</code> to bring up a menu that allows you to choose any of these tasks we've just defined. Alternatively you can use <code>F1</code> key and type <code>run task</code> and choose <code>Tasks: Run Task</code>.</p>
+<p>To run any of these tasks you can use <code>Ctrl-Alt-T</code> on Windows, or <code>Ctrl-Option-T</code> on Mac to bring up a menu that allows you to choose any of these tasks we've just defined. Alternatively you can use <code>F1</code> key and type <code>run task</code> and choose <code>Tasks: Run Task</code>.</p>
 <h2 id="configure-vscode-shell">Configure VSCode shell</h2>
 <p><strong>One very important note:</strong> The makefile I'm using uses <code>rm -rf</code> as part of building the <code>clean</code> target. This <code>rm</code> command isn't normally available on windows. So I've configured my VSCode environment to use a <code>bash</code> shell whenever it needs to provide a shell for any command.</p>
 <p>This <code>bash</code> shell came with my <a href="https://gitforwindows.org/">Git for Windows</a> installation. If you have something similar, then you'll want to configure VSCode to use such a shell. Alternatively you can edit the makefile(s) in this project folder.</p>
@@ -585,6 +616,7 @@ you actually have installed (hint: the <code>8.3.1</code> might need to be chang
             &quot;cwd&quot;: &quot;${workspaceRoot}&quot;,
             &quot;executable&quot;: &quot;./Debug/i6.elf&quot;,
             &quot;device&quot;: &quot;Kinetis&quot;,
+            &quot;svdFile&quot;: &quot;${workspaceRoot}/.vscode/MKL16Z4.svd&quot;,
             &quot;configFiles&quot;: [
                 &quot;interface/stlink.cfg&quot;,
                 &quot;target/klx.cfg&quot;,
@@ -598,6 +630,7 @@ you actually have installed (hint: the <code>8.3.1</code> might need to be chang
             &quot;cwd&quot;: &quot;${workspaceRoot}&quot;,
             &quot;executable&quot;: &quot;./Debug/i6.elf&quot;,
             &quot;device&quot;: &quot;Kinetis&quot;,
+            &quot;svdFile&quot;: &quot;${workspaceRoot}/.vscode/MKL16Z4.svd&quot;,
             &quot;configFiles&quot;: [
                 &quot;interface/stlink.cfg&quot;,
                 &quot;target/klx.cfg&quot;,
@@ -609,12 +642,37 @@ you actually have installed (hint: the <code>8.3.1</code> might need to be chang
 
 <p>Some useful info about these configs can be found here: <a href="https://marcelball.ca/projects/cortex-debug/cortex-debug-launch-configurations/">https://marcelball.ca/projects/cortex-debug/cortex-debug-launch-configurations/</a></p>
 <p>After these additions have been made you can click on the Debug icon on the left of VSCode and be able to execute one of these configurations. </p>
+<p>Regarding the <code>.svd</code> file in the above config. A Google search for <code>kinetis svd files</code> led me to this: <a href="https://github.com/posborne/cmsis-svd/issues/29">https://github.com/posborne/cmsis-svd/issues/29</a>
+which in turn led me to this: <a href="https://github.com/hackrid/KDS_SVD/blob/master/KDS_3_2/MKL16Z4.svd">https://github.com/hackrid/KDS_SVD/blob/master/KDS_3_2/MKL16Z4.svd</a>. </p>
 <h3 id="semihosting">"semihosting"</h3>
 <p>It is possible to direct <code>printf</code> messages (<code>stdout</code>) to the debug interface. This capability is known as <em>semihosting</em>.</p>
 <blockquote>
 <p>Note: I discovered this via Google and reading about this: <a href="https://dzone.com/articles/semihosting-gnu-arm-embedded">https://dzone.com/articles/semihosting-gnu-arm-embedded</a> and also <a href="https://bgamari.github.io/posts/2014-10-31-semihosting.html">https://bgamari.github.io/posts/2014-10-31-semihosting.html</a></p>
 </blockquote>
 <p>I have not yet attempted using this feature but will investigate this soon.</p>
+<h2 id="add-shortcuts-extension-to-vscode">Add "Shortcuts" extension to VSCode</h2>
+<p>The <a href="https://marketplace.visualstudio.com/items?itemName=gizak.shortcuts">"Shortcuts"</a> extension will install clickable icons on the bottom status bar of VSCode. Each icon is a shortcut to a vscode command.</p>
+<p>Setting this up was tricky. There's no clear documentation that I could find. 
+Press <code>F1</code> key and type <code>preferences workspace</code>. Select <code>Preferences: Open Workspace Settings</code>. Enter <code>shortcuts</code> in the search bar. Hover your mouse cursor over "Shortcuts: Buttons" and a gear icon will appear. Click on the gear icon and choose "Copy Setting as JSON" (this will ), then click on "Edit in settings.json". Position the cursor between the curly brackets and then paste (<code>Ctrl+V</code>/<code>Cmd+V</code>) the copied setting into the file. </p>
+<p>The file should look like this:</p>
+<pre><code>&quot;shortcuts.buttons&quot;: [
+  &quot;file-binary , workbench.action.tasks.build , Run build task&quot;,
+  &quot;beaker , workbench.action.tasks.test , Run test task&quot;,
+  &quot;terminal , workbench.action.terminal.toggleTerminal , Toggle terminal panel&quot;,
+  &quot;telescope , workbench.action.showCommands , Show command palette&quot;,
+  &quot;bug, workbench.action.debug.start, Launch debug&quot;
+]
+</code></pre>
+
+<p>This will create 5 new icons on the bottom status bar. I'd prefer to customize these to just 3. So replace the above contents with the following:</p>
+<pre><code>&quot;shortcuts.buttons&quot;: [
+  &quot;file-binary , workbench.action.tasks.build , Run Build Task&quot;,
+  &quot;rocket , workbench.action.tasks.runTask , Run Task&quot;,
+  &quot;bug, workbench.action.debug.start, Launch Debug&quot;
+]
+</code></pre>
+
+<p>The first icon ("file-binary") should launch the "Make Debug Firmware" task (because that is the only one marked as the default build task). The second icon will execute the "Tasks: Run Task" command which reveals a dropdown menu of the available tasks. And the third icon will launch a debugging session.</p>
                 
                   
                 
@@ -664,15 +722,20 @@ you actually have installed (hint: the <code>8.3.1</code> might need to be chang
           Material for MkDocs</a>
       </div>
       
+        
+      
     </div>
   </div>
 </footer>
       
     </div>
     
-      <script src="../assets/javascripts/application.c648116f.js"></script>
+      <script src="../assets/javascripts/application.b41f3d20.js"></script>
       
       <script>app.initialize({version:"1.0.4",url:{base:".."}})</script>
+      
+    
+    
       
     
   </body>
