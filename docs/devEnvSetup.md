@@ -80,14 +80,31 @@ For example my `settings.json` ends up looking like this:
 
 For the remaining tools I recommend installing them into into a single folder. On my Windows machine I use `C:\Tools`. You could also choose to use `C:\VSARM`. Keep it simple and avoid having spaces in the path. 
 
-On a Mac or Linux machine you could use:: `~/vsarm`. 
+On a Mac or Linux machine you could create a subfolder in your home folder.
 
-Create an environment variable named `VSARM` and set its value to the `C:\Tools` (or `$HOME/vsarm`) folder.
+```
+mkdir ~/vsarm
+```
+
+
+Create an environment variable named `VSARM` and set its value to this folder.
+
+For example on my Mac I added this line to my `~/.zshrc` file:
+
+```
+# VSARM
+export VSARM="$HOME/vsarm"
+```
+
+> Note: If you use `bash` (the default shell for Mac OS) then you would instead add that to your `~/.bash_profile` file.
 
 ### Install arm gnu toolchain
 
 Go to: <https://developer.arm.com/tools-and-software/open-source-software/developer-tools/gnu-toolchain/gnu-rm/downloads>
-Download the appropriate installer. There are several available. For my Windows development PC I chose:
+Download the appropriate installer. There are several available. 
+
+#### Windows installation
+For my Windows development PC I chose:
 
 ```
 gcc-arm-none-eabi-8-2019-q3-update-win32-sha2.exe
@@ -111,7 +128,37 @@ Make sure these gnu tools are in your path. More specifically you will want to a
 C:\Tools\armcc\bin
 ```
 
+#### Mac OS installation
+
+For my old MacBook I chose to download this version:
+
+```
+Mac OS X 64-bit
+File: gcc-arm-none-eabi-8-2019-q3-update-mac.tar.bz2 (105.72 MB)
+```
+
+Using a Finder window I then double-clicked on the downloaded `.bz2` file which unpacked the contents into a new folder named:
+
+```
+gcc-arm-none-eabi-8-2019-q3-update
+```
+
+I then renamed that folder to `armcc` and then moved this `armcc` folder into my `~/vsarm` folder.
+
+Finally I adjusted my path by editing my `.zshrc` file and added this to the bottom of it:
+
+```
+# vsarm tools
+export PATH="$HOME/vsarm/armcc/bin:$PATH"
+
+```
+
+> Note: If you use `bash` for your shell (which is the default for Mac OS) then add the above to your `~/.bash_profile` instead.
+
+
 ### Install MinGW-W64 (for Windows machines only)
+
+This step is only needed for Windows development machines.
 
 We need MinGW-W64 for the `mingw32-make.exe` program. If you have already have a `make` utility on your machine then you could skip this
 
@@ -127,11 +174,7 @@ Make sure the MinGW-W64 tools are in your path. More specifically you will want 
 C:\Tools\mingw\mingw32\bin
 ```
 
-### Install OpenOCD
-For Mac/Linux users (I believe) the OpenOCD project maintainers recommend you build it yourself using the latest version
-of the source code available from the repository. An easier solution may be to obtain pre-built versions from: <https://xpack.github.io/openocd/>
-
-For Mac OS: the `README.md` file from `https://github.com/Marus/cortex-debug` mentions not using the default version of OpenOCD provided by Homebrew. Instead you may be able to build OpenOCD from source using Homebrew (`brew install open-ocd --HEAD`). 
+### Installing OpenOCD on Windows
 
 For Windows users I recommend obtaining a version of OpenOCD from here: <https://gnutoolchains.com/arm-eabi/openocd/>
 
@@ -146,6 +189,22 @@ C:\Tools\OpenOCD\bin
 
 > Note: There are several binary versions of OpenOCD available for installation. The one from SysProgs (gnutoolchains.com)
 seems to be updated regularly and also provides drivers that may be helpful to you.
+
+### Installing OpenOCD on Mac OS
+While it may be possible to install a prebuilt version of OpenOCD using Homebrew, I've learned that 
+the OpenOCD project maintainers recommend Mac/Linux users to build it themselves using the latest version
+of the source code available from the repository. 
+
+> Note: We will be using the "Cortex Debug" extension for VSCode. The `README.md` file from `https://github.com/Marus/cortex-debug` mentions not using the default version of OpenOCD provided by Homebrew. So...even more reason for us to build it from source.
+
+So to be safe, we'll use Homebrew to ***build*** and install OpenOCD using the latest available source code. Using Terminal, enter the following:
+
+```
+brew install open-ocd --HEAD
+```
+
+This took a little while to complete, but once it finished I found it was immmediately available for use at `/usr/local/bin/openocd`. No adjustments to my path were needed.
+
 
 # Setup Visual Studio Code Project
 This git repo already contains the necessary configurations we need (see the various files in the `.vscode` folder). 
@@ -341,7 +400,7 @@ Replace the contents of this file with the following:
 
 > Note: Be sure to adjust the `-j` parameter to the `make` if needed.
 
-To run any of these tasks you can use `Ctrl-Alt-T` to bring up a menu that allows you to choose any of these tasks we've just defined. Alternatively you can use `F1` key and type `run task` and choose `Tasks: Run Task`.
+To run any of these tasks you can use `Ctrl-Alt-T` on Windows, or `Ctrl-Option-T` on Mac to bring up a menu that allows you to choose any of these tasks we've just defined. Alternatively you can use `F1` key and type `run task` and choose `Tasks: Run Task`.
 
 ## Configure VSCode shell
 
