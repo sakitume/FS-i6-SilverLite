@@ -16,18 +16,16 @@ extern "C" {
 
 typedef enum e_BtnIndex
 {
-    kBtn_RollR,
-    kBtn_ThrottleU,
-    kBtn_Down,
-    kBtn_RollL,
-    kBtn_ThrottleD,
-    kBtn_Up,
-    kBtn_PitchU,
-    kBtn_YawR,
-    kBtn_Ok,
-    kBtn_PitchD,
-    kBtn_YawL,
-    kBtn_Cancel
+    // The following buttons are in a 4x3 matrix, normally low
+    kBtn_RollR,     kBtn_ThrottleU,     kBtn_Down,
+    kBtn_RollL,     kBtn_ThrottleD,     kBtn_Up,
+    kBtn_PitchU,    kBtn_YawR,          kBtn_Ok,
+    kBtn_PitchD,    kBtn_YawL,          kBtn_Cancel,
+
+    // These 3 are discrete button pins, normally low
+    kBtn_Bind,
+    kBtn_SwA,
+    kBtn_SwD
 } e_BtnIndex;
 
 

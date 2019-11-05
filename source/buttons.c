@@ -15,14 +15,14 @@ struct ButtonState_t
     uint8_t     debounceState   : 1;    // debounced state this frame
     uint8_t     toggled         : 1;    // Set if the state toggled this frame
 };
-static struct ButtonState_t buttons[4][3];  // only takes 12 bytes
+static struct ButtonState_t buttons[5][3];  // only takes 15 bytes
 
 #ifdef __MEASURE_UPDATE_TIME__
 static unsigned long updateTime;
 #endif
 
 //------------------------------------------------------------------------------
-// Buttons are configured as a 4x3 matrix. L1-L4 are rows, R1-R3 are columns
+// 12 buttons are configured as a 4x3 matrix. L1-L4 are rows, R1-R3 are columns
 //
 //      R1      R2          R3
 // L1   Roll-R  Throttle-U  Down
@@ -169,6 +169,13 @@ void buttons_update(void)
         GPIO_PinInit(BOARD_INITPINS_BUTTON_L1_GPIO, BOARD_INITPINS_BUTTON_L1_PIN + row, &pin_config_input);
     }
 
+    // Update the 3 discrete buttons in the last row of buttons[][]
+    // Note: These are normally high and when activated they go low. But I'm going to invert the
+    // reported values so that these buttons are consistent with how the other buttons operate
+    buttons[4][0].currState = !GPIO_ReadPinInput(BOARD_INITPINS_Bind_GPIO, BOARD_INITPINS_Bind_PIN);
+    buttons[4][1].currState = !GPIO_ReadPinInput(BOARD_INITPINS_SwA_GPIO, BOARD_INITPINS_SwA_PIN);
+    buttons[4][2].currState = !GPIO_ReadPinInput(BOARD_INITPINS_SwD_GPIO, BOARD_INITPINS_SwD_PIN);
+
     // For each button
     pButton = &buttons[0][0];
     for (int i=0; i<sizeof(buttons)/sizeof(buttons[0][0]); i++, pButton++)
@@ -229,15 +236,15 @@ void buttons_test(void)
         debug("\n");
     }
     debug("Bind: ");
-    debug_putc('0'+GPIO_ReadPinInput(BOARD_INITPINS_Bind_GPIO, BOARD_INITPINS_Bind_PIN));
+    debug_putc('0'+button_active(kBtn_Bind));
     debug("\n");
 
     debug("SwA: ");
-    debug_putc('0'+GPIO_ReadPinInput(BOARD_INITPINS_SwA_GPIO, BOARD_INITPINS_SwA_PIN));
+    debug_putc('0'+button_active(kBtn_SwA));
     debug("  ");
 
     debug("SwD: ");
-    debug_putc('0'+GPIO_ReadPinInput(BOARD_INITPINS_SwD_GPIO, BOARD_INITPINS_SwD_PIN));
+    debug_putc('0'+button_active(kBtn_SwD));
     debug("\n");
 
 #ifdef __MEASURE_UPDATE_TIME__
@@ -265,5 +272,5 @@ int button_toggledActive(e_BtnIndex btnIndex)
 int button_active(e_BtnIndex btnIndex)
 {
     // Note: Treating buttons[][] as a single dimensional array
-    return buttons[0][btnIndex].debounceState;
+    return (&buttons[0][0])[btnIndex].debounceState;
 }
