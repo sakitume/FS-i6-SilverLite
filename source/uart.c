@@ -17,6 +17,8 @@
 /*! @brief Ring buffer size (Unit: Byte). */
 #define DEMO_RING_BUFFER_SIZE 16
 
+#if defined(__USE_TRAINER_PORT_UART__)
+
 /*! @brief Ring buffer to save received data. */
 
 /*******************************************************************************
@@ -108,3 +110,10 @@ void uart_test(void)
 {
 	// NOTHING
 }
+
+#else // #if defined(__USE_TRAINER_PORT_UART__)
+void uart_init(void)    {}
+void uart_update(void)  {}
+void uart_test(void)    {}
+#endif
+

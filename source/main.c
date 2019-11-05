@@ -45,6 +45,7 @@
 #include "backlight.h"
 #include "buttons.h"
 #include "drv_time.h"
+#include "uart.h"
 
 //------------------------------------------------------------------------------
 //#define __USE_TRAINER_PORT_UART__
@@ -54,7 +55,6 @@
     #if defined(__USE_DEBUG_CONSOLE__)
         #error
     #endif
-    #include "uart.h"
 #endif
 
 #if defined(__USE_DEBUG_CONSOLE__)    
@@ -63,6 +63,23 @@
     #endif
     #include "fsl_debug_console.h"
 #endif
+
+//------------------------------------------------------------------------------
+// Forward declarations
+static void tests();
+
+//------------------------------------------------------------------------------
+void required_updates()
+{
+    // Call time_update() once at start of every loop
+    time_update();
+    buttons_update();
+    adc_update();
+
+#if defined(__USE_TRAINER_PORT_UART__)
+    uart_update();
+#endif    
+}
 
 //------------------------------------------------------------------------------
 int main(void)
@@ -76,38 +93,35 @@ int main(void)
     BOARD_InitDebugConsole();
 #endif    
 
+#if defined(__USE_TRAINER_PORT_UART__)
+    uart_init();
+#endif    
     lcd_init();
     led_backlight_init();
     screen_init();
     console_init();
     debug_init();
     adc_init();
-#if defined(__USE_TRAINER_PORT_UART__)
-    uart_init();
-#endif    
     buttons_init();
 
+    //
+    tests();
+}
+
+//------------------------------------------------------------------------------
+static void tests()
+{
     int testNumber = 0;
     while (1)
     {
-        // Call time_update() once at start of every loop
-        unsigned long totalMillis = time_update();
-        unsigned long us_now = micros_this_frame();
-        buttons_update();
-        adc_update();
-#if defined(__USE_TRAINER_PORT_UART__)
-        uart_update();
-#endif
+        // Call the required update functions of various systems
+        required_updates();
 
+        // Advance to next test if down button was activated
         if (button_toggledActive(kBtn_Down))
         {
             testNumber++;
-            if (testNumber >= 2)
-            {
-                testNumber = 0;
-            }
         }
-
         switch (testNumber)
         {
             case 0:
@@ -117,54 +131,19 @@ int main(void)
             case 1:
                 adc_test();
                 break;
-            
+
+            case 2:
+                delay_test();
+                break;
+
+            case 3:
+                millis_test();
+                break;
+
             default:
+                testNumber = 0;
                 break;
         }
-
-        PRINTF("loop time: %d\n", micros_realtime() - us_now);
+        PRINTF("loop time: %d\n", micros_realtime() - micros_this_frame());
     }
-}
-
-//------------------------------------------------------------------------------
-void tests()
-{
-#if 0
-    #if defined(__USE_TRAINER_PORT_UART__)
-        uart_test();
-    #endif
-#endif
-
-#if 0
-        buttons_test();
-#endif        
-
-#if 0  
-        extern void delay_test(void);
-        delay_test();
-#endif        
-#if 0   
-        extern void millis_test(void);
-        millis_test();
-#endif         
-
-#if 0
-        adc_test();
-#endif
-
-#if 0
-        unsigned long us_now = micros_realtime();
-        adc_update();
-        unsigned long delta = micros_realtime() - us_now;
-        console_clear();
-        debug("ADC Update: ");
-        debug_put_uint16(delta);
-        debug_put_newline();
-        debug_flush();
-        PRINTF("ADC Update: %d\n", delta);
-#endif
-
-#if 0
-        screen_test();        
-#endif        
 }
