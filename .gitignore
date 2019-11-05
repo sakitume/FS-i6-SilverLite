@@ -9,5 +9,6 @@
 /armgcc/release/
 /armgcc/cmake_install.cmake
 /armgcc/CMakeCache.txt
+/armgcc/build_log.txt
 /armgcc/Makefile
 /armgcc/CMakeFiles/
