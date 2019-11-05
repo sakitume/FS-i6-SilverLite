@@ -11,7 +11,7 @@ int BOARD_SysTick(void);
 //------------------------------------------------------------------------------
 // Call time_update() once at start of every main loop. It must be called at
 // least every 2000000 microseconds to avoid error. Returns total number of
-// elapsed microseconds since startup.
+// elapsed milliseconds since startup.
 unsigned long time_update(void);
 
 //------------------------------------------------------------------------------

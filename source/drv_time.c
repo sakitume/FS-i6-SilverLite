@@ -13,7 +13,12 @@ static unsigned long gTotalMicros;
 // Total number of elapsed milliseconds
 // Overflows in 49.7 days
 // Updated on every call to time_update()
-static unsigned long gTotalMillis;
+static unsigned long gMillisThisFrame;
+
+// Total number of elapsed microseconds leading up to the current frame
+// Overflows in 71 minutes
+// Updated on every call to time_update()
+static unsigned long gMicrosThisFrame;
 
 //------------------------------------------------------------------------------
 // This handler is executed every 2000000 microseconds (2 seconds)
@@ -107,25 +112,25 @@ unsigned long micros_realtime(void)
 // least every 2000000 microseconds to avoid error.
 //
 // Updates the following global time accumulators:
-//  gTotalMicros
-//  gTotalMillis
+//  gMicrosThisFrame
+//  gMillisThisFrame
 unsigned long time_update()
 {
     static unsigned long lastMicros;
     static unsigned long remainder;
 
-    unsigned long now = micros_realtime();
-    unsigned long elapsed = now - lastMicros;
-    lastMicros = now;
+    gMicrosThisFrame = micros_realtime();
+    unsigned long elapsed = gMicrosThisFrame - lastMicros;
+    lastMicros = gMicrosThisFrame;
     elapsed += remainder;
     while (elapsed >= 1000)
     {
-        gTotalMillis++;
+        gMillisThisFrame++;
         elapsed -= 1000;
     }
     remainder = elapsed;
 
-    return gTotalMillis;
+    return gMillisThisFrame;
 }
 
 //------------------------------------------------------------------------------
@@ -184,11 +189,11 @@ void delay_ms(uint32_t ms)
 }
 
 //------------------------------------------------------------------------------
-// Returns number of elapsed microseconds since startup. This value is for the
-// the current main-loop/update frame
+// Returns number of elapsed microseconds since startup leading up to the current
+// frame. This value is for the the current main-loop/update frame
 unsigned long micros_this_frame(void)
 {
-    return gTotalMicros;
+    return gMicrosThisFrame;
 }
 
 //------------------------------------------------------------------------------
@@ -196,7 +201,7 @@ unsigned long micros_this_frame(void)
 // the current main-loop/update frame
 unsigned long millis_this_frame(void)
 {
-    return gTotalMillis;
+    return gMillisThisFrame;
 }
 
 //------------------------------------------------------------------------------
@@ -209,15 +214,12 @@ void delay_test(void)
     screen_clear();
     screen_put_uint14(10, 10, 1, delta);
     screen_update();
-    delay_ms(100);
 }
 
 //------------------------------------------------------------------------------
 void millis_test(void)
 {
-    unsigned long totalMillis = time_update();
     screen_clear();
-    screen_put_time(10, 10, 1, totalMillis / 1000);
+    screen_put_time(10, 10, 1, millis_this_frame() / 1000);
     screen_update();
-    delay_ms(100);
 }
