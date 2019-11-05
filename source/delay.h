@@ -4,7 +4,7 @@
 extern "C" {
 #endif /* __cplusplus */
 
-void delay_us(uint32_t us);
+void delay_us(int32_t us);
 void delay_ms(uint32_t ms);
 #define _delay_ms	delay_ms
 

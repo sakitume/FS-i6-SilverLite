@@ -53,7 +53,6 @@ static void lcd_reset(void) {
     lcd_write_command(0x28, 0);
     lcd_write_command(0xAF, 0);
 
-    int index = 0;
     int page = 0;
       do
       {

@@ -140,12 +140,36 @@ unsigned long time_update()
 //        screen_update();
 //        _delay_ms(100);
 //    }
-void delay_us(uint32_t us)
+void delay_us(int32_t us)
 {
+#if 1
+    // based on https:// github.com/leaflabs/libmaple
+    us *= 16;
+
+    // fudge for function call overhead
+    us--;
+    us--;
+    us--;
+    us--;
+    us--;
+    us--;
+    us--;
+    us--;
+
+    asm volatile(".syntax unified           \n\t"
+        "   mov r0, %[us]          \n\t"
+        "1: subs r0, #1            \n\t"
+        "   bge 1b                 \n\t"
+        ".syntax divided           \n\t"
+    :
+    : [us] "r" (us)
+    : "r0");
+#else    
     volatile uint32_t count;
     count = us * 6 - 6;
     while (count--)
         ;
+#endif        
 }
 
 //------------------------------------------------------------------------------

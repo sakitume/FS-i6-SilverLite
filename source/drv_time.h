@@ -30,7 +30,7 @@ unsigned long millis_this_frame(void);
 
 //------------------------------------------------------------------------------
 // Delays for the requested number of microseconds
-void delay_us(uint32_t us);
+void delay_us(int32_t us);
 
 //------------------------------------------------------------------------------
 // Delays for the requested number of milliseconds

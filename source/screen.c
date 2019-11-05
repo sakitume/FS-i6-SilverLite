@@ -46,7 +46,7 @@ void screen_update(void) {
 }
 
 void screen_test(void) {
-    uint32_t x, y;
+    uint32_t x;
     while (1) {
         for (x = 0; x < 64; x++) {
             screen_clear();
@@ -106,7 +106,7 @@ void screen_draw_line(uint8_t x1, uint8_t y1, uint8_t x2, uint8_t y2, uint8_t co
 // set pixels from upper left edge x,y to lower right edge x1,y1 to the given color
 // the width of the region is x1-x + 1, height is y1-y+1
 void screen_set_pixels(uint8_t x, uint8_t y, uint8_t x2, uint8_t y2, uint8_t color) {
-    uint8_t mask, pageOffset, h, i, data;
+    uint8_t mask, pageOffset, h, i;
     uint8_t height = y2-y+1;
     uint8_t width = x2-x+1;
     uint16_t dpos = 0;
@@ -262,7 +262,7 @@ void screen_fill_round_rect(uint8_t x, uint8_t y, uint8_t width,
     }
 }
 
-uint8_t screen_put_char(uint8_t c) {
+static uint8_t screen_put_char(char c) {
     uint8_t thielefont = 0;
     uint8_t width      = 0;
     uint8_t height     = screen_font_ptr[FONT_HEIGHT];
@@ -556,7 +556,7 @@ uint8_t screen_put_char(uint8_t c) {
     return 1;  // valid char
 }
 
-void screen_puts_xy(uint8_t x, uint8_t y, uint8_t color, uint8_t *str) {
+void screen_puts_xy(uint8_t x, uint8_t y, uint8_t color, const char *str) {
     screen_font_x = x;
     screen_font_y = y;
     screen_font_color = color;
@@ -567,7 +567,7 @@ void screen_puts_xy(uint8_t x, uint8_t y, uint8_t color, uint8_t *str) {
     }
 }
 
-uint32_t screen_strlen(uint8_t *str) {
+uint32_t screen_strlen(const char *str) {
     uint32_t len = 0;
     while (*str++) {
         len++;
@@ -579,8 +579,7 @@ uint32_t screen_strlen(uint8_t *str) {
     return (screen_font_ptr[FONT_FIXED_WIDTH] + 1) * len;
 }
 
-void screen_puts_xy_centered(uint8_t x, uint8_t y, uint8_t color, uint8_t *str) {
-    uint32_t font_w = screen_font_ptr[FONT_FIXED_WIDTH];
+void screen_puts_xy_centered(uint8_t x, uint8_t y, uint8_t color, const char *str) {
     uint32_t font_h = screen_font_ptr[FONT_HEIGHT];
 
     uint32_t len = screen_strlen(str);
@@ -589,7 +588,7 @@ void screen_puts_xy_centered(uint8_t x, uint8_t y, uint8_t color, uint8_t *str) 
     screen_puts_xy(sx, sy, color, str);
 }
 
-void screen_puts_centered(uint8_t y, uint8_t color, uint8_t *str) {
+void screen_puts_centered(uint8_t y, uint8_t color, const char *str) {
     screen_puts_xy_centered(LCD_WIDTH/2, y, color, str);
 }
 
@@ -633,7 +632,6 @@ void screen_put_int8(uint8_t x, uint8_t y, uint8_t color, int8_t c) {
 void screen_put_time(uint8_t x, uint8_t y, uint8_t c, int16_t time) {
     // print time -00:00 on screen
     uint32_t color = c;
-    uint32_t negative = 0;
 
     if (time < 0) {
         time = -time;
@@ -685,20 +683,17 @@ void screen_put_uint8_2dec(uint8_t x, uint8_t y, uint8_t color, uint8_t c) {
 
     uint8_t tmp;
     uint8_t mul;
-    uint8_t l;
 
     // this should not happen
     if (c >= 100) {
         return;
     }
 
-    l = 0;
     for (mul = 10; mul > 0; mul = mul/ 10) {
         tmp = '0';
         while (c >= mul) {
             c -= mul;
             tmp++;
-            l = 1;
         }
         screen_put_char(tmp);
     }

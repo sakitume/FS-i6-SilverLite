@@ -23,15 +23,18 @@
 #include <stdint.h>
 #include "font.h"
 
+#if defined(__cplusplus)
+extern "C" {
+#endif /* __cplusplus */
+
 // rendering color for text, background is the inverse (allowed: 0,1)
 #define CONSOLE_TEXTCOLOR 1
 
 __attribute__((section (".TestCODE"))) void console_init(void);
 __attribute__((section (".TestCODE"))) void console_clear(void);
 
-__attribute__((section (".TestCODE"))) static void console_render_str(uint8_t line, uint8_t color, uint8_t *str);
-__attribute__((section (".TestCODE"))) void console_puts(uint8_t *str);
-__attribute__((section (".TestCODE"))) void console_putc(uint8_t c);
+__attribute__((section (".TestCODE"))) void console_puts(const char *str);
+__attribute__((section (".TestCODE"))) void console_putc(char c);
 __attribute__((section (".TestCODE"))) void console_render(void);
 
 // you can define the console font here. make sure to use FIXED WIDTH fonts!
@@ -46,6 +49,11 @@ __attribute__((section (".TestCODE"))) void console_render(void);
 // calculate how many chars can be printed on the console
 #define CONSOLE_BUFFER_SIZE_X (LCD_WIDTH  / (CONSOLE_FONT_WIDTH+1))
 #define CONSOLE_BUFFER_SIZE_Y ((LCD_HEIGHT / (CONSOLE_FONT_HEIGHT+1))+1)
+
+
+#if defined(__cplusplus)
+}
+#endif /* __cplusplus */
 
 #endif  // CONSOLE_H_
 

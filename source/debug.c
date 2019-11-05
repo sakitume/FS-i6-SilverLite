@@ -67,10 +67,10 @@ void debug_flush(void) {
 }
 
 
-void debug(uint8_t *data) {
-    uint8_t c = *data++;
+void debug(const char *data) {
+    char c = *data++;
     while (c) {
-        debug_putc(c);
+        debug_putc((uint8_t)c);
         c = *data++;
     }
 }

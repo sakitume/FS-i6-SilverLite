@@ -48,12 +48,12 @@ void screen_set_pixels(uint8_t x, uint8_t y, uint8_t x2, uint8_t y2, uint8_t col
 void screen_draw_line(uint8_t x1, uint8_t y1, uint8_t x2, uint8_t y2, uint8_t color);
 
 
-uint32_t screen_strlen(uint8_t *str);
+uint32_t screen_strlen(const char *str);
 
 __attribute__((section (".TestCODE")))  void screen_set_font(const uint8_t *font);
-__attribute__((section (".TestCODE")))  void screen_puts_xy(uint8_t x, uint8_t y, uint8_t color, uint8_t *str);
-void screen_puts_xy_centered(uint8_t y, uint8_t x, uint8_t color, uint8_t *str);
-void screen_puts_centered(uint8_t y, uint8_t color, uint8_t *str);
+__attribute__((section (".TestCODE")))  void screen_puts_xy(uint8_t x, uint8_t y, uint8_t color, const char *str);
+void screen_puts_xy_centered(uint8_t y, uint8_t x, uint8_t color, const char *str);
+void screen_puts_centered(uint8_t y, uint8_t color, const char *str);
 void screen_put_int8(uint8_t x, uint8_t y, uint8_t color, int8_t c);
 void screen_put_uint8(uint8_t x, uint8_t y, uint8_t color, uint8_t c);
 void screen_put_uint8_2dec(uint8_t x, uint8_t y, uint8_t color, uint8_t c);

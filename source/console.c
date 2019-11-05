@@ -22,7 +22,7 @@
 #include "font.h"
 #include "delay.h"
 
-static uint8_t console_buffer[CONSOLE_BUFFER_SIZE_Y][CONSOLE_BUFFER_SIZE_X+1];
+static char console_buffer[CONSOLE_BUFFER_SIZE_Y][CONSOLE_BUFFER_SIZE_X+1];
 static uint8_t console_write_x;
 static uint8_t console_write_y;
 
@@ -43,7 +43,7 @@ void console_clear(void) {
     }
 }
 
-static void console_render_str(uint8_t line, uint8_t color, uint8_t *str) {
+static void console_render_str(uint8_t line, uint8_t color, const char *str) {
     const uint8_t *font = CONSOLE_FONT;
 
     screen_set_font(font);
@@ -63,13 +63,13 @@ static void console_render_str(uint8_t line, uint8_t color, uint8_t *str) {
 }
 
 
-void console_puts(uint8_t *str) {
+void console_puts(const char *str) {
     while (*str) {
         console_putc(*str);
     }
 }
 
-void console_putc(uint8_t c) {
+void console_putc(char c) {
     uint32_t x = 0;
     // print one char to our screen, this function
     // handles the screen layout etc
