@@ -28,8 +28,8 @@ pin_labels:
 - {pin_num: '20', pin_signal: PTE24/TPM0_CH0/I2C0_SCL, label: SCL}
 - {pin_num: '21', pin_signal: PTE25/TPM0_CH1/I2C0_SDA, label: SDA}
 - {pin_num: '22', pin_signal: TSI0_CH1/PTA0/TPM0_CH5/SWD_CLK, label: SWD-CLK}
-- {pin_num: '24', pin_signal: TSI0_CH3/PTA2/UART0_TX/TPM2_CH1, label: PPM-IN, identifier: PPM_IN}
-- {pin_num: '23', pin_signal: TSI0_CH2/PTA1/UART0_RX/TPM2_CH0, label: PPM-OUT, identifier: PPM_OUT}
+- {pin_num: '24', pin_signal: TSI0_CH3/PTA2/UART0_TX/TPM2_CH1, label: PPM-IN, identifier: SOFT_SPI_MISO}
+- {pin_num: '23', pin_signal: TSI0_CH2/PTA1/UART0_RX/TPM2_CH0, label: PPM-OUT, identifier: NRF24L01_CE}
 - {pin_num: '25', pin_signal: TSI0_CH4/PTA3/I2C1_SCL/TPM0_CH0/SWD_DIO, label: SWD-DIO}
 - {pin_num: '28', pin_signal: PTA12/TPM1_CH0/I2S0_TXD0, label: Buzzer, identifier: Buzzer}
 - {pin_num: '27', pin_signal: PTA5/TPM0_CH2/I2S0_TX_BCLK, label: Bind, identifier: Bind}
@@ -53,7 +53,7 @@ pin_labels:
 - {pin_num: '46', pin_signal: PTC3/LLWU_P7/UART1_RX/TPM0_CH2/CLKOUT/I2S0_TX_BCLK, label: 'RF1 or RFI (Radio Module '}
 - {pin_num: '47', pin_signal: VSS63, label: GND}
 - {pin_num: '48', pin_signal: VDD64, label: +3.3V}
-- {pin_num: '49', pin_signal: PTC4/LLWU_P8/SPI0_PCS0/UART1_TX/TPM0_CH3/I2S0_MCLK, label: SCS (Radio Module), identifier: SOFT_SPI_CS}
+- {pin_num: '49', pin_signal: PTC4/LLWU_P8/SPI0_PCS0/UART1_TX/TPM0_CH3/I2S0_MCLK, label: SCS (Radio Module), identifier: SOFT_SPI_CS_A7105}
 - {pin_num: '50', pin_signal: PTC5/LLWU_P9/SPI0_SCK/LPTMR0_ALT2/I2S0_RXD0/CMP0_OUT, label: SCK (Radio Module), identifier: SOFT_SPI_SCK}
 - {pin_num: '51', pin_signal: CMP0_IN0/PTC6/LLWU_P10/SPI0_MOSI/EXTRG_IN/I2S0_RX_BCLK/SPI0_MISO/I2S0_MCLK, label: SDIO (Radio Module), identifier: SOFT_SPI_MOSI}
 - {pin_num: '52', pin_signal: CMP0_IN1/PTC7/SPI0_MISO/I2S0_RX_FS/SPI0_MOSI, label: RF0 or RFO (Radio Module PA Output)}
@@ -63,10 +63,10 @@ pin_labels:
 - {pin_num: '56', pin_signal: PTC11/I2C1_SDA/I2S0_RXD0, label: LCD-D7}
 - {pin_num: '57', pin_signal: PTD0/SPI0_PCS0/TPM0_CH0, label: SwA, identifier: SwA}
 - {pin_num: '58', pin_signal: ADC0_SE5b/PTD1/SPI0_SCK/TPM0_CH1, label: Ch3 Throttle}
-- {pin_num: '60', pin_signal: PTD3/SPI0_MISO/UART2_TX/TPM0_CH3/SPI0_MOSI, label: GIO1 (Radio Module), identifier: SOFT_SPI_MISO}
+- {pin_num: '60', pin_signal: PTD3/SPI0_MISO/UART2_TX/TPM0_CH3/SPI0_MOSI, label: GIO1 (Radio Module)}
 - {pin_num: '5', pin_signal: ADC0_DP1/ADC0_SE1/PTE16/SPI0_PCS0/UART2_TX/TPM_CLKIN0, label: TX}
 - {pin_num: '6', pin_signal: ADC0_DM1/ADC0_SE5a/PTE17/SPI0_SCK/UART2_RX/TPM_CLKIN1/LPTMR0_ALT3, label: RX}
-- {pin_num: '59', pin_signal: PTD2/SPI0_MOSI/UART2_RX/TPM0_CH2/SPI0_MISO, label: 'spare? (unmarked test pad)', identifier: SPARE}
+- {pin_num: '59', pin_signal: PTD2/SPI0_MOSI/UART2_RX/TPM0_CH2/SPI0_MISO, label: 'spare? (unmarked test pad)', identifier: SOFT_SPI_CS_NRF24L01}
 - {pin_num: '61', pin_signal: PTD4/LLWU_P14/SPI1_PCS0/UART2_RX/TPM0_CH4, label: SwD, identifier: SwD}
 - {pin_num: '62', pin_signal: ADC0_SE6b/PTD5/SPI1_SCK/UART2_TX/TPM0_CH5, label: Ch2 Pitch}
 - {pin_num: '63', pin_signal: ADC0_SE7b/PTD6/LLWU_P15/SPI1_MOSI/UART0_RX/SPI1_MISO, label: Ch1 Roll}
@@ -114,20 +114,9 @@ BOARD_InitPins:
   - {pin_num: '22', peripheral: SWD, signal: CLK, pin_signal: TSI0_CH1/PTA0/TPM0_CH5/SWD_CLK}
   - {pin_num: '25', peripheral: SWD, signal: DIO, pin_signal: TSI0_CH4/PTA3/I2C1_SCL/TPM0_CH0/SWD_DIO}
   - {pin_num: '34', peripheral: RCM, signal: RESET, pin_signal: PTA20/RESET_b}
-  - {pin_num: '35', peripheral: GPIOB, signal: 'GPIO, 0', pin_signal: ADC0_SE8/TSI0_CH0/PTB0/LLWU_P5/I2C0_SCL/TPM1_CH0}
-  - {pin_num: '36', peripheral: GPIOB, signal: 'GPIO, 1', pin_signal: ADC0_SE9/TSI0_CH6/PTB1/I2C0_SDA/TPM1_CH1}
-  - {pin_num: '37', peripheral: GPIOB, signal: 'GPIO, 2', pin_signal: ADC0_SE12/TSI0_CH7/PTB2/I2C0_SCL/TPM2_CH0}
-  - {pin_num: '38', peripheral: GPIOB, signal: 'GPIO, 3', pin_signal: ADC0_SE13/TSI0_CH8/PTB3/I2C0_SDA/TPM2_CH1}
-  - {pin_num: '39', peripheral: GPIOB, signal: 'GPIO, 16', pin_signal: TSI0_CH9/PTB16/SPI1_MOSI/UART0_RX/TPM_CLKIN0/SPI1_MISO}
-  - {pin_num: '40', peripheral: GPIOB, signal: 'GPIO, 17', pin_signal: TSI0_CH10/PTB17/SPI1_MISO/UART0_TX/TPM_CLKIN1/SPI1_MOSI}
-  - {pin_num: '41', peripheral: GPIOB, signal: 'GPIO, 18', pin_signal: TSI0_CH11/PTB18/TPM2_CH0/I2S0_TX_BCLK}
-  - {pin_num: '42', peripheral: GPIOB, signal: 'GPIO, 19', pin_signal: TSI0_CH12/PTB19/TPM2_CH1/I2S0_TX_FS}
   - {pin_num: '43', peripheral: ADC0, signal: 'SE, 14', pin_signal: ADC0_SE14/TSI0_CH13/PTC0/EXTRG_IN/CMP0_OUT/I2S0_TXD0}
   - {pin_num: '44', peripheral: ADC0, signal: 'SE, 15', pin_signal: ADC0_SE15/TSI0_CH14/PTC1/LLWU_P6/RTC_CLKIN/I2C1_SCL/TPM0_CH0/I2S0_TXD0}
   - {pin_num: '45', peripheral: ADC0, signal: 'SE, 11', pin_signal: ADC0_SE11/TSI0_CH15/PTC2/I2C1_SDA/TPM0_CH1/I2S0_TX_FS}
-  - {pin_num: '49', peripheral: SPI0, signal: PCS0, pin_signal: PTC4/LLWU_P8/SPI0_PCS0/UART1_TX/TPM0_CH3/I2S0_MCLK}
-  - {pin_num: '50', peripheral: SPI0, signal: SCK, pin_signal: PTC5/LLWU_P9/SPI0_SCK/LPTMR0_ALT2/I2S0_RXD0/CMP0_OUT}
-  - {pin_num: '51', peripheral: SPI0, signal: MOSI, pin_signal: CMP0_IN0/PTC6/LLWU_P10/SPI0_MOSI/EXTRG_IN/I2S0_RX_BCLK/SPI0_MISO/I2S0_MCLK}
   - {pin_num: '53', peripheral: GPIOC, signal: 'GPIO, 8', pin_signal: CMP0_IN2/PTC8/I2C0_SCL/TPM0_CH4/I2S0_MCLK}
   - {pin_num: '54', peripheral: GPIOC, signal: 'GPIO, 9', pin_signal: CMP0_IN3/PTC9/I2C0_SDA/TPM0_CH5/I2S0_RX_BCLK}
   - {pin_num: '55', peripheral: GPIOC, signal: 'GPIO, 10', pin_signal: PTC10/I2C1_SCL/I2S0_RX_FS}
@@ -142,10 +131,23 @@ BOARD_InitPins:
   - {pin_num: '29', peripheral: GPIOA, signal: 'GPIO, 13', pin_signal: PTA13/TPM1_CH1/I2S0_TX_FS}
   - {pin_num: '64', peripheral: GPIOD, signal: 'GPIO, 7', pin_signal: PTD7/SPI1_MISO/UART0_TX/SPI1_MOSI}
   - {pin_num: '61', peripheral: GPIOD, signal: 'GPIO, 4', pin_signal: PTD4/LLWU_P14/SPI1_PCS0/UART2_RX/TPM0_CH4}
-  - {pin_num: '60', peripheral: SPI0, signal: MISO, pin_signal: PTD3/SPI0_MISO/UART2_TX/TPM0_CH3/SPI0_MOSI}
   - {pin_num: '27', peripheral: GPIOA, signal: 'GPIO, 5', pin_signal: PTA5/TPM0_CH2/I2S0_TX_BCLK}
   - {pin_num: '28', peripheral: GPIOA, signal: 'GPIO, 12', pin_signal: PTA12/TPM1_CH0/I2S0_TXD0}
   - {pin_num: '59', peripheral: GPIOD, signal: 'GPIO, 2', pin_signal: PTD2/SPI0_MOSI/UART2_RX/TPM0_CH2/SPI0_MISO}
+  - {pin_num: '35', peripheral: GPIOB, signal: 'GPIO, 0', pin_signal: ADC0_SE8/TSI0_CH0/PTB0/LLWU_P5/I2C0_SCL/TPM1_CH0}
+  - {pin_num: '39', peripheral: GPIOB, signal: 'GPIO, 16', pin_signal: TSI0_CH9/PTB16/SPI1_MOSI/UART0_RX/TPM_CLKIN0/SPI1_MISO}
+  - {pin_num: '40', peripheral: GPIOB, signal: 'GPIO, 17', pin_signal: TSI0_CH10/PTB17/SPI1_MISO/UART0_TX/TPM_CLKIN1/SPI1_MOSI}
+  - {pin_num: '41', peripheral: GPIOB, signal: 'GPIO, 18', pin_signal: TSI0_CH11/PTB18/TPM2_CH0/I2S0_TX_BCLK}
+  - {pin_num: '42', peripheral: GPIOB, signal: 'GPIO, 19', pin_signal: TSI0_CH12/PTB19/TPM2_CH1/I2S0_TX_FS}
+  - {pin_num: '50', peripheral: GPIOC, signal: 'GPIO, 5', pin_signal: PTC5/LLWU_P9/SPI0_SCK/LPTMR0_ALT2/I2S0_RXD0/CMP0_OUT}
+  - {pin_num: '49', peripheral: GPIOC, signal: 'GPIO, 4', pin_signal: PTC4/LLWU_P8/SPI0_PCS0/UART1_TX/TPM0_CH3/I2S0_MCLK}
+  - {pin_num: '23', peripheral: GPIOA, signal: 'GPIO, 1', pin_signal: TSI0_CH2/PTA1/UART0_RX/TPM2_CH0}
+  - {pin_num: '24', peripheral: GPIOA, signal: 'GPIO, 2', pin_signal: TSI0_CH3/PTA2/UART0_TX/TPM2_CH1}
+  - {pin_num: '37', peripheral: GPIOB, signal: 'GPIO, 2', pin_signal: ADC0_SE12/TSI0_CH7/PTB2/I2C0_SCL/TPM2_CH0}
+  - {pin_num: '36', peripheral: GPIOB, signal: 'GPIO, 1', pin_signal: ADC0_SE9/TSI0_CH6/PTB1/I2C0_SDA/TPM1_CH1}
+  - {pin_num: '38', peripheral: GPIOB, signal: 'GPIO, 3', pin_signal: ADC0_SE13/TSI0_CH8/PTB3/I2C0_SDA/TPM2_CH1}
+  - {pin_num: '60', peripheral: GPIOD, signal: 'GPIO, 3', pin_signal: PTD3/SPI0_MISO/UART2_TX/TPM0_CH3/SPI0_MOSI}
+  - {pin_num: '51', peripheral: GPIOC, signal: 'GPIO, 6', pin_signal: CMP0_IN0/PTC6/LLWU_P10/SPI0_MOSI/EXTRG_IN/I2S0_RX_BCLK/SPI0_MISO/I2S0_MCLK}
  * BE CAREFUL MODIFYING THIS COMMENT - IT IS YAML SETTINGS FOR TOOLS ***********
  */
 /* clang-format on */
@@ -172,6 +174,9 @@ void BOARD_InitPins(void)
     /* PORTA0 (pin 22) is configured as SWD_CLK */
     PORT_SetPinMux(PORTA, 0U, kPORT_MuxAlt7);
 
+    /* PORTA1 (pin 23) is configured as PTA1 */
+    PORT_SetPinMux(BOARD_INITPINS_NRF24L01_CE_PORT, BOARD_INITPINS_NRF24L01_CE_PIN, kPORT_MuxAsGpio);
+
     /* PORTA12 (pin 28) is configured as PTA12 */
     PORT_SetPinMux(BOARD_INITPINS_Buzzer_PORT, BOARD_INITPINS_Buzzer_PIN, kPORT_MuxAsGpio);
 
@@ -183,6 +188,9 @@ void BOARD_InitPins(void)
 
     /* PORTA19 (pin 33) is configured as XTAL0 */
     PORT_SetPinMux(PORTA, 19U, kPORT_PinDisabledOrAnalog);
+
+    /* PORTA2 (pin 24) is configured as PTA2 */
+    PORT_SetPinMux(BOARD_INITPINS_SOFT_SPI_MISO_PORT, BOARD_INITPINS_SOFT_SPI_MISO_PIN, kPORT_MuxAsGpio);
 
     /* PORTA20 (pin 34) is configured as RESET_b */
     PORT_SetPinMux(PORTA, 20U, kPORT_MuxAlt7);
@@ -235,14 +243,14 @@ void BOARD_InitPins(void)
     /* PORTC2 (pin 45) is configured as ADC0_SE11 */
     PORT_SetPinMux(PORTC, 2U, kPORT_PinDisabledOrAnalog);
 
-    /* PORTC4 (pin 49) is configured as SPI0_PCS0 */
-    PORT_SetPinMux(BOARD_INITPINS_SOFT_SPI_CS_PORT, BOARD_INITPINS_SOFT_SPI_CS_PIN, kPORT_MuxAlt2);
+    /* PORTC4 (pin 49) is configured as PTC4 */
+    PORT_SetPinMux(BOARD_INITPINS_SOFT_SPI_CS_A7105_PORT, BOARD_INITPINS_SOFT_SPI_CS_A7105_PIN, kPORT_MuxAsGpio);
 
-    /* PORTC5 (pin 50) is configured as SPI0_SCK */
-    PORT_SetPinMux(BOARD_INITPINS_SOFT_SPI_SCK_PORT, BOARD_INITPINS_SOFT_SPI_SCK_PIN, kPORT_MuxAlt2);
+    /* PORTC5 (pin 50) is configured as PTC5 */
+    PORT_SetPinMux(BOARD_INITPINS_SOFT_SPI_SCK_PORT, BOARD_INITPINS_SOFT_SPI_SCK_PIN, kPORT_MuxAsGpio);
 
-    /* PORTC6 (pin 51) is configured as SPI0_MOSI */
-    PORT_SetPinMux(BOARD_INITPINS_SOFT_SPI_MOSI_PORT, BOARD_INITPINS_SOFT_SPI_MOSI_PIN, kPORT_MuxAlt2);
+    /* PORTC6 (pin 51) is configured as PTC6 */
+    PORT_SetPinMux(BOARD_INITPINS_SOFT_SPI_MOSI_PORT, BOARD_INITPINS_SOFT_SPI_MOSI_PIN, kPORT_MuxAsGpio);
 
     /* PORTC8 (pin 53) is configured as PTC8 */
     PORT_SetPinMux(PORTC, 8U, kPORT_MuxAsGpio);
@@ -257,10 +265,10 @@ void BOARD_InitPins(void)
     PORT_SetPinMux(PORTD, 1U, kPORT_PinDisabledOrAnalog);
 
     /* PORTD2 (pin 59) is configured as PTD2 */
-    PORT_SetPinMux(BOARD_INITPINS_SPARE_PORT, BOARD_INITPINS_SPARE_PIN, kPORT_MuxAsGpio);
+    PORT_SetPinMux(BOARD_INITPINS_SOFT_SPI_CS_NRF24L01_PORT, BOARD_INITPINS_SOFT_SPI_CS_NRF24L01_PIN, kPORT_MuxAsGpio);
 
-    /* PORTD3 (pin 60) is configured as SPI0_MISO */
-    PORT_SetPinMux(BOARD_INITPINS_SOFT_SPI_MISO_PORT, BOARD_INITPINS_SOFT_SPI_MISO_PIN, kPORT_MuxAlt2);
+    /* PORTD3 (pin 60) is configured as PTD3 */
+    PORT_SetPinMux(PORTD, 3U, kPORT_MuxAsGpio);
 
     /* PORTD4 (pin 61) is configured as PTD4 */
     PORT_SetPinMux(BOARD_INITPINS_SwD_PORT, BOARD_INITPINS_SwD_PIN, kPORT_MuxAsGpio);

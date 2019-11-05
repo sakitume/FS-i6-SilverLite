@@ -28,33 +28,47 @@ void BOARD_InitBootPins(void);
 #define SOPT5_UART1RXSRC_UART_RX 0x00u /*!<@brief UART1 Receive Data Source Select: UART1_RX pin */
 #define SOPT5_UART1TXSRC_UART_TX 0x00u /*!<@brief UART1 Transmit Data Source Select: UART1_TX pin */
 
+/*! @name PORTD0 (number 57), SwA
+  @{ */
+#define BOARD_INITPINS_SwA_GPIO GPIOD /*!<@brief GPIO device name: GPIOD */
+#define BOARD_INITPINS_SwA_PORT PORTD /*!<@brief PORT device name: PORTD */
+#define BOARD_INITPINS_SwA_PIN 0U     /*!<@brief PORTD pin index: 0 */
+                                      /* @} */
+
+/*! @name PORTD4 (number 61), SwD
+  @{ */
+#define BOARD_INITPINS_SwD_GPIO GPIOD /*!<@brief GPIO device name: GPIOD */
+#define BOARD_INITPINS_SwD_PORT PORTD /*!<@brief PORT device name: PORTD */
+#define BOARD_INITPINS_SwD_PIN 4U     /*!<@brief PORTD pin index: 4 */
+                                      /* @} */
+
+/*! @name PORTA5 (number 27), Bind
+  @{ */
+#define BOARD_INITPINS_Bind_GPIO GPIOA /*!<@brief GPIO device name: GPIOA */
+#define BOARD_INITPINS_Bind_PORT PORTA /*!<@brief PORT device name: PORTA */
+#define BOARD_INITPINS_Bind_PIN 5U     /*!<@brief PORTA pin index: 5 */
+                                       /* @} */
+
+/*! @name PORTA12 (number 28), Buzzer
+  @{ */
+#define BOARD_INITPINS_Buzzer_GPIO GPIOA /*!<@brief GPIO device name: GPIOA */
+#define BOARD_INITPINS_Buzzer_PORT PORTA /*!<@brief PORT device name: PORTA */
+#define BOARD_INITPINS_Buzzer_PIN 12U    /*!<@brief PORTA pin index: 12 */
+                                         /* @} */
+
+/*! @name PORTD2 (number 59), spare? (unmarked test pad)
+  @{ */
+#define BOARD_INITPINS_SOFT_SPI_CS_NRF24L01_GPIO GPIOD /*!<@brief GPIO device name: GPIOD */
+#define BOARD_INITPINS_SOFT_SPI_CS_NRF24L01_PORT PORTD /*!<@brief PORT device name: PORTD */
+#define BOARD_INITPINS_SOFT_SPI_CS_NRF24L01_PIN 2U     /*!<@brief PORTD pin index: 2 */
+                                                       /* @} */
+
 /*! @name PORTB0 (number 35), LED
   @{ */
 #define BOARD_INITPINS_LED_BACKLIGHT_GPIO GPIOB /*!<@brief GPIO device name: GPIOB */
 #define BOARD_INITPINS_LED_BACKLIGHT_PORT PORTB /*!<@brief PORT device name: PORTB */
 #define BOARD_INITPINS_LED_BACKLIGHT_PIN 0U     /*!<@brief PORTB pin index: 0 */
                                                 /* @} */
-
-/*! @name PORTB1 (number 36), Buttons R1
-  @{ */
-#define BOARD_INITPINS_BUTTON_R1_GPIO GPIOB /*!<@brief GPIO device name: GPIOB */
-#define BOARD_INITPINS_BUTTON_R1_PORT PORTB /*!<@brief PORT device name: PORTB */
-#define BOARD_INITPINS_BUTTON_R1_PIN 1U     /*!<@brief PORTB pin index: 1 */
-                                            /* @} */
-
-/*! @name PORTB2 (number 37), Buttons R2
-  @{ */
-#define BOARD_INITPINS_BUTTON_R2_GPIO GPIOB /*!<@brief GPIO device name: GPIOB */
-#define BOARD_INITPINS_BUTTON_R2_PORT PORTB /*!<@brief PORT device name: PORTB */
-#define BOARD_INITPINS_BUTTON_R2_PIN 2U     /*!<@brief PORTB pin index: 2 */
-                                            /* @} */
-
-/*! @name PORTB3 (number 38), Buttons R3
-  @{ */
-#define BOARD_INITPINS_BUTTON_R3_GPIO GPIOB /*!<@brief GPIO device name: GPIOB */
-#define BOARD_INITPINS_BUTTON_R3_PORT PORTB /*!<@brief PORT device name: PORTB */
-#define BOARD_INITPINS_BUTTON_R3_PIN 3U     /*!<@brief PORTB pin index: 3 */
-                                            /* @} */
 
 /*! @name PORTB16 (number 39), Buttons L1
   @{ */
@@ -84,64 +98,61 @@ void BOARD_InitBootPins(void);
 #define BOARD_INITPINS_BUTTON_L4_PIN 19U    /*!<@brief PORTB pin index: 19 */
                                             /* @} */
 
-/*! @name PORTC4 (number 49), SCS (Radio Module)
-  @{ */
-#define BOARD_INITPINS_SOFT_SPI_CS_PORT PORTC /*!<@brief PORT device name: PORTC */
-#define BOARD_INITPINS_SOFT_SPI_CS_PIN 4U     /*!<@brief PORTC pin index: 4 */
-                                              /* @} */
-
 /*! @name PORTC5 (number 50), SCK (Radio Module)
   @{ */
+#define BOARD_INITPINS_SOFT_SPI_SCK_GPIO GPIOC /*!<@brief GPIO device name: GPIOC */
 #define BOARD_INITPINS_SOFT_SPI_SCK_PORT PORTC /*!<@brief PORT device name: PORTC */
 #define BOARD_INITPINS_SOFT_SPI_SCK_PIN 5U     /*!<@brief PORTC pin index: 5 */
                                                /* @} */
 
+/*! @name PORTC4 (number 49), SCS (Radio Module)
+  @{ */
+#define BOARD_INITPINS_SOFT_SPI_CS_A7105_GPIO GPIOC /*!<@brief GPIO device name: GPIOC */
+#define BOARD_INITPINS_SOFT_SPI_CS_A7105_PORT PORTC /*!<@brief PORT device name: PORTC */
+#define BOARD_INITPINS_SOFT_SPI_CS_A7105_PIN 4U     /*!<@brief PORTC pin index: 4 */
+                                                    /* @} */
+
+/*! @name PORTA1 (number 23), PPM-OUT
+  @{ */
+#define BOARD_INITPINS_NRF24L01_CE_GPIO GPIOA /*!<@brief GPIO device name: GPIOA */
+#define BOARD_INITPINS_NRF24L01_CE_PORT PORTA /*!<@brief PORT device name: PORTA */
+#define BOARD_INITPINS_NRF24L01_CE_PIN 1U     /*!<@brief PORTA pin index: 1 */
+                                              /* @} */
+
+/*! @name PORTA2 (number 24), PPM-IN
+  @{ */
+#define BOARD_INITPINS_SOFT_SPI_MISO_GPIO GPIOA /*!<@brief GPIO device name: GPIOA */
+#define BOARD_INITPINS_SOFT_SPI_MISO_PORT PORTA /*!<@brief PORT device name: PORTA */
+#define BOARD_INITPINS_SOFT_SPI_MISO_PIN 2U     /*!<@brief PORTA pin index: 2 */
+                                                /* @} */
+
+/*! @name PORTB2 (number 37), Buttons R2
+  @{ */
+#define BOARD_INITPINS_BUTTON_R2_GPIO GPIOB /*!<@brief GPIO device name: GPIOB */
+#define BOARD_INITPINS_BUTTON_R2_PORT PORTB /*!<@brief PORT device name: PORTB */
+#define BOARD_INITPINS_BUTTON_R2_PIN 2U     /*!<@brief PORTB pin index: 2 */
+                                            /* @} */
+
+/*! @name PORTB1 (number 36), Buttons R1
+  @{ */
+#define BOARD_INITPINS_BUTTON_R1_GPIO GPIOB /*!<@brief GPIO device name: GPIOB */
+#define BOARD_INITPINS_BUTTON_R1_PORT PORTB /*!<@brief PORT device name: PORTB */
+#define BOARD_INITPINS_BUTTON_R1_PIN 1U     /*!<@brief PORTB pin index: 1 */
+                                            /* @} */
+
+/*! @name PORTB3 (number 38), Buttons R3
+  @{ */
+#define BOARD_INITPINS_BUTTON_R3_GPIO GPIOB /*!<@brief GPIO device name: GPIOB */
+#define BOARD_INITPINS_BUTTON_R3_PORT PORTB /*!<@brief PORT device name: PORTB */
+#define BOARD_INITPINS_BUTTON_R3_PIN 3U     /*!<@brief PORTB pin index: 3 */
+                                            /* @} */
+
 /*! @name PORTC6 (number 51), SDIO (Radio Module)
   @{ */
+#define BOARD_INITPINS_SOFT_SPI_MOSI_GPIO GPIOC /*!<@brief GPIO device name: GPIOC */
 #define BOARD_INITPINS_SOFT_SPI_MOSI_PORT PORTC /*!<@brief PORT device name: PORTC */
 #define BOARD_INITPINS_SOFT_SPI_MOSI_PIN 6U     /*!<@brief PORTC pin index: 6 */
                                                 /* @} */
-
-/*! @name PORTD0 (number 57), SwA
-  @{ */
-#define BOARD_INITPINS_SwA_GPIO GPIOD /*!<@brief GPIO device name: GPIOD */
-#define BOARD_INITPINS_SwA_PORT PORTD /*!<@brief PORT device name: PORTD */
-#define BOARD_INITPINS_SwA_PIN 0U     /*!<@brief PORTD pin index: 0 */
-                                      /* @} */
-
-/*! @name PORTD4 (number 61), SwD
-  @{ */
-#define BOARD_INITPINS_SwD_GPIO GPIOD /*!<@brief GPIO device name: GPIOD */
-#define BOARD_INITPINS_SwD_PORT PORTD /*!<@brief PORT device name: PORTD */
-#define BOARD_INITPINS_SwD_PIN 4U     /*!<@brief PORTD pin index: 4 */
-                                      /* @} */
-
-/*! @name PORTD3 (number 60), GIO1 (Radio Module)
-  @{ */
-#define BOARD_INITPINS_SOFT_SPI_MISO_PORT PORTD /*!<@brief PORT device name: PORTD */
-#define BOARD_INITPINS_SOFT_SPI_MISO_PIN 3U     /*!<@brief PORTD pin index: 3 */
-                                                /* @} */
-
-/*! @name PORTA5 (number 27), Bind
-  @{ */
-#define BOARD_INITPINS_Bind_GPIO GPIOA /*!<@brief GPIO device name: GPIOA */
-#define BOARD_INITPINS_Bind_PORT PORTA /*!<@brief PORT device name: PORTA */
-#define BOARD_INITPINS_Bind_PIN 5U     /*!<@brief PORTA pin index: 5 */
-                                       /* @} */
-
-/*! @name PORTA12 (number 28), Buzzer
-  @{ */
-#define BOARD_INITPINS_Buzzer_GPIO GPIOA /*!<@brief GPIO device name: GPIOA */
-#define BOARD_INITPINS_Buzzer_PORT PORTA /*!<@brief PORT device name: PORTA */
-#define BOARD_INITPINS_Buzzer_PIN 12U    /*!<@brief PORTA pin index: 12 */
-                                         /* @} */
-
-/*! @name PORTD2 (number 59), spare? (unmarked test pad)
-  @{ */
-#define BOARD_INITPINS_SPARE_GPIO GPIOD /*!<@brief GPIO device name: GPIOD */
-#define BOARD_INITPINS_SPARE_PORT PORTD /*!<@brief PORT device name: PORTD */
-#define BOARD_INITPINS_SPARE_PIN 2U     /*!<@brief PORTD pin index: 2 */
-                                        /* @} */
 
 /*!
  * @brief Configures pin routing and optionally pin electrical features.
