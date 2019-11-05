@@ -93,6 +93,15 @@ int main(void)
     BOARD_InitDebugConsole();
 #endif    
 
+    // Prevent A7105 module from being selected during SPI
+    {
+        // Set CS for the A7105 module to always be inactive (HIGH)
+        gpio_pin_config_t pin_config_output_high = {
+            kGPIO_DigitalOutput, 1
+        };
+        GPIO_PinInit(BOARD_INITPINS_SOFT_SPI_CS_A7105_GPIO, BOARD_INITPINS_SOFT_SPI_CS_A7105_PIN, &pin_config_output_high); // PORTC, 4
+    }
+
 #if defined(__USE_TRAINER_PORT_UART__)
     uart_init();
 #endif    
