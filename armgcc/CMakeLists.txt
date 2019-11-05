@@ -232,6 +232,8 @@ add_executable(${TargetELF}
 "${SrcPath}/delay.h"
 "${SrcPath}/drv_time.c"
 "${SrcPath}/drv_time.h"
+"${SrcPath}/flash.cpp"
+"${SrcPath}/flash.h"
 "${SrcPath}/font.c"
 "${SrcPath}/font.h"
 "${SrcPath}/lcd.c"
