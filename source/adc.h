@@ -40,7 +40,7 @@ typedef enum
     ADC_CHANNEL_COUNT
 } e_ADCChannel;
 
-void adc_init(void);
+int adc_init(void);
 void adc_update(void);  // currently takes 183 microseconds
 void adc_test(void);
 

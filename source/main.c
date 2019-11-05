@@ -46,6 +46,7 @@
 #include "buttons.h"
 #include "drv_time.h"
 #include "uart.h"
+#include "flash.h"
 
 //------------------------------------------------------------------------------
 //#define __USE_TRAINER_PORT_UART__
@@ -134,11 +135,16 @@ int main(void)
 #endif    
     lcd_init();
     led_backlight_init();
+    flash_init();
     screen_init();
     console_init();
     debug_init();
-    adc_init();
     buttons_init();
+    int needStickCalibration = adc_init();
+    if (needStickCalibration)
+    {
+        adc_calibrate_sticks();
+    }
 
     //
     tests();
@@ -180,6 +186,6 @@ static void tests()
                 testNumber = 0;
                 break;
         }
-        PRINTF("loop time: %d\n", micros_realtime() - micros_this_frame());
+//        PRINTF("loop time: %d\n", micros_realtime() - micros_this_frame());
     }
 }

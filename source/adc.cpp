@@ -21,8 +21,10 @@
 #include "debug.h"
 #include "console.h"
 #include "fsl_adc16.h"
+#include "fsl_debug_console.h"
 #include "fsl_port.h"
 #include "delay.h"
+#include "flash.h"
 
 static uint16_t adc_data[ADC_CHANNEL_COUNT];
 
@@ -42,13 +44,15 @@ static const uint8_t adac_channels[] = {
 
 static uint16_t chanMinMidMax[4][3];
 
+static bool bNeedRecalibrate;
+
 //------------------------------------------------------------------------------
 // Forward declarations
 static void adc_init_internal(void);
 static void LoadCalibrationData();
 
 //------------------------------------------------------------------------------
-void adc_init(void)
+int adc_init(void)
 {
 	debug("adc: init\n"); 
     debug_flush();
@@ -61,6 +65,7 @@ void adc_init(void)
     adc_init_internal();
 
     LoadCalibrationData();
+    return bNeedRecalibrate;
 }
 
 static void adc_init_internal(void)
@@ -170,9 +175,8 @@ uint32_t adc_get_battery_voltage(void) {
     return mv / 10;
 }
 
-
 //------------------------------------------------------------------------------
-static void LoadCalibrationData()
+static void SetupSaneDefaults()
 {
     // Provide default calibration data should previously stored calibration
     // data be unavailable
@@ -186,50 +190,70 @@ static void LoadCalibrationData()
         minMidMax[1] = 2048;
         minMidMax[2] = 4096 - 400;
     }
+}
 
-#if 0
-    // Retrieve previously saved min/mid/max values for channels 0 thru 3
-    int epromIndex = ee_CHAN0_MIN_LO;
-    for (int chan=0; chan<4; chan++)
+//------------------------------------------------------------------------------
+static void LoadCalibrationData()
+{
+    int result = flash_read(kEEPROM_StickCalibration, &chanMinMidMax[0][0], sizeof(chanMinMidMax));
+    if (result != sizeof(chanMinMidMax))
     {
-        // Min
-        unsigned lo = EEPROM.read(epromIndex++);
-        unsigned hi = EEPROM.read(epromIndex++);
-        chanMinMidMax[chan][0] = lo | (hi << 8);
-
-        // Mid
-        lo = EEPROM.read(epromIndex++);
-        hi = EEPROM.read(epromIndex++);
-        chanMinMidMax[chan][1] = lo | (hi << 8);
-
-        // Max
-        lo = EEPROM.read(epromIndex++);
-        hi = EEPROM.read(epromIndex++);
-        chanMinMidMax[chan][2] = lo | (hi << 8);
+        PRINTF("Unable to load stick calibration data from flash");
+        SetupSaneDefaults();
     }
-#endif
+    else
+    {
+        // Check if previously stored min/max values are missing or seem invalid
+        bNeedRecalibrate = false;
+        for (int chan=0; chan<4; chan++)
+        {
+            const uint16_t *minMidMax = chanMinMidMax[chan];
+            uint16_t cmin = minMidMax[0];
+            uint16_t cmid = minMidMax[1];
+            uint16_t cmax = minMidMax[2];
+
+            if (cmin >= cmax)
+            {
+                PRINTF("Stick calibration is required: bad min/max for channel: %d\n", chan);
+                bNeedRecalibrate = true;
+                break;
+            }
+            if ((cmax - cmin) > 4096)
+            {
+                PRINTF("Stick calibration is required: bad range for channel: %d\n", chan);
+                bNeedRecalibrate = true;
+                break;
+            }
+            int diff = (int)cmid - 2048;
+            if (diff < 0) diff = -diff;
+            if (diff > 300)
+            {
+                PRINTF("Stick calibration is required: bad mid value for channel: %d\n", chan);
+                bNeedRecalibrate = true;
+                break;
+            }
+        }
+
+        // If we didn't auto-detect that recalibration was necessary
+        // then check if user is holding sticks down to lower right
+        // for at least 1/2 second during a 1 second check
+        if (bNeedRecalibrate)
+        {
+            SetupSaneDefaults();
+        }
+    }
 }
 
 //------------------------------------------------------------------------------
 static void SaveCalibrationData()
 {
-#if 0
-    int epromIndex = ee_CHAN0_MIN_LO;
-    for (int chan=0; chan<4; chan++)
+    static_assert(sizeof(chanMinMidMax) == 24, "Unexpected size");
+    
+    int result = flash_write(kEEPROM_StickCalibration, &chanMinMidMax[0][0], sizeof(chanMinMidMax));
+    if (result)
     {
-        uint16_t value;
-        const uint16_t *minMidMax = chanMinMidMax[chan];
-        value = minMidMax[0];
-        EEPROM.update(epromIndex++, value & 0xFF);
-        EEPROM.update(epromIndex++, value >> 8);
-        value = minMidMax[1];
-        EEPROM.update(epromIndex++, value & 0xFF);
-        EEPROM.update(epromIndex++, value >> 8);
-        value = minMidMax[2];
-        EEPROM.update(epromIndex++, value & 0xFF);
-        EEPROM.update(epromIndex++, value >> 8);
+        PRINTF("Unable to save stick calibration data into flash");
     }
-#endif
 }
 
 //------------------------------------------------------------------------------
