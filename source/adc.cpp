@@ -45,11 +45,7 @@ static uint16_t chanMinMidMax[4][3];
 //------------------------------------------------------------------------------
 // Forward declarations
 static void adc_init_internal(void);
-
 static void LoadCalibrationData();
-//static void updatePPMFromADC(bool bClampAndNormalize);
-static void CalibrateSticks();
-
 
 //------------------------------------------------------------------------------
 void adc_init(void)
