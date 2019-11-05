@@ -7,7 +7,7 @@
             "request": "launch",
             "servertype": "openocd",
             "cwd": "${workspaceRoot}",
-            "executable": "./Debug/i6.elf",
+            "executable": "./armgcc/debug/fs-i6.elf",
             "device": "Kinetis",
             "svdFile": "${workspaceRoot}/.vscode/MKL16Z4.svd",
             "configFiles": [
@@ -21,7 +21,7 @@
             "request": "attach",
             "servertype": "openocd",
             "cwd": "${workspaceRoot}",
-            "executable": "./Debug/i6.elf",
+            "executable": "./armgcc/debug/fs-i6.elf",
             "device": "Kinetis",
             "svdFile": "${workspaceRoot}/.vscode/MKL16Z4.svd",
             "configFiles": [

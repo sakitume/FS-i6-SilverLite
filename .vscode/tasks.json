@@ -4,27 +4,14 @@
     "version": "2.0.0",
     "tasks": [
         {
-            "label": "Clean Debug",
+            "label": "Clean",
             "type": "shell",
-            "command": "make clean",
+            "command": "clean.sh",
             "windows": {
-                "command": "mingw32-make clean"
+                "command": "clean.bat"
             },
             "options": {
-                "cwd": "${workspaceRoot}/Debug"
-            },
-            "group": "build",
-            "problemMatcher": []
-        },
-        {
-            "label": "Clean Release",
-            "type": "shell",
-            "command": "make clean",
-            "windows": {
-                "command": "mingw32-make clean"
-            },
-            "options": {
-                "cwd": "${workspaceRoot}/Release"
+                "cwd": "${workspaceRoot}/armgcc"
             },
             "group": "build",
             "problemMatcher": []
@@ -32,12 +19,12 @@
         {
             "label": "Make Debug Firmware",
             "type": "shell",
-            "command": "make -j8 all",
+            "command": "build_debug.sh",
             "windows": {
-                "command": "mingw32-make -j8 all"
+                "command": "build_debug.bat"
             },
             "options": {
-                "cwd": "${workspaceRoot}/Debug"
+                "cwd": "${workspaceRoot}/armgcc"
             },
             "group": {
                 "kind": "build",
@@ -52,12 +39,12 @@
         {
             "label": "Make Release Firmware",
             "type": "shell",
-            "command": "make -j8 all",
+            "command": "build_release.sh",
             "windows": {
-                "command": "mingw32-make -j8 all"
+                "command": "build_release.bat"
             },
             "options": {
-                "cwd": "${workspaceRoot}/Release"
+                "cwd": "${workspaceRoot}/armgcc"
             },
             "group": "build",
             "problemMatcher": []
@@ -65,9 +52,9 @@
         {
             "label": "Load Debug Firmware",
             "type": "shell",
-            "command": "openocd -f interface/stlink.cfg -f target/klx.cfg -c \"program i6.elf verify reset exit\"",
+            "command": "openocd -f interface/stlink.cfg -f target/klx.cfg -c \"program fs-i6.elf verify reset exit\"",
             "options": {
-                "cwd": "${workspaceRoot}/Debug"
+                "cwd": "${workspaceRoot}/armgcc/debug"
             },
             "group": "build",
             "problemMatcher": []
@@ -77,7 +64,7 @@
             "type": "shell",
             "command": "openocd -f interface/stlink.cfg -f target/klx.cfg -c \"program fs-i6.elf verify reset exit\"",
             "options": {
-                "cwd": "${workspaceRoot}/Release"
+                "cwd": "${workspaceRoot}/armgcc/release"
             },
             "group": "build",
             "problemMatcher": []
