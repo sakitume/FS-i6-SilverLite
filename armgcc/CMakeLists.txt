@@ -219,7 +219,7 @@ add_executable(${TargetELF}
 "${ProjRoot}/board/clock_config.h"
 "${ProjRoot}/board/pin_mux.c"
 "${ProjRoot}/board/pin_mux.h"
-"${SrcPath}/adc.c"
+"${SrcPath}/adc.cpp"
 "${SrcPath}/adc.h"
 "${SrcPath}/backlight.c"
 "${SrcPath}/backlight.h"

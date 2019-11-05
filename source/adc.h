@@ -21,51 +21,43 @@
 #define ADC_H_
 #include <stdbool.h>
 #include <stdint.h>
-#define ADC_CHANNEL_COUNT 9
+
+#if defined(__cplusplus)
+extern "C" {
+#endif /* __cplusplus */
+
+typedef enum 
+{
+    ADC_ID_AILERON = 0,
+    ADC_ID_ELEVATION,
+    ADC_ID_THROTTLE,
+    ADC_ID_RUDDER,
+    ADC_ID_CH0,
+    ADC_ID_CH1,
+    ADC_ID_SwB,
+    ADC_ID_SwC,
+    ADC_ID_BATTERY,
+    ADC_CHANNEL_COUNT
+} e_ADCChannel;
 
 void adc_init(void);
 void adc_update(void);  // currently takes 183 microseconds
 void adc_test(void);
 
-/*
-static void adc_init_rcc(void);
-static void adc_init_gpio(void);
-static void adc_init_mode(void);
-static void adc_init_dma(void);
-static void adc_dma_arm(void);
+uint16_t adc_get_channel_calibrated(int id);
 
-void adc_process(void);
-
-uint16_t adc_get_channel(uint32_t id);
-int32_t  adc_get_channel_rescaled(uint8_t idx);
-uint16_t adc_get_channel_packetdata(uint8_t idx);
+// Return a fixed point number of the battery voltage: 1230 = 12.3 V
 uint32_t adc_get_battery_voltage(void);
 
-// internal channel ordering. we will always use AETR0123 internally
-typedef enum {
-  CHANNEL_ID_AILERON = 0,
-  CHANNEL_ID_ELEVATION,
-  CHANNEL_ID_THROTTLE,
-  CHANNEL_ID_RUDDER,
-  CHANNEL_ID_CH0,
-  CHANNEL_ID_CH1,
-  CHANNEL_ID_CH2,
-  CHANNEL_ID_CH3,
-  CHANNEL_ID_SIZE
-} channel_id_t;
+const char *adc_get_channel_name(int id, bool short_descr);
 
-uint8_t *adc_get_channel_name(uint8_t i, bool short_descr);
 
-#define ADC_DMA_CHANNEL           DMA1_Channel1
-#define ADC_DMA_TC_FLAG           DMA1_FLAG_TC1
-#define ADC_CHANNEL_COUNT 11
+void adc_calibrate_sticks();
 
-// rescaled data goes from -3200 to 3200
-// set zero threshold to 10% movement from absolute zero
-#define ADC_RESCALED_ABSOLUTE_MIN        -3200
-#define ADC_RESCALED_ABSOLUTE_MAX         3200
-#define ADC_RESCALED_ZERO_THRESHOLD      (ADC_RESCALED_ABSOLUTE_MIN + 0.1 * \
-                                         (ADC_RESCALED_ABSOLUTE_MAX - ADC_RESCALED_ABSOLUTE_MIN))
 
-*/
+#if defined(__cplusplus)
+}
+#endif /* __cplusplus */
+
+
 #endif  // ADC_H_
