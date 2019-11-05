@@ -73,12 +73,39 @@ void required_updates()
 {
     // Call time_update() once at start of every loop
     time_update();
+
+    // Query state of buttons and perform debounce
     buttons_update();
+
+    // Retrieve ADC values for sticks and mult-position switches
     adc_update();
 
 #if defined(__USE_TRAINER_PORT_UART__)
     uart_update();
-#endif    
+#endif
+
+    // Check if lcd backlight should be turned on or off
+    // If any of up/down/ok/cancel/bind buttons are active then light should be on;
+    // if none of the buttons are active then set 10 second timer to turn off light
+    static unsigned millisUntilBacklightOff = 10000;
+    bool buttonActive = (button_active(kBtn_Up) || button_active(kBtn_Down) || button_active(kBtn_Ok)
+        || button_active(kBtn_Cancel) || button_active(kBtn_Bind));
+    if (buttonActive)
+    {
+        if (!millisUntilBacklightOff)
+        {
+            led_backlight_on();
+        }
+        millisUntilBacklightOff = millis_this_frame() + 10000;  // 10 seconds
+    }
+    else if (millisUntilBacklightOff)
+    {
+        if (millis_this_frame() >= millisUntilBacklightOff)
+        {
+            millisUntilBacklightOff = 0;
+            led_backlight_off();
+        }
+    }
 }
 
 //------------------------------------------------------------------------------
