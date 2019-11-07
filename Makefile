@@ -82,6 +82,8 @@ SOURCES =  \
 	${SRC_DIR}/flash.h \
 	${SRC_DIR}/font.c \
 	${SRC_DIR}/font.h \
+	${SRC_DIR}/gui.cpp \
+	${SRC_DIR}/gui.h \
 	${SRC_DIR}/lcd.c \
 	${SRC_DIR}/lcd.h \
 	${SRC_DIR}/main.cpp \

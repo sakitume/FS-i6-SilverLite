@@ -34,8 +34,9 @@ static uint16_t storage_calc_crc(void)
 {
     uint16_t crc;
     uint8_t *storage_ptr = (uint8_t*)&storage;
-
-    crc = crc16(storage_ptr, sizeof(storage) - sizeof(storage.checksum));
+    
+//    crc = crc16(storage_ptr, sizeof(storage) - sizeof(storage.checksum));
+    crc = crc16(storage_ptr, offsetof(FlashStorage_t, checksum));
     return crc;
 }
 
@@ -80,9 +81,13 @@ void storage_save()
     
     storage.checksum = storage_calc_crc();
 
+#if 1
+    PRINTF("storage_save: temporarily disabled");
+#else
     int result = flash_write(0, &storage, sizeof(storage));
     if (result)
     {
         PRINTF("storage_save(): flash_write error");
     }
+#endif    
 }

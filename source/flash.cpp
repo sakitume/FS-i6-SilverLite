@@ -138,27 +138,39 @@ int flash_read(unsigned addr, void *dest, unsigned sizeBytes)
 }
 
 //------------------------------------------------------------------------------
-int flash_write(unsigned addr, const void *dest, unsigned sizeBytes)
+int flash_write(unsigned addr, const void *src, unsigned sizeBytes)
 {
     if (status != kReady)
     {
         return -1;
     }
 
+    if (0x3 & (int)src)
+    {
+        PRINTF("flash_write source buffer isn't 32-bit aligned\n");
+        return -2;
+    }
+
+    if (sizeBytes & 3)
+    {
+        PRINTF("flash_write sizeBytes isn't 32-bit aligned\n");
+        sizeBytes = (sizeBytes + 3) & ~0x3;
+    }
+
     uint32_t eepromAddr = flash_get_eeprom_base() + addr;
-    status_t result = FLASH_Program(&s_flashDriver, eepromAddr, (uint32_t*)dest, sizeBytes);
+    status_t result = FLASH_Program(&s_flashDriver, eepromAddr, (uint32_t*)src, sizeBytes);
     if (kStatus_FLASH_Success != result)
     {
-        PRINTF("FLASH_Program failure\n");
+        PRINTF("FLASH_Program failure: %d\n", result);
         return -2;
     }
 
     /* Verify programming by Program Check command with user margin levels */
     uint32_t failAddr, failDat;
-    result = FLASH_VerifyProgram(&s_flashDriver, eepromAddr, sizeBytes, (const uint32_t*)dest, kFLASH_MarginValueUser, &failAddr, &failDat);
+    result = FLASH_VerifyProgram(&s_flashDriver, eepromAddr, sizeBytes, (const uint32_t*)src, kFLASH_MarginValueUser, &failAddr, &failDat);
     if (kStatus_FLASH_Success != result)
     {
-        PRINTF("FLASH_VerifyProgram failure\n");
+        PRINTF("FLASH_VerifyProgram failure: %d\n", result);
         return -3;
     }
     return 0;

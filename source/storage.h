@@ -18,6 +18,7 @@ struct ModelDesc_t
 
 struct FlashStorage_t 
 {
+    uint32_t    fixes_alignment;    // ensures storage is 32bit aligned
     uint8_t     bayang_txid[4];
 
     // stick calibration data
@@ -30,7 +31,8 @@ struct FlashStorage_t
     // new data should be placed BEFORE the checksum...
     //
     // checksum
-    uint16_t checksum;
+    uint16_t    checksum;
+    uint32_t    fixes_alignment2;    // ensures storage is 32bit aligned
 };
 
 extern FlashStorage_t storage;

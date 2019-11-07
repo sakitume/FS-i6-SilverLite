@@ -50,6 +50,7 @@
 #include "uart.h"
 #include "flash.h"
 #include "storage.h"
+#include "gui.h"
 
 //------------------------------------------------------------------------------
 //#define __USE_TRAINER_PORT_UART__
@@ -138,7 +139,7 @@ int main(void)
 #if defined(__USE_TRAINER_PORT_UART__)
     uart_init();
 #endif
-    timer_init();
+    timer_init();   // Initializing this causes flash_write to reset the mcu!
     lcd_init();
     led_backlight_init();
     flash_init();
@@ -154,6 +155,8 @@ int main(void)
         adc_calibrate_sticks();
     }
 
+    gui_init();
+    gui_loop();
     //
     tests();
 }
