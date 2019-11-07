@@ -122,19 +122,6 @@ int flash_read(unsigned addr, void *dest, unsigned sizeBytes)
         return -1;
     }
 
-    // source buffer must be uint32_t aligned
-    if (0x3 & (int)dest)
-    {
-        PRINTF("flash_read buffer is not 32bit aligned\n");
-        return -2;
-    }
-    // sizeBytes must be a multiple of 4
-    if (0x3 & sizeBytes)
-    {
-        PRINTF("flash_read sizeBytes is not a multiple of 4\n");
-        return -3;
-    }
-    
 #if defined(__DCACHE_PRESENT) && __DCACHE_PRESENT
     /* Clean the D-Cache before reading the flash data*/
     SCB_CleanInvalidateDCache();
@@ -158,25 +145,12 @@ int flash_write(unsigned addr, const void *dest, unsigned sizeBytes)
         return -1;
     }
 
-    // source buffer must be uint32_t aligned
-    if (0x3 & (int)dest)
-    {
-        PRINTF("flash_write buffer is not 32bit aligned\n");
-        return -2;
-    }
-    // sizeBytes must be a multiple of 4
-    if (0x3 & sizeBytes)
-    {
-        PRINTF("flash_write sizeBytes is not a multiple of 4\n");
-        return -3;
-    }
-    
     uint32_t eepromAddr = flash_get_eeprom_base() + addr;
     status_t result = FLASH_Program(&s_flashDriver, eepromAddr, (uint32_t*)dest, sizeBytes);
     if (kStatus_FLASH_Success != result)
     {
         PRINTF("FLASH_Program failure\n");
-        return -4;
+        return -2;
     }
 
     /* Verify programming by Program Check command with user margin levels */
@@ -185,7 +159,7 @@ int flash_write(unsigned addr, const void *dest, unsigned sizeBytes)
     if (kStatus_FLASH_Success != result)
     {
         PRINTF("FLASH_VerifyProgram failure\n");
-        return -5;
+        return -3;
     }
     return 0;
 }

@@ -58,6 +58,7 @@ uint8_t storage_init()
     }
     if (!valid)
     {
+        memset(&storage, 0, sizeof(storage));
         // TODO: Provide defaults?
     }
 
