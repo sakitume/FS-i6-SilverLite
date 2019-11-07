@@ -36,8 +36,10 @@
 #include "pin_mux.h"
 #include "clock_config.h"
 
+#include "timer.h"
 #include "delay.h"
 #include "lcd.h"
+#include "sound.h"
 #include "console.h"
 #include "screen.h"
 #include "debug.h"
@@ -86,6 +88,8 @@ void required_updates()
     uart_update();
 #endif
 
+    sound_update();
+
     // Check if lcd backlight should be turned on or off
     // If any of up/down/ok/cancel/bind buttons are active then light should be on;
     // if none of the buttons are active then set 10 second timer to turn off light
@@ -133,7 +137,8 @@ int main(void)
 
 #if defined(__USE_TRAINER_PORT_UART__)
     uart_init();
-#endif    
+#endif
+    timer_init();
     lcd_init();
     led_backlight_init();
     flash_init();
@@ -142,6 +147,7 @@ int main(void)
     console_init();
     debug_init();
     buttons_init();
+    sound_init();
     int needStickCalibration = adc_init();
     if (needStickCalibration)
     {

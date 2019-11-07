@@ -58,6 +58,8 @@ SOURCES =  \
 	${SDK_DIR}/devices/MKL16Z4/drivers/fsl_pit.c \
 	${SDK_DIR}/devices/MKL16Z4/drivers/fsl_smc.h \
 	${SDK_DIR}/devices/MKL16Z4/drivers/fsl_smc.c \
+	${SDK_DIR}/devices/MKL16Z4/drivers/fsl_tpm.h \
+	${SDK_DIR}/devices/MKL16Z4/drivers/fsl_tpm.c \
 	${BOARD_DIR}/board.c \
 	${BOARD_DIR}/board.h \
 	${BOARD_DIR}/clock_config.c \
@@ -85,8 +87,12 @@ SOURCES =  \
 	${SRC_DIR}/main.cpp \
 	${SRC_DIR}/screen.c \
 	${SRC_DIR}/screen.h \
+	${SRC_DIR}/sound.cpp \
+	${SRC_DIR}/sound.h \
 	${SRC_DIR}/storage.cpp \
 	${SRC_DIR}/storage.h \
+	${SRC_DIR}/timer.cpp \
+	${SRC_DIR}/timer.h \
 	${SRC_DIR}/uart.c \
 	${SRC_DIR}/uart.h \
 	

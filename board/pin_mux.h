@@ -25,6 +25,7 @@ extern "C" {
  */
 void BOARD_InitBootPins(void);
 
+#define SOPT4_TPM1CH0SRC_TPM1 0x00u    /*!<@brief TPM1 channel 0 input capture source select: TPM1_CH0 signal */
 #define SOPT5_UART1RXSRC_UART_RX 0x00u /*!<@brief UART1 Receive Data Source Select: UART1_RX pin */
 #define SOPT5_UART1TXSRC_UART_TX 0x00u /*!<@brief UART1 Transmit Data Source Select: UART1_TX pin */
 
@@ -48,13 +49,6 @@ void BOARD_InitBootPins(void);
 #define BOARD_INITPINS_Bind_PORT PORTA /*!<@brief PORT device name: PORTA */
 #define BOARD_INITPINS_Bind_PIN 5U     /*!<@brief PORTA pin index: 5 */
                                        /* @} */
-
-/*! @name PORTA12 (number 28), Buzzer
-  @{ */
-#define BOARD_INITPINS_Buzzer_GPIO GPIOA /*!<@brief GPIO device name: GPIOA */
-#define BOARD_INITPINS_Buzzer_PORT PORTA /*!<@brief PORT device name: PORTA */
-#define BOARD_INITPINS_Buzzer_PIN 12U    /*!<@brief PORTA pin index: 12 */
-                                         /* @} */
 
 /*! @name PORTD2 (number 59), spare? (unmarked test pad)
   @{ */
@@ -153,6 +147,12 @@ void BOARD_InitBootPins(void);
 #define BOARD_INITPINS_SOFT_SPI_MOSI_PORT PORTC /*!<@brief PORT device name: PORTC */
 #define BOARD_INITPINS_SOFT_SPI_MOSI_PIN 6U     /*!<@brief PORTC pin index: 6 */
                                                 /* @} */
+
+/*! @name PORTA12 (number 28), Buzzer
+  @{ */
+#define BOARD_INITPINS_Buzzer_PORT PORTA /*!<@brief PORT device name: PORTA */
+#define BOARD_INITPINS_Buzzer_PIN 12U    /*!<@brief PORTA pin index: 12 */
+                                         /* @} */
 
 /*!
  * @brief Configures pin routing and optionally pin electrical features.

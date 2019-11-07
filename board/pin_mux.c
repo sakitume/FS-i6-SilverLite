@@ -132,7 +132,6 @@ BOARD_InitPins:
   - {pin_num: '64', peripheral: GPIOD, signal: 'GPIO, 7', pin_signal: PTD7/SPI1_MISO/UART0_TX/SPI1_MOSI}
   - {pin_num: '61', peripheral: GPIOD, signal: 'GPIO, 4', pin_signal: PTD4/LLWU_P14/SPI1_PCS0/UART2_RX/TPM0_CH4}
   - {pin_num: '27', peripheral: GPIOA, signal: 'GPIO, 5', pin_signal: PTA5/TPM0_CH2/I2S0_TX_BCLK}
-  - {pin_num: '28', peripheral: GPIOA, signal: 'GPIO, 12', pin_signal: PTA12/TPM1_CH0/I2S0_TXD0}
   - {pin_num: '59', peripheral: GPIOD, signal: 'GPIO, 2', pin_signal: PTD2/SPI0_MOSI/UART2_RX/TPM0_CH2/SPI0_MISO}
   - {pin_num: '35', peripheral: GPIOB, signal: 'GPIO, 0', pin_signal: ADC0_SE8/TSI0_CH0/PTB0/LLWU_P5/I2C0_SCL/TPM1_CH0}
   - {pin_num: '39', peripheral: GPIOB, signal: 'GPIO, 16', pin_signal: TSI0_CH9/PTB16/SPI1_MOSI/UART0_RX/TPM_CLKIN0/SPI1_MISO}
@@ -148,6 +147,7 @@ BOARD_InitPins:
   - {pin_num: '38', peripheral: GPIOB, signal: 'GPIO, 3', pin_signal: ADC0_SE13/TSI0_CH8/PTB3/I2C0_SDA/TPM2_CH1}
   - {pin_num: '60', peripheral: GPIOD, signal: 'GPIO, 3', pin_signal: PTD3/SPI0_MISO/UART2_TX/TPM0_CH3/SPI0_MOSI}
   - {pin_num: '51', peripheral: GPIOC, signal: 'GPIO, 6', pin_signal: CMP0_IN0/PTC6/LLWU_P10/SPI0_MOSI/EXTRG_IN/I2S0_RX_BCLK/SPI0_MISO/I2S0_MCLK}
+  - {pin_num: '28', peripheral: TPM1, signal: 'CH, 0', pin_signal: PTA12/TPM1_CH0/I2S0_TXD0}
  * BE CAREFUL MODIFYING THIS COMMENT - IT IS YAML SETTINGS FOR TOOLS ***********
  */
 /* clang-format on */
@@ -177,8 +177,8 @@ void BOARD_InitPins(void)
     /* PORTA1 (pin 23) is configured as PTA1 */
     PORT_SetPinMux(BOARD_INITPINS_NRF24L01_CE_PORT, BOARD_INITPINS_NRF24L01_CE_PIN, kPORT_MuxAsGpio);
 
-    /* PORTA12 (pin 28) is configured as PTA12 */
-    PORT_SetPinMux(BOARD_INITPINS_Buzzer_PORT, BOARD_INITPINS_Buzzer_PIN, kPORT_MuxAsGpio);
+    /* PORTA12 (pin 28) is configured as TPM1_CH0 */
+    PORT_SetPinMux(BOARD_INITPINS_Buzzer_PORT, BOARD_INITPINS_Buzzer_PIN, kPORT_MuxAlt3);
 
     /* PORTA13 (pin 29) is configured as PTA13 */
     PORT_SetPinMux(PORTA, 13U, kPORT_MuxAsGpio);
@@ -326,6 +326,13 @@ void BOARD_InitPins(void)
 
     /* PORTE31 (pin 19) is configured as PTE31 */
     PORT_SetPinMux(PORTE, 31U, kPORT_MuxAsGpio);
+
+    SIM->SOPT4 = ((SIM->SOPT4 &
+                   /* Mask bits to zero which are setting */
+                   (~(SIM_SOPT4_TPM1CH0SRC_MASK)))
+
+                  /* TPM1 channel 0 input capture source select: TPM1_CH0 signal. */
+                  | SIM_SOPT4_TPM1CH0SRC(SOPT4_TPM1CH0SRC_TPM1));
 
     SIM->SOPT5 = ((SIM->SOPT5 &
                    /* Mask bits to zero which are setting */
