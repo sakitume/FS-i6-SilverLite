@@ -115,7 +115,7 @@ int flash_get_eeprom_base()
 }
 
 //------------------------------------------------------------------------------
-int flash_read(enum EEPROM_Map addr, void *dest, unsigned sizeBytes)
+int flash_read(unsigned addr, void *dest, unsigned sizeBytes)
 {
     if (status != kReady)
     {
@@ -141,7 +141,6 @@ int flash_read(enum EEPROM_Map addr, void *dest, unsigned sizeBytes)
 #endif
 
     uint32_t eepromAddr = flash_get_eeprom_base() + addr;
-    volatile uint8_t *eepromPtr = (volatile uint8_t*)eepromAddr;
     uint8_t *pDst = (uint8_t*)dest;
     int i;
     for (i=0; i<(int)sizeBytes; i++)
@@ -152,7 +151,7 @@ int flash_read(enum EEPROM_Map addr, void *dest, unsigned sizeBytes)
 }
 
 //------------------------------------------------------------------------------
-int flash_write(enum EEPROM_Map addr, const void *dest, unsigned sizeBytes)
+int flash_write(unsigned addr, const void *dest, unsigned sizeBytes)
 {
     if (status != kReady)
     {

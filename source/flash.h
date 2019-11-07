@@ -11,15 +11,8 @@ void flash_test();
 
 int flash_ready();
 
-enum EEPROM_Map
-{
-    kEEPROM_TransmitterID,              // 4 bytes, transmitter ID
-    kEEPROM_StickCalibration   = 4,     // 24 bytes, stick calibration data (see adc.cpp)
-    kEEPROM_kNext              = 28
-};
-
-int flash_read(enum EEPROM_Map addr, void *dest, unsigned sizeBytes);
-int flash_write(enum EEPROM_Map addr, const void *dest, unsigned sizeBytes);
+int flash_read(unsigned addr, void *dest, unsigned sizeBytes);
+int flash_write(unsigned addr, const void *dest, unsigned sizeBytes);
 
 
 #if defined(__cplusplus)

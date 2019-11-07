@@ -85,6 +85,8 @@ SOURCES =  \
 	${SRC_DIR}/main.c \
 	${SRC_DIR}/screen.c \
 	${SRC_DIR}/screen.h \
+	${SRC_DIR}/storage.cpp \
+	${SRC_DIR}/storage.h \
 	${SRC_DIR}/uart.c \
 	${SRC_DIR}/uart.h \
 	

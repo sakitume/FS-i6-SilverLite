@@ -24,7 +24,7 @@
 #include "fsl_debug_console.h"
 #include "fsl_port.h"
 #include "delay.h"
-#include "flash.h"
+#include "storage.h"
 
 static uint16_t adc_data[ADC_CHANNEL_COUNT];
 
@@ -41,8 +41,6 @@ static const uint8_t adac_channels[] = {
 	14, // ADC0_SE14, SwC
 	15, // ADC0_SE15, SwB
 };
-
-static uint16_t chanMinMidMax[4][3];
 
 static bool bNeedRecalibrate;
 
@@ -185,7 +183,7 @@ static void SetupSaneDefaults()
     // Set mid to absolute mid
     for (int chan=0; chan<4; chan++)
     {
-        uint16_t *minMidMax = chanMinMidMax[chan];
+        uint16_t *minMidMax = storage.chanMinMidMax[chan];
         minMidMax[0] = 400;
         minMidMax[1] = 2048;
         minMidMax[2] = 4096 - 400;
@@ -195,8 +193,7 @@ static void SetupSaneDefaults()
 //------------------------------------------------------------------------------
 static void LoadCalibrationData()
 {
-    int result = flash_read(kEEPROM_StickCalibration, &chanMinMidMax[0][0], sizeof(chanMinMidMax));
-    if (result != sizeof(chanMinMidMax))
+    if (!storage_is_valid())
     {
         PRINTF("Unable to load stick calibration data from flash");
         SetupSaneDefaults();
@@ -207,7 +204,7 @@ static void LoadCalibrationData()
         bNeedRecalibrate = false;
         for (int chan=0; chan<4; chan++)
         {
-            const uint16_t *minMidMax = chanMinMidMax[chan];
+            const uint16_t *minMidMax = storage.chanMinMidMax[chan];
             uint16_t cmin = minMidMax[0];
             uint16_t cmid = minMidMax[1];
             uint16_t cmax = minMidMax[2];
@@ -234,25 +231,10 @@ static void LoadCalibrationData()
             }
         }
 
-        // If we didn't auto-detect that recalibration was necessary
-        // then check if user is holding sticks down to lower right
-        // for at least 1/2 second during a 1 second check
         if (bNeedRecalibrate)
         {
             SetupSaneDefaults();
         }
-    }
-}
-
-//------------------------------------------------------------------------------
-static void SaveCalibrationData()
-{
-    static_assert(sizeof(chanMinMidMax) == 24, "Unexpected size");
-    
-    int result = flash_write(kEEPROM_StickCalibration, &chanMinMidMax[0][0], sizeof(chanMinMidMax));
-    if (result)
-    {
-        PRINTF("Unable to save stick calibration data into flash");
     }
 }
 
@@ -283,7 +265,7 @@ uint16_t adc_get_channel_calibrated(int id)
     // If the channel is a stick value (AETR)
     if (id <= ADC_ID_RUDDER)
     {
-        uint16_t *minMidMax = chanMinMidMax[id];
+        uint16_t *minMidMax = storage.chanMinMidMax[id];
         if (rawVal < minMidMax[0])
         {
             minMidMax[0] = rawVal;
@@ -354,7 +336,7 @@ void adc_calibrate_sticks()
                 // Set min/max to default values (smaller than the full range)
                 for (int chan=0; chan<4; chan++)
                 {
-                    uint16_t *minMidMax = chanMinMidMax[chan];
+                    uint16_t *minMidMax = storage.chanMinMidMax[chan];
                     minMidMax[0] = 400;
                     minMidMax[2] = 4096 - 400;
                 }
@@ -375,7 +357,7 @@ void adc_calibrate_sticks()
                 for (int i=0; i<4; i++)
                 {
                     uint16_t val = adc_get_channel_raw(i);
-                    uint16_t *minMidMax = chanMinMidMax[i];
+                    uint16_t *minMidMax = storage.chanMinMidMax[i];
                     if (i == 2) // throttle
                     {
                         minMidMax[1] = 2048;
@@ -390,7 +372,7 @@ void adc_calibrate_sticks()
                     console_clear();
                     for (int i=0; i<4; i++)
                     {
-                        uint16_t *minMidMax = chanMinMidMax[i];
+                        uint16_t *minMidMax = storage.chanMinMidMax[i];
                         debug_put_uint16(minMidMax[0]);
                         debug_putc(' ');
                         debug_put_uint16(minMidMax[1] >> 2);
@@ -436,7 +418,7 @@ void adc_calibrate_sticks()
                     console_clear();
                     for (int i=0; i<4; i++)
                     {
-                        uint16_t *minMidMax = chanMinMidMax[i];
+                        uint16_t *minMidMax = storage.chanMinMidMax[i];
                         debug_put_uint16(minMidMax[0] >> 2);
                         debug_putc(' ');
                         debug_put_uint16(minMidMax[1] >> 2);
@@ -476,7 +458,7 @@ void adc_calibrate_sticks()
                 }
                 else if (button_toggledActive(kBtn_Ok))
                 {
-                    SaveCalibrationData();
+                    storage_save();
                     state++;
                 }
             }              
