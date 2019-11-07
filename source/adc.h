@@ -44,6 +44,7 @@ int adc_init(void);
 void adc_update(void);  // currently takes 183 microseconds
 void adc_test(void);
 
+uint16_t adc_get_channel_raw(int id);
 uint16_t adc_get_channel_calibrated(int id);
 
 // Return a fixed point number of the battery voltage: 1230 = 12.3 V

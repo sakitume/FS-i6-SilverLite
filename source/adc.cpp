@@ -149,10 +149,10 @@ const char *adc_get_channel_name(int id, bool short_descr)
         case (ADC_ID_ELEVATION) : return ((short_descr) ? "E" : "ELE");
         case (ADC_ID_THROTTLE)  : return ((short_descr) ? "T" : "THR");
         case (ADC_ID_RUDDER)    : return ((short_descr) ? "R" : "RUD");
-        case (ADC_ID_CH0)       : return ((short_descr) ? "0" : "CH0");
-        case (ADC_ID_CH1)       : return ((short_descr) ? "1" : "CH1");
-        case (ADC_ID_SwB)       : return ((short_descr) ? "2" : "CH2");
-        case (ADC_ID_SwC)       : return ((short_descr) ? "3" : "CH3");
+        case (ADC_ID_CH0)       : return ((short_descr) ? "0" : "VRA");
+        case (ADC_ID_CH1)       : return ((short_descr) ? "1" : "VRB");
+        case (ADC_ID_SwB)       : return ((short_descr) ? "2" : "SwB");
+        case (ADC_ID_SwC)       : return ((short_descr) ? "3" : "SwC");
         case (ADC_ID_BATTERY)   : return ((short_descr) ? "V" : "VLT");
     }
 }
@@ -239,7 +239,7 @@ static void LoadCalibrationData()
 }
 
 //------------------------------------------------------------------------------
-static uint16_t adc_get_channel_raw(int id) 
+uint16_t adc_get_channel_raw(int id) 
 {
     switch (id) 
     {
