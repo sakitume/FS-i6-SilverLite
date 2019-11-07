@@ -24,13 +24,21 @@
 #include "MKL16Z4.h"
 #include "fsl_gpio.h"
 
+
+
 #define LCD_WIDTH   128
 #define LCD_HEIGHT   64
 
+#if defined(__cplusplus)
+extern "C" {
+#endif /* __cplusplus */
 __attribute__((section (".TestCODE"))) void lcd_init(void);
 __attribute__((section (".TestCODE"))) void lcd_send_data(const uint8_t *buf);
 __attribute__((section (".TestCODE"))) void lcd_powerdown(void);
 __attribute__((section (".TestCODE"))) void lcd_show_logo(void);
+#if defined(__cplusplus)
+}
+#endif /* __cplusplus */
 
 #define LCD_RW_HI()   { GPIOE->PSOR = 0x8000; }
 #define LCD_RW_LO()   { GPIOE->PCOR = 0x8000; }

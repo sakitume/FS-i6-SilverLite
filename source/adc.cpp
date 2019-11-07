@@ -316,7 +316,9 @@ uint16_t adc_get_channel_calibrated(int id)
 #include "console.h"
 #include "debug.h"
 
-extern "C" void required_updates();
+//------------------------------------------------------------------------------
+extern void required_updates();
+
 //------------------------------------------------------------------------------
 void adc_calibrate_sticks()
 {

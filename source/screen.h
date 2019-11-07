@@ -24,6 +24,11 @@
 
 #include "lcd.h"
 
+#if defined(__cplusplus)
+extern "C" {
+#endif /* __cplusplus */
+
+
 #define SCREEN_BUFFER_SIZE ((LCD_WIDTH * LCD_HEIGHT) / 8)
 extern uint8_t __attribute__((section (".screenBuffer"))) screen_buffer[SCREEN_BUFFER_SIZE];
 
@@ -87,5 +92,8 @@ __attribute__((section (".TestCODE")))  void screen_fill(uint8_t color);
   } \
 }
 
+#if defined(__cplusplus)
+}
+#endif /* __cplusplus */
 #endif  // SCREEN_H_
 

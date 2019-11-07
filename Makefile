@@ -82,7 +82,7 @@ SOURCES =  \
 	${SRC_DIR}/font.h \
 	${SRC_DIR}/lcd.c \
 	${SRC_DIR}/lcd.h \
-	${SRC_DIR}/main.c \
+	${SRC_DIR}/main.cpp \
 	${SRC_DIR}/screen.c \
 	${SRC_DIR}/screen.h \
 	${SRC_DIR}/storage.cpp \
