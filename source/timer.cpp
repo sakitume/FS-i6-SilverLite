@@ -7,6 +7,9 @@ enum { kMaxCallbacks = 4 };
 static milli_timer_cb_t callbacks[kMaxCallbacks];
 static volatile uint8_t numCallbacks;
 static volatile uint32_t gTotalMillis;
+
+enum { kMaxTimeouts = 4 };
+static volatile uint32_t timeouts[kMaxTimeouts];
 //------------------------------------------------------------------------------
 extern "C" void PIT_IRQHandler(void)
 {
@@ -20,6 +23,14 @@ extern "C" void PIT_IRQHandler(void)
         if (callbacks[i])
         {
             callbacks[i](gTotalMillis);
+        }
+    }
+    for (unsigned i=0; i<kMaxTimeouts; i++)
+    {
+        uint32_t timeout = timeouts[i];
+        if (timeout)
+        {
+            timeouts[i] = timeout - 1;
         }
     }
 }
@@ -62,5 +73,24 @@ void timer_add_callback(milli_timer_cb_t callback)
 void timer_update()
 {
     // Nothing to do
+}
+
+//------------------------------------------------------------------------------
+void timer_set_timeout(unsigned timerID, unsigned timeoutMillis)
+{
+    if (timerID < kMaxTimeouts)
+    {
+        timeouts[timerID] = timeoutMillis;
+    }
+}
+
+//------------------------------------------------------------------------------
+int timer_get_timeout(unsigned timerID)
+{
+    if (timerID < kMaxTimeouts)
+    {
+        return timeouts[timerID];
+    }
+    return 0;
 }
 

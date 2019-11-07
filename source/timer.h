@@ -13,6 +13,9 @@ void timer_update();
 typedef void (*milli_timer_cb_t)(unsigned long millis);
 void timer_add_callback(milli_timer_cb_t callback);
 
+void timer_set_timeout(unsigned timerID, unsigned timeoutMillis);
+int timer_get_timeout(unsigned timerID);
+
 
 #if defined(__cplusplus)
 }
