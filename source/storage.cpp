@@ -62,6 +62,14 @@ uint8_t storage_init()
         // TODO: Provide defaults?
     }
 
+    // TODO
+    for (int i=0; i<STORAGE_MODEL_MAX_COUNT; i++)
+    {
+        ModelDesc_t &model = storage.model[i];
+        model.timer = 4 * 60;
+        strcpy(model.name, "TinyWhoop");
+    }
+
     return valid;
 }
 
