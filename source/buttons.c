@@ -274,3 +274,9 @@ int button_active(e_BtnIndex btnIndex)
     // Note: Treating buttons[][] as a single dimensional array
     return (&buttons[0][0])[btnIndex].debounceState;
 }
+
+int button_raw_state(e_BtnIndex btnIndex)
+{
+    // Note: Treating buttons[][] as a single dimensional array
+    return (&buttons[0][0])[btnIndex].currState;
+}

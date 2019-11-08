@@ -36,6 +36,7 @@ void buttons_test(void);
 int button_toggled(e_BtnIndex btnIndex);
 int button_toggledActive(e_BtnIndex btnIndex);
 int button_active(e_BtnIndex btnIndex);
+int button_raw_state(e_BtnIndex btnIndex);
 
 #if defined(__cplusplus)
 }
