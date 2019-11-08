@@ -195,6 +195,7 @@ static int16_t gui_model_timer;
 
 static uint8_t gui_button_cursor_enabled;
 static uint8_t gui_button_cursor;
+static uint8_t alarmBeepsDisabled;
 
 static volatile uint32_t gui_loop_100ms_counter;
 static volatile uint8_t milli100;
@@ -504,6 +505,42 @@ void gui_handle_buttons(void) {
         }
     }
 
+    // If on main page and user presses cancel button
+    if (gui_page == GUI_PAGE_MAIN)
+    {
+        static uint32_t lastActivated;
+        if (button_toggled(kBtn_Cancel))
+        {
+            if (button_active(kBtn_Cancel))
+            {
+                lastActivated = millis_this_frame();
+            }
+            else if (lastActivated)
+            {
+                uint32_t delta = millis_this_frame() - lastActivated;
+                lastActivated = 0;
+
+                // If it was a short button press
+                if (delta < 800)
+                {
+                    // toggle alarm beep enabled switch
+                    alarmBeepsDisabled = !alarmBeepsDisabled;
+                }
+            }
+        }
+        else if (lastActivated)
+        {
+            // If held down for 2.5 seconds
+            uint32_t delta = millis_this_frame() - lastActivated;
+            if (delta >= 2500)
+            {
+                lastActivated = 0;
+                sound_play_bind();
+                gui_cb_model_timer_reload();
+            }
+        }
+    }
+
     // UI Button cursor handling
     {
         if (button_toggledActive(kBtn_Ok))
@@ -676,6 +713,8 @@ void gui_loop(void) {
             // render normal ui
             gui_render();
         }
+
+//        PRINTF("loop time: %d\n", micros_realtime() - micros_this_frame());
     }
 }
 
