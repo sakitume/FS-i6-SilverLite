@@ -29,6 +29,8 @@
 #include "sound.h"
 #include "timer.h"
 #include "buttons.h"
+#include "backlight.h"
+#include "drv_time.h"
 
 //------------------------------------------------------------------------------
 #define min(a, b)       ((a) < (b) ? (a) : (b))
@@ -602,9 +604,13 @@ static void gui_process_logic(void) {
             gui_model_timer--;
         }
     }
+
+    // If calibrating sticks, or displaying sliders then keep led backlight on
+    if ((gui_page == GUI_PAGE_CONFIG_STICK_CAL) || (gui_page == GUI_PAGE_STICKS))
+    {
+        led_backlight_tickle();
+    }
 }
-
-
 
 void gui_loop(void) {
     uint32_t gui_startup_counter = 0;
@@ -973,7 +979,9 @@ static void gui_render_main_screen(void) {
     if ((gui_model_timer >= 0) && (gui_model_timer < 15)) {
         if ((gui_loop_100ms_counter % 10) == 0) {
             // beep!
+            // TODO: Make this an option that can be easily toggled
             sound_play_low_time();
+            led_backlight_tickle();
         }
     }
 
