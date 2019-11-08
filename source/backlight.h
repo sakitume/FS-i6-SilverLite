@@ -16,6 +16,10 @@ void __attribute__((section (".TestCODE"))) led_backlight_init(void);
 void led_backlight_on();
 void led_backlight_off();
 
+void led_backlight_update();
+void led_backlight_tickle();
+
+
 #if defined(__cplusplus)
 }
 #endif /* __cplusplus */
