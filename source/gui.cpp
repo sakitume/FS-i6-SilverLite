@@ -201,6 +201,7 @@ static void onEveryMillisecond(unsigned long millis)
     milli100++;
     if (milli100 >= 100)
     {
+        milli100 = 0;
         gui_loop_100ms_counter++;
     }
 }
