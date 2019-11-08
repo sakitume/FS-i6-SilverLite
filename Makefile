@@ -30,6 +30,7 @@ endif
 BOARD_DIR	 	= board
 SDK_DIR			= SDK
 SRC_DIR		 	= source
+GEM_DIR			= GEM
 
 #-------------------------------------------------------------------------------
 # Source Files
@@ -97,6 +98,13 @@ SOURCES =  \
 	${SRC_DIR}/timer.h \
 	${SRC_DIR}/uart.c \
 	${SRC_DIR}/uart.h \
+	${GEM_DIR}/GEMItem.h \
+	${GEM_DIR}/GEMItem.cpp \
+	${GEM_DIR}/GEMSelect.cpp \
+	${GEM_DIR}/GEMPage.h \
+	${GEM_DIR}/GEMPage.cpp \
+	${GEM_DIR}/GEM.h \
+	${GEM_DIR}/GEM.cpp \
 	
 #-------------------------------------------------------------------------------
 # Include directories
@@ -106,7 +114,8 @@ INCLUDE_DIRS = \
 	$(SDK_DIR)/devices/MKL16Z4 \
 	$(SDK_DIR)/devices/MKL16Z4/drivers \
 	$(SDK_DIR)/devices/MKL16Z4/utilities \
-	$(BOARD_DIR)
+	$(BOARD_DIR) \
+	$(GEM_DIR)
 
 #-------------------------------------------------------------------------------
 # Object List

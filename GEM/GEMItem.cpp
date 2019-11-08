@@ -33,11 +33,11 @@
   along with this library.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include <Arduino.h>
+
 #include "GEMItem.h"
 #include "GEM.h"
 
-GEMItem::GEMItem(char* title_, byte& linkedVariable_, GEMSelect& select_, void (*saveAction_)())
+GEMItem::GEMItem(const char* title_, byte& linkedVariable_, GEMSelect& select_, void (*saveAction_)())
   : title(title_)
   , linkedVariable(&linkedVariable_)
   , linkedType(GEM_VAL_SELECT)
@@ -46,7 +46,7 @@ GEMItem::GEMItem(char* title_, byte& linkedVariable_, GEMSelect& select_, void (
   , type(GEM_ITEM_VAL)
 { }
 
-GEMItem::GEMItem(char* title_, int& linkedVariable_, GEMSelect& select_, void (*saveAction_)())
+GEMItem::GEMItem(const char* title_, int& linkedVariable_, GEMSelect& select_, void (*saveAction_)())
   : title(title_)
   , linkedVariable(&linkedVariable_)
   , linkedType(GEM_VAL_SELECT)
@@ -55,7 +55,7 @@ GEMItem::GEMItem(char* title_, int& linkedVariable_, GEMSelect& select_, void (*
   , type(GEM_ITEM_VAL)
 { }
 
-GEMItem::GEMItem(char* title_, char* linkedVariable_, GEMSelect& select_, void (*saveAction_)())
+GEMItem::GEMItem(const char* title_, char* linkedVariable_, GEMSelect& select_, void (*saveAction_)())
   : title(title_)
   , linkedVariable(linkedVariable_)
   , linkedType(GEM_VAL_SELECT)
@@ -66,7 +66,7 @@ GEMItem::GEMItem(char* title_, char* linkedVariable_, GEMSelect& select_, void (
 
 //---
 
-GEMItem::GEMItem(char* title_, byte& linkedVariable_, GEMSelect& select_, boolean readonly_)
+GEMItem::GEMItem(const char* title_, byte& linkedVariable_, GEMSelect& select_, boolean readonly_)
   : title(title_)
   , linkedVariable(&linkedVariable_)
   , linkedType(GEM_VAL_SELECT)
@@ -75,7 +75,7 @@ GEMItem::GEMItem(char* title_, byte& linkedVariable_, GEMSelect& select_, boolea
   , type(GEM_ITEM_VAL)
 { }
 
-GEMItem::GEMItem(char* title_, int& linkedVariable_, GEMSelect& select_, boolean readonly_)
+GEMItem::GEMItem(const char* title_, int& linkedVariable_, GEMSelect& select_, boolean readonly_)
   : title(title_)
   , linkedVariable(&linkedVariable_)
   , linkedType(GEM_VAL_SELECT)
@@ -84,7 +84,7 @@ GEMItem::GEMItem(char* title_, int& linkedVariable_, GEMSelect& select_, boolean
   , type(GEM_ITEM_VAL)
 { }
 
-GEMItem::GEMItem(char* title_, char* linkedVariable_, GEMSelect& select_, boolean readonly_)
+GEMItem::GEMItem(const char* title_, char* linkedVariable_, GEMSelect& select_, boolean readonly_)
   : title(title_)
   , linkedVariable(linkedVariable_)
   , linkedType(GEM_VAL_SELECT)
@@ -95,7 +95,7 @@ GEMItem::GEMItem(char* title_, char* linkedVariable_, GEMSelect& select_, boolea
 
 //---
 
-GEMItem::GEMItem(char* title_, byte& linkedVariable_, void (*saveAction_)())
+GEMItem::GEMItem(const char* title_, byte& linkedVariable_, void (*saveAction_)())
   : title(title_)
   , linkedVariable(&linkedVariable_)
   , linkedType(GEM_VAL_BYTE)
@@ -103,7 +103,7 @@ GEMItem::GEMItem(char* title_, byte& linkedVariable_, void (*saveAction_)())
   , saveAction(saveAction_)
 { }
 
-GEMItem::GEMItem(char* title_, int& linkedVariable_, void (*saveAction_)())
+GEMItem::GEMItem(const char* title_, int& linkedVariable_, void (*saveAction_)())
   : title(title_)
   , linkedVariable(&linkedVariable_)
   , linkedType(GEM_VAL_INTEGER)
@@ -111,7 +111,7 @@ GEMItem::GEMItem(char* title_, int& linkedVariable_, void (*saveAction_)())
   , saveAction(saveAction_)
 { }
 
-GEMItem::GEMItem(char* title_, char* linkedVariable_, void (*saveAction_)())
+GEMItem::GEMItem(const char* title_, char* linkedVariable_, void (*saveAction_)())
   : title(title_)
   , linkedVariable(linkedVariable_)
   , linkedType(GEM_VAL_CHAR)
@@ -119,7 +119,7 @@ GEMItem::GEMItem(char* title_, char* linkedVariable_, void (*saveAction_)())
   , saveAction(saveAction_)
 { }
 
-GEMItem::GEMItem(char* title_, boolean& linkedVariable_, void (*saveAction_)())
+GEMItem::GEMItem(const char* title_, boolean& linkedVariable_, void (*saveAction_)())
   : title(title_)
   , linkedVariable(&linkedVariable_)
   , linkedType(GEM_VAL_BOOLEAN)
@@ -129,7 +129,7 @@ GEMItem::GEMItem(char* title_, boolean& linkedVariable_, void (*saveAction_)())
 
 //---
 
-GEMItem::GEMItem(char* title_, byte& linkedVariable_, boolean readonly_)
+GEMItem::GEMItem(const char* title_, byte& linkedVariable_, boolean readonly_)
   : title(title_)
   , linkedVariable(&linkedVariable_)
   , linkedType(GEM_VAL_BYTE)
@@ -137,7 +137,7 @@ GEMItem::GEMItem(char* title_, byte& linkedVariable_, boolean readonly_)
   , type(GEM_ITEM_VAL)
 { }
 
-GEMItem::GEMItem(char* title_, int& linkedVariable_, boolean readonly_)
+GEMItem::GEMItem(const char* title_, int& linkedVariable_, boolean readonly_)
   : title(title_)
   , linkedVariable(&linkedVariable_)
   , linkedType(GEM_VAL_INTEGER)
@@ -145,7 +145,7 @@ GEMItem::GEMItem(char* title_, int& linkedVariable_, boolean readonly_)
   , type(GEM_ITEM_VAL)
 { }
 
-GEMItem::GEMItem(char* title_, char* linkedVariable_, boolean readonly_)
+GEMItem::GEMItem(const char* title_, char* linkedVariable_, boolean readonly_)
   : title(title_)
   , linkedVariable(linkedVariable_)
   , linkedType(GEM_VAL_CHAR)
@@ -153,7 +153,7 @@ GEMItem::GEMItem(char* title_, char* linkedVariable_, boolean readonly_)
   , type(GEM_ITEM_VAL)
 { }
 
-GEMItem::GEMItem(char* title_, boolean& linkedVariable_, boolean readonly_)
+GEMItem::GEMItem(const char* title_, boolean& linkedVariable_, boolean readonly_)
   : title(title_)
   , linkedVariable(&linkedVariable_)
   , linkedType(GEM_VAL_BOOLEAN)
@@ -163,19 +163,19 @@ GEMItem::GEMItem(char* title_, boolean& linkedVariable_, boolean readonly_)
 
 //---
 
-GEMItem::GEMItem(char* title_, GEMPage& linkedPage_)
+GEMItem::GEMItem(const char* title_, GEMPage& linkedPage_)
   : title(title_)
   , linkedPage(&linkedPage_)
   , type(GEM_ITEM_LINK)
 { }
 
-GEMItem::GEMItem(char* title_, GEMPage* linkedPage_)
+GEMItem::GEMItem(const char* title_, GEMPage* linkedPage_)
   : title(title_)
   , linkedPage(linkedPage_)
   , type(GEM_ITEM_LINK)
 { }
 
-GEMItem::GEMItem(char* title_, void (*buttonAction_)())
+GEMItem::GEMItem(const char* title_, void (*buttonAction_)())
   : title(title_)
   , buttonAction(buttonAction_)
   , type(GEM_ITEM_BUTTON)

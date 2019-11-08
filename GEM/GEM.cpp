@@ -31,7 +31,10 @@
   along with this library.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include <Arduino.h>
+#include "FakeArduino.h"
+#include <string.h>
+#include <ctype.h>
+#include <stdlib.h>
 #include "GEM.h"
 
 // Macro constant (alias) for current version of GEM library, printed on _splash screen
@@ -123,6 +126,7 @@ void GEM::hideVersion(boolean flag) {
 }
 
 void GEM::init() {
+#if 0 //XXX  
   _glcd.loadSprite_P(GEM_SPR_ARROW_RIGHT, arrowRight);
   _glcd.loadSprite_P(GEM_SPR_ARROW_LEFT, arrowLeft);
   _glcd.loadSprite_P(GEM_SPR_ARROW_BTN, arrowBtn);
@@ -155,6 +159,7 @@ void GEM::init() {
   } else {
     delay(1000);
   }
+#endif  
 }
 
 void GEM::setMenuPageCurrent(GEMPage& menuPageCurrent) {
@@ -187,7 +192,7 @@ void GEM::drawTitleBar() {
   _glcd.fontFace(_menuItemFontSize);
 }
 
-void GEM::printMenuItemString(char* str, byte num, byte startPos) {
+void GEM::printMenuItemString(const char* str, byte num, byte startPos) {
   byte i = startPos;
   while (i < num + startPos && str[i] != '\0') {
     _glcd.put(str[i]);
@@ -195,15 +200,15 @@ void GEM::printMenuItemString(char* str, byte num, byte startPos) {
   }
 }
 
-void GEM::printMenuItemTitle(char* str, int offset) {
+void GEM::printMenuItemTitle(const char* str, int offset) {
   printMenuItemString(str, _menuItemTitleLength + offset);
 }
 
-void GEM::printMenuItemValue(char* str, int offset, byte startPos) {
+void GEM::printMenuItemValue(const char* str, int offset, byte startPos) {
   printMenuItemString(str, _menuItemValueLength + offset, startPos);
 }
 
-void GEM::printMenuItemFull(char* str, int offset) {
+void GEM::printMenuItemFull(const char* str, int offset) {
   printMenuItemString(str, _menuItemTitleLength + _menuItemValueLength + offset);
 }
 
@@ -409,7 +414,6 @@ void GEM::checkboxToggle() {
     menuItemTmp->saveAction();
     exitEditValue();
   } else {
-    int mode = GLCD_MODE_NORMAL;
     if (!checkboxValue) {
       _glcd.drawSprite(_menuValuesLeftOffset, topOffset, GEM_SPR_CHECKBOX_CHECKED, GLCD_MODE_NORMAL);
     } else {
@@ -579,8 +583,6 @@ void GEM::nextEditValueSelect() {
 }
 
 void GEM::prevEditValueSelect() {
-  GEMItem* menuItemTmp = _menuPageCurrent->getCurrentMenuItem();
-  GEMSelect* select = menuItemTmp->select;
   if (_valueSelectNum > 0) {
     _valueSelectNum--;
   }
@@ -598,7 +600,6 @@ void GEM::drawEditValueSelect() {
 
 void GEM::saveEditValue() {
   GEMItem* menuItemTmp = _menuPageCurrent->getCurrentMenuItem();
-  void* temp;
   switch (menuItemTmp->linkedType) {
     case GEM_VAL_INTEGER:
       *(int*)menuItemTmp->linkedVariable = atoi(_valueString);
@@ -630,10 +631,6 @@ void GEM::exitEditValue() {
   _editValueMode = false;
   drawEditValueCursor();
   drawMenu();
-}
-
-void GEM::editValueLoop() {
-  delay(1000);
 }
 
 // Trim leading/trailing whitespaces

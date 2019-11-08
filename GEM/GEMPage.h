@@ -36,7 +36,7 @@
 #ifndef HEADER_GEMPAGE
 #define HEADER_GEMPAGE
 
-#include <Arduino.h>
+#include "FakeArduino.h"
 #include "GEMItem.h"
 
 // Forward declaration of GEM class
@@ -49,11 +49,11 @@ class GEMPage {
     /* 
       @param 'title_' - title of the menu page displayed at top of the screen
     */
-    GEMPage(char* title_ = "");
+    GEMPage(const char* title_ = "");
     void addMenuItem(GEMItem& menuItem);              // Add menu item to menu page
     void setParentMenuPage(GEMPage& parentMenuPage);  // Specify parent level menu page (to know where to go back to when pressing Back button)
   private:
-    char* title;
+    const char* title;
     byte currentItemNum = 0;                          // Currently selected (focused) menu item of the page
     byte itemsCount = 0;
     GEMItem* getMenuItem(byte index);

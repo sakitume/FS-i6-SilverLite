@@ -36,6 +36,9 @@
 #ifndef HEADER_GEMITEM
 #define HEADER_GEMITEM
 
+#include "FakeArduino.h"
+
+
 // Macro constants (aliases) for menu item types
 #define GEM_ITEM_VAL 0     // Menu item represents associated variable
 #define GEM_ITEM_LINK 1    // Menu item represents link to another menu page
@@ -62,9 +65,9 @@ class GEMItem {
       @param 'select_' - reference to GEMSelect option select
       @param 'saveAction_' - pointer to callback function executed when associated variable is successfully saved
     */
-    GEMItem(char* title_, byte& linkedVariable_, GEMSelect& select_, void (*saveAction_)());
-    GEMItem(char* title_, int& linkedVariable_, GEMSelect& select_, void (*saveAction_)());
-    GEMItem(char* title_, char* linkedVariable_, GEMSelect& select_, void (*saveAction_)());
+    GEMItem(const char* title_, byte& linkedVariable_, GEMSelect& select_, void (*saveAction_)());
+    GEMItem(const char* title_, int& linkedVariable_, GEMSelect& select_, void (*saveAction_)());
+    GEMItem(const char* title_, char* linkedVariable_, GEMSelect& select_, void (*saveAction_)());
     /* 
       Constructors for menu item that represents option select, w/o callback
       @param 'title_' - title of the menu item displayed on the screen
@@ -74,19 +77,19 @@ class GEMItem {
       values GEM_READONLY (alias for true)
       default false
     */
-    GEMItem(char* title_, byte& linkedVariable_, GEMSelect& select_, boolean readonly_ = false);
-    GEMItem(char* title_, int& linkedVariable_, GEMSelect& select_, boolean readonly_ = false);
-    GEMItem(char* title_, char* linkedVariable_, GEMSelect& select_, boolean readonly_ = false);
+    GEMItem(const char* title_, byte& linkedVariable_, GEMSelect& select_, boolean readonly_ = false);
+    GEMItem(const char* title_, int& linkedVariable_, GEMSelect& select_, boolean readonly_ = false);
+    GEMItem(const char* title_, char* linkedVariable_, GEMSelect& select_, boolean readonly_ = false);
     /* 
       Constructors for menu item that represents variable, w/ callback
       @param 'title_' - title of the menu item displayed on the screen
       @param 'linkedVariable_' - reference to variable that menu item is associated with (either byte, int, char*, or boolean)
       @param 'saveAction_' - pointer to callback function executed when associated variable is successfully saved
     */
-    GEMItem(char* title_, byte& linkedVariable_, void (*saveAction_)());
-    GEMItem(char* title_, int& linkedVariable_, void (*saveAction_)());
-    GEMItem(char* title_, char* linkedVariable_, void (*saveAction_)());
-    GEMItem(char* title_, boolean& linkedVariable_, void (*saveAction_)());
+    GEMItem(const char* title_, byte& linkedVariable_, void (*saveAction_)());
+    GEMItem(const char* title_, int& linkedVariable_, void (*saveAction_)());
+    GEMItem(const char* title_, char* linkedVariable_, void (*saveAction_)());
+    GEMItem(const char* title_, boolean& linkedVariable_, void (*saveAction_)());
     /* 
       Constructors for menu item that represents variable, w/o callback
       @param 'title_' - title of the menu item displayed on the screen
@@ -95,34 +98,34 @@ class GEMItem {
       values GEM_READONLY (alias for true)
       default false
     */
-    GEMItem(char* title_, byte& linkedVariable_, boolean readonly_ = false);
-    GEMItem(char* title_, int& linkedVariable_, boolean readonly_ = false);
-    GEMItem(char* title_, char* linkedVariable_, boolean readonly_ = false);
-    GEMItem(char* title_, boolean& linkedVariable_, boolean readonly_ = false);
+    GEMItem(const char* title_, byte& linkedVariable_, boolean readonly_ = false);
+    GEMItem(const char* title_, int& linkedVariable_, boolean readonly_ = false);
+    GEMItem(const char* title_, char* linkedVariable_, boolean readonly_ = false);
+    GEMItem(const char* title_, boolean& linkedVariable_, boolean readonly_ = false);
     /* 
       Constructor for menu item that represents link to another menu page (via reference)
       @param 'title_' - title of the menu item displayed on the screen
       @param 'linkedPage_' - reference to GEMPage menu page that menu item is associated with
     */
-    GEMItem(char* title_, GEMPage& linkedPage_);
+    GEMItem(const char* title_, GEMPage& linkedPage_);
     /* 
       Constructor for menu item that represents link to another menu page (via pointer)
       @param 'title_' - title of the menu item displayed on the screen
       @param 'linkedPage_' - pointer to GEMPage menu page that menu item is associated with
     */
-    GEMItem(char* title_, GEMPage* linkedPage_);
+    GEMItem(const char* title_, GEMPage* linkedPage_);
     /* 
       Constructor for menu item that represents button
       @param 'title_' - title of the menu item displayed on the screen
       @param 'buttonAction_' - pointer to function that will be executed when menu item is activated
     */
-    GEMItem(char* title_, void (*buttonAction_)());
+    GEMItem(const char* title_, void (*buttonAction_)());
     void setReadonly(boolean mode = true);  // Explicitly set or unset readonly mode for variable that menu item is associated with
                                             // (relevant for GEM_VAL_INTEGER, GEM_VAL_BYTE, GEM_VAL_CHAR, GEM_VAL_BOOLEAN variable
                                             // menu items and GEM_VAL_SELECT option select)
     boolean getReadonly();                  // Get readonly state for variable that menu item is associated with
   private:
-    char* title;
+    const char* title;
     byte type;
     void* linkedVariable;
     byte linkedType;

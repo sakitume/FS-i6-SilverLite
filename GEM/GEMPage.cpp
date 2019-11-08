@@ -33,10 +33,10 @@
   along with this library.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include <Arduino.h>
+#include "FakeArduino.h"
 #include "GEMPage.h"
 
-GEMPage::GEMPage(char* title_)
+GEMPage::GEMPage(const char* title_)
   : title(title_)
 { }
 

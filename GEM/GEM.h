@@ -34,7 +34,8 @@
 #ifndef HEADER_GEM
 #define HEADER_GEM
 
-#include <AltSerialGraphicLCD.h>
+#include "FakeArduino.h"
+#include "FakeGLCD.h"
 #include "GEMPage.h"
 #include "GEMSelect.h"
 
@@ -140,10 +141,10 @@ class GEM {
     GEMPage* _menuPageCurrent;
     GEMItem* _menuItemCurrent;
     void drawTitleBar();
-    void printMenuItemString(char* str, byte num, byte startPos = 0);
-    void printMenuItemTitle(char* str, int offset = 0);
-    void printMenuItemValue(char* str, int offset = 0, byte startPos = 0);
-    void printMenuItemFull(char* str, int offset = 0);
+    void printMenuItemString(const char* str, byte num, byte startPos = 0);
+    void printMenuItemTitle(const char* str, int offset = 0);
+    void printMenuItemValue(const char* str, int offset = 0, byte startPos = 0);
+    void printMenuItemFull(const char* str, int offset = 0);
     byte getMenuItemInsetOffset(boolean forSprite = false);
     byte getCurrentItemTopOffset(boolean withInsetOffset = true, boolean forSprite = false);
     void printMenuItems();
@@ -181,7 +182,6 @@ class GEM {
     void saveEditValue();
     void cancelEditValue();
     void exitEditValue();
-    void editValueLoop();
     char* trimString(char* str);
 
     /* KEY DETECTION */
