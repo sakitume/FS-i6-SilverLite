@@ -164,6 +164,7 @@ uint32_t adc_get_battery_voltage(void) {
     // raw data is 0 .. 4095 ~ 0 .. 3300mV
     // Vadc = raw * 3300 / 4095
     uint32_t raw = adc_battery_voltage_raw_filtered;
+#if 0    
     // the voltage divider is 5.1k / 10k
     // Vadc = Vbat * R2 / (R1+R2) = Vbat * 51/ 151
     // -> Vbat = Vadc * (R1-R2) / R2
@@ -171,6 +172,15 @@ uint32_t adc_get_battery_voltage(void) {
     //         = (raw * (3300 * 151) ) / (4095 * 51)
     uint32_t mv = (raw * (3300 * 151) ) / (4095 * 51);
     return mv / 10;
+#else
+    // the voltage divider is 10k / 10k
+    // Vadc = Vbat * R2 / (R1+R2) = Vbat * 10/ 200
+    // -> Vbat = Vadc * (R1-R2) / R2
+    // -> Vout = raw * 3300 * (200 / 10) / 4095
+    //         = (raw * (3300 * 200) ) / (4095 * 10)
+    uint32_t mv = (raw * (3300 * 200) ) / (4095 * 10);
+    return mv / 100;
+#endif    
 }
 
 //------------------------------------------------------------------------------
