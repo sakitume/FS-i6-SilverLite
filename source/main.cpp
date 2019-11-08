@@ -133,10 +133,15 @@ int main(void)
         adc_calibrate_sticks();
     }
 
+    // Call buttons_update() once so we can use button_raw_state()
+    buttons_update();
+    if (button_raw_state(kBtn_ThrottleU))
+    {
+        tests();
+    }
+
     gui_init();
     gui_loop();
-    //
-    tests();
 }
 
 //------------------------------------------------------------------------------
