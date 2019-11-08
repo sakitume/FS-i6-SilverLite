@@ -74,9 +74,6 @@ touch_event_t touch_get_last_event(void)
 
 
 #define GUI_LOOP_DELAY_MS 100
-#define GUI_SHUTDOWN_PRESS_S 2.0
-#define GUI_SHUTDOWN_PRESS_COUNT_FROM_MS(_ms) ((_ms)/GUI_LOOP_DELAY_MS)
-#define GUI_SHUTDOWN_PRESS_COUNT (GUI_SHUTDOWN_PRESS_COUNT_FROM_MS(1000*GUI_SHUTDOWN_PRESS_S))
 
 // touch function pointer
 typedef void (*f_ptr_t)(void);
@@ -113,9 +110,8 @@ static void gui_touch_callback_clear(void);
 #define GUI_PAGE_CONFIG_MODEL_SETTINGS  (GUI_PAGE_CONFIG_FLAG | 2)
 
 
-#define GUI_SUBPAGE_SETTING_MODEL_NAME  0
-#define GUI_SUBPAGE_SETTING_MODEL_SCALE 1
-#define GUI_SUBPAGE_SETTING_MODEL_TIMER 2
+#define GUI_SUBPAGE_SETTING_MODEL_SCALE 0
+#define GUI_SUBPAGE_SETTING_MODEL_TIMER 1
 
 void gui_init(void);
 void gui_loop(void);
@@ -150,7 +146,6 @@ static void gui_cb_model_timer_reload(void);
 static void gui_cb_model_prev(void);
 static void gui_cb_model_next(void);
 static void gui_cb_setting_model_stickscale(void);
-static void gui_cb_setting_model_name(void);
 static void gui_cb_setting_model_timer(void);
 static void gui_cb_setting_option_leave(void);
 static void gui_cb_previous_page(void);
@@ -183,12 +178,9 @@ static void gui_setup_bootloader_render(void);
 
 
 //------------------------------------------------------------------------------
-static uint32_t gui_config_counter;
-static uint32_t gui_shutdown_pressed;
 static uint8_t gui_active = 0;
 static uint8_t gui_page;
 static uint8_t gui_sub_page;
-static uint8_t gui_config_tap_detected;
 static uint8_t gui_touch_callback_index;
 static touch_callback_entry_t gui_touch_callback[GUI_TOUCH_CALLBACK_COUNT];
 static int16_t gui_model_timer;
@@ -199,6 +191,10 @@ static uint8_t alarmBeepsDisabled;
 
 static volatile uint32_t gui_loop_100ms_counter;
 static volatile uint8_t milli100;
+
+//------------------------------------------------------------------------------
+// This is a millisecond timer callback that we use to manage the
+// gui_loop_100ms_counter variable used by the original gui code
 static void onEveryMillisecond(unsigned long millis)
 {
     milli100++;
@@ -209,12 +205,11 @@ static void onEveryMillisecond(unsigned long millis)
     }
 }
 
+//------------------------------------------------------------------------------
 void gui_init(void) {
     debug("gui: init\n"); debug_flush();
     gui_page     = GUI_PAGE_MAIN;
     gui_sub_page = 0;
-    gui_shutdown_pressed = 0;
-    gui_config_tap_detected = 0;
     gui_touch_callback_index = 0;
 
     gui_touch_callback_clear();
@@ -327,9 +322,6 @@ static void gui_process_touch(void) {
                         // play sound
                         sound_play_click();
 
-                        // reset sub pages
-                        gui_config_counter = 0;
-
                         // execute callback!
                         gui_touch_callback_execute(i);
                 }
@@ -357,11 +349,6 @@ static void gui_cb_model_next(void) {
 static void gui_cb_setting_model_stickscale(void) {
     gui_page    |= GUI_PAGE_CONFIG_OPTION_FLAG;
     gui_sub_page = GUI_SUBPAGE_SETTING_MODEL_SCALE;
-}
-
-static void gui_cb_setting_model_name(void) {
-    gui_page    |= GUI_PAGE_CONFIG_OPTION_FLAG;
-    gui_sub_page = GUI_SUBPAGE_SETTING_MODEL_NAME;
 }
 
 static void gui_cb_setting_model_timer(void) {
@@ -868,15 +855,6 @@ static void gui_config_stick_calibration_store_adc_values(void)
 void gui_render(void) {
     // start with empty screen
     screen_fill(0);
-
-#if 0 // This messes up button handling, plus it can't work without touch screen
-    // register page inc/dec callbacks
-    gui_touch_callback_register(0, GUI_PREV_CLICK_X, 0, LCD_HEIGHT,
-                                &gui_cb_previous_page);
-    gui_touch_callback_register(LCD_WIDTH-GUI_PREV_CLICK_X, LCD_WIDTH, 0, LCD_HEIGHT,
-                                &gui_cb_next_page);
-#endif
-
     switch (gui_page) {
         default  :
         case (GUI_PAGE_MAIN) :
@@ -1078,12 +1056,10 @@ static void gui_setup_main_render(void) {
 static void gui_setup_bootloader_render(void) {
     // header
     gui_config_header_render("BOOTLOADER MODE");
-    screen_puts_xy(3, 9, 1, "WILL ENTER BOOTLOADER NOW!");
+    screen_puts_xy(3, 9, 1, "WILL REBOOT NOW!");
     screen_update();
 
-    // Our STM32 F072 has:
-    // 16k SRAM in address 0x2000 0000 - 0x2000 3FFF
-    *((uint32_t *)0x20003FF0) = 0xDEADBEEF;
+    delay_ms(1000 * 2);
 
     // reset the processor
     NVIC_SystemReset();
@@ -1095,24 +1071,8 @@ static void gui_setup_bindmode_render(void) {
 
     // header
     gui_config_header_render("BIND");
-    screen_puts_xy(3, 9, 1, "Sending bind packets...");
-    screen_puts_xy(3, 9 + 3*h, 1, "CAUTION: UNTESTED...");
-
+    screen_puts_xy(3, 9, 1, "This does nothing...");
     screen_puts_xy(3, 9 + 7*h, 1, "Switch off TX to leave...");
-
-    if (gui_config_counter == 0) {
-        // TODO
-        //frsky_enter_bindmode();
-    }
-    gui_config_counter++;
-
-    if (gui_config_counter > 500/GUI_LOOP_DELAY_MS) {
-        // play a sound every 2 seconds
-        sound_play_bind();
-
-        // next iteration
-        gui_config_counter = 1;
-    }
 }
 
 static void gui_config_model_render_main(void) {
@@ -1123,12 +1083,6 @@ static void gui_config_model_render_main(void) {
 
     // add model name
     screen_puts_centered(y, 1, storage.model[storage.current_model].name);
-
-#if 0 // This messes up button handling, plus it can't work without touch screen
-    // register the callback
-    gui_touch_callback_register(20, LCD_WIDTH - 20, y, y + font[FONT_HEIGHT] + 1,
-                                &gui_cb_setting_model_name);
-#endif                                
 
     // add < ... > buttons
     gui_add_button_smallfont(3, y - 3, 15, 10, "<", &gui_cb_model_prev);
@@ -1231,10 +1185,6 @@ static void gui_config_model_render(void) {
         // which options have to be changed?
         switch (gui_sub_page) {
             default:
-            case (GUI_SUBPAGE_SETTING_MODEL_NAME) :
-                gui_render_option_window("MODEL NAME", 0);
-                break;
-
             case (GUI_SUBPAGE_SETTING_MODEL_SCALE) :
                 gui_render_option_window("STICK SCALE", &gui_cb_render_option_stickscale);
                 break;
