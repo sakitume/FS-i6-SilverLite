@@ -539,12 +539,20 @@ void gui_handle_buttons(void) {
                 {
                     gui_button_cursor--;
                 }
+                else if (gui_touch_callback_index)
+                {
+                    gui_button_cursor = gui_touch_callback_index - 1;
+                }
             }
             else if (button_toggledActive(kBtn_Down))
             {
                 if ((gui_button_cursor + 1) < gui_touch_callback_index)
                 {
                     gui_button_cursor++;
+                }
+                else
+                {
+                    gui_button_cursor = 0;
                 }
             }
         }
