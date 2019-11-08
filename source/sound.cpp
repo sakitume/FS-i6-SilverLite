@@ -7,6 +7,11 @@
 #include "fsl_clock.h"
 #include "fsl_tpm.h"
 
+//#define __UPDATE_ON_ISR_THREAD__
+#if defined(__UPDATE_ON_ISR_THREAD__)    
+    #include "timer.h"
+#endif
+
 //------------------------------------------------------------------------------
 // Buzzer is connected to TPM1_CH0
 #define BOARD_TIMER_BASEADDR TPM1
@@ -22,10 +27,16 @@ struct tone_t
 enum 	{	SOUND_QUEUE_SIZE = 10 };
 static tone_t sound_queue[SOUND_QUEUE_SIZE];
 static int sound_queue_state;
-static int sound_tone_duration;
 static uint8_t timerStarted;
 
+#if defined(__UPDATE_ON_ISR_THREAD__)    
+static volatile int sound_tone_duration;
+#else
+static int sound_tone_duration;
+#endif
+
 //------------------------------------------------------------------------------
+// Note: This might be called by our millisecond ISR so be mindful!
 static void sound_set_frequency(uint32_t freq)
 {
     tpm_chnl_pwm_signal_param_t tpmParam;
@@ -40,7 +51,6 @@ static void sound_set_frequency(uint32_t freq)
 	// TPM_SetupPwm() fails with freq values below approx 1500
 	if (freq < 1500)
 	{
-//		PRINTF("SetFreq: %d\n", freq);
 		if (timerStarted)
 		{
 			timerStarted = false;
@@ -49,8 +59,7 @@ static void sound_set_frequency(uint32_t freq)
 	}
 	else
 	{
-		status_t result = TPM_SetupPwm(BOARD_TIMER_BASEADDR, &tpmParam, 1, kTPM_EdgeAlignedPwm, freq, BOARD_TIMER_SOURCE_CLOCK);
-//		PRINTF("SetFreq: %d, %s\n", freq, (result == kStatus_Success) ? "okay" : "fail");
+		TPM_SetupPwm(BOARD_TIMER_BASEADDR, &tpmParam, 1, kTPM_EdgeAlignedPwm, freq, BOARD_TIMER_SOURCE_CLOCK);
 		if (!timerStarted)
 		{
 			timerStarted = true;
@@ -83,18 +92,39 @@ static void InitPWM()
 }
 
 //------------------------------------------------------------------------------
-void sound_init()
+#if defined(__UPDATE_ON_ISR_THREAD__)    
+static void on_milli_update(unsigned long millis)
 {
-	InitPWM();	
+    if (sound_queue_state == 0) {
+        // off, return
+        return;
+    }
 
-    sound_queue_state = 0;
-    sound_set_frequency(0);
-    sound_tone_duration = 0;
+    if (sound_tone_duration <= 0) {
+
+        // next sample
+        uint32_t id = sound_queue_state - 1;
+        if ((id == SOUND_QUEUE_SIZE) || (sound_queue[id].duration_ms == 0)) {
+            // no more samples, switch off:
+            sound_set_frequency(0);
+            sound_queue_state = 0;
+        } else {
+            // fetch next sample
+            sound_tone_duration = sound_queue[id].duration_ms;
+            sound_set_frequency(sound_queue[id].frequency);
+            sound_queue_state++;
+        }
+    } else {
+        sound_tone_duration--;
+    }
 }
+#endif
 
 //------------------------------------------------------------------------------
 void sound_update()
 {
+#if defined(__UPDATE_ON_ISR_THREAD__)    
+#else
 	static uint32_t	msLast;
 	uint32_t msNow = millis_this_frame();
 	unsigned delta = msNow - msLast;
@@ -122,6 +152,21 @@ void sound_update()
             sound_queue_state++;
         }
     }
+#endif    
+}
+
+//------------------------------------------------------------------------------
+void sound_init()
+{
+	InitPWM();	
+
+    sound_queue_state = 0;
+    sound_set_frequency(0);
+    sound_tone_duration = 0;
+
+#if defined(__UPDATE_ON_ISR_THREAD__)    
+    timer_add_callback(on_milli_update);
+#endif
 }
 
 //------------------------------------------------------------------------------
