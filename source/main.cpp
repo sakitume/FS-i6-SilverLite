@@ -133,6 +133,14 @@ int main(void)
         adc_calibrate_sticks();
     }
 
+    // Perform required updates for a little bit before fully starting up
+    // this allows an gui code to properly query adc or buttons
+    for (int i=0; i<5; i++)
+    {
+        required_updates();
+        delay_ms(20);
+    }
+
     // Call buttons_update() once so we can use button_raw_state()
     buttons_update();
     if (button_raw_state(kBtn_ThrottleU))
