@@ -41,6 +41,7 @@ const unsigned char sprite_beeps_disabled[] =
 #define GUI_STATUSBAR_FONT font_tomthumb3x5
 
 //------------------------------------------------------------------------------
+static bool guiEnabled;
 static int16_t modelTimer;
 static uint8_t alarmBeepsDisabled;
 static bool exitDialogActive;
@@ -104,7 +105,7 @@ static void ReloadModelTimer()
 }
 
 //------------------------------------------------------------------------------
-int gui_handle_buttons() 
+void gui_handle_buttons() 
 {
     static CShortLongPress timerLongPress(kBtn_Ok, 15);
     static CShortLongPress exitDialogLongPress(kBtn_Ok, 10);
@@ -115,20 +116,21 @@ int gui_handle_buttons()
         {
             exitDialogLongPress.reset();
             exitDialogActive = false;
-            return 1;
         }
         if (exitDialogLongPress.check() > 0)
         {
             exitDialogActive = false;
-            return 0;
+
+            // Exit this gui app context
+            guiEnabled = false;
         }
-        return 1;        
+        return;
     }
     else if (button_toggledActive(kBtn_Cancel))
     {
         timerLongPress.reset();
         exitDialogActive = true;
-        return 1;
+        return;
     }
 
 
@@ -144,8 +146,6 @@ int gui_handle_buttons()
         // toggle alarm beep enabled switch
         alarmBeepsDisabled = !alarmBeepsDisabled;
     }
-
-    return 1;
 }
 
 //------------------------------------------------------------------------------
@@ -381,7 +381,7 @@ static void txCtxRender() {
 //------------------------------------------------------------------------------
 static void txCtxEnter() 
 {
-    // re init model timer
+    guiEnabled = true;
     ReloadModelTimer();
 
     // TODO: Init TX system here
@@ -391,7 +391,10 @@ static void txCtxEnter()
 static void txCtxLoop() 
 {
     gui_process_logic();
-    if (!gui_handle_buttons())
+    gui_handle_buttons();
+
+    // If process_logic or handle_buttons disabled the run flag
+    if (!guiEnabled)
     {
         gGEM.context.exit();
         return;
@@ -406,6 +409,8 @@ static void txCtxLoop()
 static void txCtxExit() 
 {
     // TODO: Shutdown TX system
+
+    // Exit back to GEM
     gGEM.drawMenu();
     gGEM.clearContext();
 }
