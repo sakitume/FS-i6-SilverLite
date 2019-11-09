@@ -100,6 +100,7 @@ SOURCES =  \
 	${SRC_DIR}/timer.h \
 	${SRC_DIR}/uart.c \
 	${SRC_DIR}/uart.h \
+	${SRC_DIR}/tx_interface.cpp \
 	${GEM_DIR}/GEMItem.h \
 	${GEM_DIR}/GEMItem.cpp \
 	${GEM_DIR}/GEMSelect.cpp \

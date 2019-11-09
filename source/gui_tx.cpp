@@ -14,6 +14,7 @@
 #include "backlight.h"
 #include "drv_time.h"
 #include "GEM.h"
+#include "tx_interface.h"
 
 //------------------------------------------------------------------------------
 extern GEM gGEM;
@@ -363,7 +364,12 @@ static void gui_render_battery() {
 }
 
 //------------------------------------------------------------------------------
-static void gui_render_rssi(uint8_t rssi_rx, uint8_t rssi_tx) {
+static void gui_render_rssi() 
+{
+#if 0
+    uint32_t rssi_fc = tx_get_rssi_fc();
+    uint32_t rssi_tx = tx_get_rssi_tx();
+
     #define GUI_RSSI_BAR_W 25
     uint16_t x = 1;
     // render rx rssi bargraph at a given position
@@ -394,6 +400,7 @@ static void gui_render_rssi(uint8_t rssi_rx, uint8_t rssi_tx) {
     bar_w = min(rssi, 100)/4;
     if (bar_w > 1) bar_w--;
     if (bar_w > 0) screen_fill_rect(x+bar_w, 2, 25-bar_w, 3, 1);
+#endif    
 }
 
 //------------------------------------------------------------------------------
@@ -405,7 +412,7 @@ static void gui_render_statusbar() {
     // draw battery voltage
     gui_render_battery();
 
-    gui_render_rssi(111, 120);
+    gui_render_rssi();
 
     if (alarmBeepsDisabled)
     {
@@ -473,25 +480,25 @@ static void renderTX() {
     screen_set_font(font_metric7x12);
     x = 1;
     y = 10;
-    uint32_t voltage = 123; // TODO, XXX telemetry_get_voltage()
-    screen_put_fixed2_1digit(x, y, 1, voltage);
+    uint32_t rssi_tx = tx_get_rssi_tx();
+    screen_put_uint8(x, y, 1, rssi_tx);
     x += (font_metric7x12[FONT_FIXED_WIDTH]+1)*3 + 3;
-    screen_puts_xy(x, y, 1, "V");
+    screen_puts_xy(x, y, 1, "T");
 
     x = 1;
     y += font_metric7x12[FONT_HEIGHT]+1;
-    uint32_t current = 123; // TODO, XXX telemetry_get_current()
-    screen_put_fixed2_1digit(x, y, 1, current);
+    uint32_t rssi_fc = tx_get_rssi_fc();
+    screen_put_uint8(x, y, 1, rssi_fc);
     x += (font_metric7x12[FONT_FIXED_WIDTH]+1)*3 + 3;
-    screen_puts_xy(x, y, 1, "A");
+    screen_puts_xy(x, y, 1, "R");
 
     x = LCD_WIDTH - (font_metric7x12[FONT_FIXED_WIDTH]+1)*7 - 1;
     y += font_metric7x12[FONT_HEIGHT]+1;
     y += 5;
-    uint16_t MAH = 123; // TODO, XXX telemetry_get_mah()
-    screen_put_uint14(x, y, 1, MAH);
+    uint16_t fcVolts = tx_get_fc_voltage();
+    screen_put_fixed2(x, y, 1, fcVolts);
     x += (font_metric7x12[FONT_FIXED_WIDTH]+1)*4 + 1;
-    screen_puts_xy(x, y, 1, "MAH");
+    screen_puts_xy(x, y, 1, "V");
 
     // screen_set_font(font_metric7x12);
     screen_set_font(font_metric15x26);
@@ -590,17 +597,19 @@ void RunTXCtx()
 //------------------------------------------------------------------------------
 static void startTX()
 {
-    txRunning = true;   // TODO: Init TX system here
+    txRunning = true;
+    tx_start();
 }
 
 //------------------------------------------------------------------------------
 static void stopTX()
 {
-    txRunning = false;  // TODO: Shutdown TX system
+    txRunning = false;
+    tx_stop();
 }
 
 //------------------------------------------------------------------------------
 static void resetTX()
 {
-    // TODO: Reset TX system
+    tx_reset();
 }
