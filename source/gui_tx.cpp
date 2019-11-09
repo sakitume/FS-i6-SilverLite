@@ -155,6 +155,15 @@ static void gui_process_logic() {
             modelTimer--;
         }
     }
+
+    if ((modelTimer >= 0) && (modelTimer < 15)) {
+        if ((gui_loop_100ms_counter % 10) == 0) {
+            if (!alarmBeepsDisabled) {
+                sound_play_low_time();
+            }
+            led_backlight_tickle();
+        }
+    }
 }
 
 //------------------------------------------------------------------------------
@@ -302,14 +311,6 @@ static void txCtxRender() {
             color = 1 - color;
         }
     }
-    if ((modelTimer >= 0) && (modelTimer < 15)) {
-        if ((gui_loop_100ms_counter % 10) == 0) {
-            // beep!
-            // TODO: Make this an option that can be easily toggled
-            sound_play_low_time();
-            led_backlight_tickle();
-        }
-    }
 
     // render background
     x = 51;
@@ -330,6 +331,8 @@ static void txCtxEnter()
 {
     // re init model timer
     ReloadModelTimer();
+
+    // TODO: Init TX system here
 }
 
 //------------------------------------------------------------------------------
@@ -350,6 +353,7 @@ static void txCtxLoop()
 //------------------------------------------------------------------------------
 static void txCtxExit() 
 {
+    // TODO: Shutdown TX system
     gGEM.drawMenu();
     gGEM.clearContext();
 }
