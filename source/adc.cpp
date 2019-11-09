@@ -205,7 +205,7 @@ static void LoadCalibrationData()
 {
     if (!storage_is_valid())
     {
-        PRINTF("Unable to load stick calibration data from flash");
+        PRINTF("Unable to load stick calibration data from flash\n");
         SetupSaneDefaults();
     }
     else
