@@ -94,7 +94,7 @@ void required_updates()
 }
 
 //------------------------------------------------------------------------------
-#define __TEST_GEM__
+//#define __TEST_GEM__
 #if defined(__TEST_GEM__)
 #include "GEM.h"
 static GLCD gGLCD;
