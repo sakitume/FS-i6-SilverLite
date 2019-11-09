@@ -103,16 +103,6 @@ class GEM {
       default 86 (suitable for 128x64 screen with other variables at their default values; 86 - maximum value for 128x64 screen)
     */
     GEM(GLCD& glcd_, byte menuPointerType_ = GEM_POINTER_ROW, byte menuItemsPerScreen_ = 5, byte menuItemHeight_ = 10, byte menuPageScreenTopOffset_ = 10, byte menuValuesLeftOffset_ = 86);
-    void setSplash(const uint8_t PROGMEM *sprite);             // Set custom sprite displayed as the splash screen when GEM is being initialized. Should be called before GEM::init().
-                                                         // The following is the format of the sprite as described in AltSerialGraphicLCD library documentation.
-                                                         // The sprite commences with two bytes which are the width and height of the image in pixels.
-                                                         // The pixel data is organised as rows of 8 vertical pixels per byte where the least significant bit (LSB)
-                                                         // is the top-left pixel and the most significant bit (MSB) tends towards the bottom-left pixel.
-                                                         // A complete row of 8 vertical pixels across the image width comprises the first row, this is then followed
-                                                         // by the next row of 8 vertical pixels and so on.
-                                                         // Where the image height is not an exact multiple of 8 bits then any unused bits are typically set to zero
-                                                         // (although this does not matter).
-    void hideVersion(boolean flag = true);               // Turn printing of the current GEM library version on splash screen off or back on. Should be called before GEM::init().
     void init();                                         // Init the menu (load necessary sprites into RAM of the SparkFun Graphic LCD Serial Backpack, display GEM splash screen, etc.)
     void setMenuPageCurrent(GEMPage& menuPageCurrent);   // Set supplied menu page as current
     void drawMenu();                                     // Draw menu on screen, with menu page set earlier in GEM::setMenuPageCurrent()

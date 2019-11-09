@@ -105,6 +105,8 @@ SOURCES =  \
 	${GEM_DIR}/GEMPage.cpp \
 	${GEM_DIR}/GEM.h \
 	${GEM_DIR}/GEM.cpp \
+	${GEM_DIR}/FakeGLCD.h \
+	${GEM_DIR}/FakeGLCD.cpp \
 	
 #-------------------------------------------------------------------------------
 # Include directories
@@ -115,6 +117,7 @@ INCLUDE_DIRS = \
 	$(SDK_DIR)/devices/MKL16Z4/drivers \
 	$(SDK_DIR)/devices/MKL16Z4/utilities \
 	$(BOARD_DIR) \
+	$(SRC_DIR) \
 	$(GEM_DIR)
 
 #-------------------------------------------------------------------------------

@@ -45,10 +45,6 @@
 // XOR mode (screen ^ pixel)
 #define GLCD_MODE_XOR              ((uint8_t)(0x04))
 
-#define GLCD_ID_CRLF               0x06 /* Line ending CR+LF */
-#define GLCD_ID_SCROLL             0x09 /* Scroll on/off */
-
-
 /// A lot of the methods are other calls with no processing so they are
 /// mapped immediataly rather than nesting function calls.
 class GLCD
@@ -72,6 +68,8 @@ public:
     /// Clear the screen
     ///
     void clearScreen();
+
+    void presentScreen();
 
     //////////////////////////////////////////////////////////////////////////
     /// Changes the font face temporarily.
@@ -117,15 +115,6 @@ public:
     void putstr(const char *s);
 
     //////////////////////////////////////////////////////////////////////////
-    /// Put a character to the screen. This is the fundemental call for the
-    /// whole of the library and manages XON/OXFF to ensure that the screen
-    /// buffer does not overflow. Noted I wanted to call this putc but there
-    /// is a macro that prevents this.
-    ///
-    /// @param cc [in] The charcter to put to the sceeen
-    void put (uint8_t cc);
-
-    //////////////////////////////////////////////////////////////////////////
     /// Draw an image in the screen from memory.
     ///
     /// @param [in] x The top left x-coordinate.
@@ -151,17 +140,6 @@ public:
     /// @param [in] mode The new drawing mode.
     ///
     void drawMode (uint8_t mode);
-
-    //////////////////////////////////////////////////////////////////////////
-    /// Draws a box. The box is described by a diagonal line from x, y1 to x2,
-    /// y2.
-    ///
-    /// @param [in] x1 The upper left x-coordinate.
-    /// @param [in] y1 The upper left y-coordingate.
-    /// @param [in] x2 The lower right x-coordinate.
-    /// @param [in] y2 The lower right y-coordinate
-    ///
-    void drawBox(uint8_t x1, uint8_t y1, uint8_t x2, uint8_t y2);
 
     //////////////////////////////////////////////////////////////////////////
     /// Draws a box. The box is described by a diagonal line from x, y1 to x2,
@@ -208,6 +186,8 @@ public:
     /// @param [in] mode The drawing mode of the line.
     ///
     void drawLine(uint8_t x1, uint8_t y1, uint8_t x2, uint8_t y2, uint8_t mode);
+
+    void loadSprite_P(uint8_t id, const uint8_t* sprite);
 };
 
 #endif  /* _GLCD_H_ */

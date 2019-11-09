@@ -44,7 +44,7 @@ struct SelectOptionInt {
 
 // Declaration of SelectOptionByte type
 struct SelectOptionByte {
-  char* name;
+  const char* name;
   byte val_byte;
 };
 

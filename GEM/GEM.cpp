@@ -117,49 +117,17 @@ GEM::GEM(GLCD& glcd_, byte menuPointerType_, byte menuItemsPerScreen_, byte menu
 
 //====================== INIT OPERATIONS
 
-void GEM::setSplash(const uint8_t PROGMEM *sprite) {
-  _splash = sprite;
-}
-
-void GEM::hideVersion(boolean flag) {
-  _enableVersion = !flag;
-}
-
 void GEM::init() {
-#if 0 //XXX  
+  _menuItemTitleLength = (_menuValuesLeftOffset - 5) / _menuItemFont[_menuItemFontSize].width;
+  _menuItemValueLength = (_glcd.xdim - _menuValuesLeftOffset - 6) / _menuItemFont[_menuItemFontSize].width;
+  _glcd.drawMode(GLCD_MODE_NORMAL);
+
   _glcd.loadSprite_P(GEM_SPR_ARROW_RIGHT, arrowRight);
   _glcd.loadSprite_P(GEM_SPR_ARROW_LEFT, arrowLeft);
   _glcd.loadSprite_P(GEM_SPR_ARROW_BTN, arrowBtn);
   _glcd.loadSprite_P(GEM_SPR_CHECKBOX_UNCHECKED, checkboxUnchecked);
   _glcd.loadSprite_P(GEM_SPR_CHECKBOX_CHECKED, checkboxChecked);
   _glcd.loadSprite_P(GEM_SPR_SELECT_ARROWS, selectArrows);
-  
-  _glcd.drawMode(GLCD_MODE_NORMAL);
-  _glcd.fontMode(GLCD_MODE_NORMAL);
-  _glcd.set(GLCD_ID_CRLF, 0);
-  _glcd.set(GLCD_ID_SCROLL, 0);
-  _glcd.clearScreen();
-  
-  _menuItemTitleLength = (_menuValuesLeftOffset - 5) / _menuItemFont[_menuItemFontSize].width;
-  _menuItemValueLength = (_glcd.xdim - _menuValuesLeftOffset - 6) / _menuItemFont[_menuItemFontSize].width;
-  _glcd.bitblt_P(_glcd.xdim/2-(pgm_read_byte(_splash)+1)/2, _glcd.ydim/2-(pgm_read_byte(_splash+1)+1)/2, GLCD_MODE_NORMAL, _splash);
-
-  if (_enableVersion) {
-    delay(500);
-    _glcd.fontFace(1);
-    _glcd.setY(_glcd.ydim - 6);
-    if (_splash != logo) {
-      _glcd.setX(_glcd.xdim - strlen(GEM_VER)*4 - 12);
-      _glcd.putstr("GEM");
-    } else {
-      _glcd.setX(_glcd.xdim - strlen(GEM_VER)*4);
-    }
-    _glcd.putstr(GEM_VER);
-    delay(500);
-  } else {
-    delay(1000);
-  }
-#endif  
 }
 
 void GEM::setMenuPageCurrent(GEMPage& menuPageCurrent) {
@@ -183,6 +151,7 @@ void GEM::drawMenu() {
   printMenuItems();
   drawMenuPointer();
   drawScrollbar();
+  _glcd.presentScreen();
 }
 
 void GEM::drawTitleBar() {
@@ -193,11 +162,15 @@ void GEM::drawTitleBar() {
 }
 
 void GEM::printMenuItemString(const char* str, byte num, byte startPos) {
+#if 0  
   byte i = startPos;
   while (i < num + startPos && str[i] != '\0') {
     _glcd.put(str[i]);
     i++;
   }
+#else
+  _glcd.putstr(str + startPos);
+#endif  
 }
 
 void GEM::printMenuItemTitle(const char* str, int offset) {
@@ -563,13 +536,17 @@ void GEM::prevEditValueDigit() {
 }
 
 void GEM::drawEditValueDigit(byte code) {
-  char chrNew = (char)code;
-  _valueString[_editValueVirtualCursorPosition] = chrNew;
+  _valueString[_editValueVirtualCursorPosition] = (char)code;
   drawEditValueCursor();
   _glcd.setX(_menuValuesLeftOffset + _editValueCursorPosition * _menuItemFont[_menuItemFontSize].width);
   int pointerPosition = getCurrentItemTopOffset();
   _glcd.setY(pointerPosition);
+#if 0
   _glcd.put(code);
+#else
+  char str[2] = { (char)code, '\0' };
+  _glcd.putstr(str);
+#endif  
   drawEditValueCursor();
 }
 
