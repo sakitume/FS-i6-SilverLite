@@ -88,9 +88,7 @@ void GLCD::drawSprite(uint8_t x, uint8_t y, uint8_t sprite_id, uint8_t mode)
     {
         return;
     }
-    uint32_t width = *sprite++;
-    uint32_t height = *sprite++;
-    screen_put_sprite(x, y, width, height, sprite, mode);
+    screen_put_sprite(x, y, sprite, mode);
 }
 
 //------------------------------------------------------------------------------

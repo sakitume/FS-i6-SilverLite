@@ -92,7 +92,7 @@ __attribute__((section (".TestCODE")))  void screen_fill(uint8_t color);
   } \
 }
 
-void screen_put_sprite(uint32_t destX, uint32_t destY, uint32_t width, uint32_t height, const uint8_t* sprite, uint8_t color);
+void screen_put_sprite(uint32_t destX, uint32_t destY, const uint8_t* sprite, uint8_t color);
 
 #if defined(__cplusplus)
 }
