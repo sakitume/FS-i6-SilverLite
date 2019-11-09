@@ -44,14 +44,12 @@ const unsigned char sprite_beeps_disabled[] =
 static bool guiEnabled;
 static int16_t modelTimer;
 static uint8_t alarmBeepsDisabled;
-static bool exitDialogActive;
 
 //------------------------------------------------------------------------------
 class CShortLongPress
 {
 public:    
     CShortLongPress(uint8_t _buttonID, uint8_t _millis100 = 25) : buttonID(_buttonID), millis100(_millis100) {}
-//    bool check();
     int check();
     void reset();
 
@@ -60,6 +58,118 @@ private:
     uint8_t millis100;
     uint32_t lastActivated;
 };
+
+//------------------------------------------------------------------------------
+class CDialogBase
+{
+public:    
+    virtual void drawMessage(int y, int h) = 0;
+    virtual void checkOkCancel();
+    virtual void close(bool wasOkay);
+};
+
+class CDialogLongPress : public CDialogBase
+{
+public:    
+    CDialogLongPress() : exitDialogLongPress(kBtn_Ok, 10) {}
+    virtual void checkOkCancel();
+
+private:
+    CShortLongPress exitDialogLongPress;    
+};
+
+class CDialogExit : public CDialogLongPress
+{
+public:
+    virtual void drawMessage(int y, int h);
+    virtual void close(bool wasOkay);
+};
+
+class CDialogBind : public CDialogLongPress
+{
+public:
+    virtual void drawMessage(int y, int h);
+    virtual void close(bool wasOkay);
+};
+
+static CDialogBind bindDialog;
+static CDialogExit exitDialog;
+static CDialogBase *activeDialog;
+
+//------------------------------------------------------------------------------
+void CDialogBase::close(bool wasOkay)
+{
+    activeDialog = nullptr;
+}
+
+//------------------------------------------------------------------------------
+void CDialogBase::checkOkCancel()
+{
+    if (button_toggledActive(kBtn_Cancel))
+    {
+        close(false);
+    }
+    if (button_toggledActive(kBtn_Ok))
+    {
+        close(true);
+    }
+}
+
+//------------------------------------------------------------------------------
+// This version requires that the OK button be long pressed
+void CDialogLongPress::checkOkCancel()
+{
+    if (button_toggledActive(kBtn_Cancel))
+    {
+        exitDialogLongPress.reset();
+        close(false);
+    }
+    if (exitDialogLongPress.check() > 0)
+    {
+        close(true);
+    }
+}
+
+//------------------------------------------------------------------------------
+void CDialogExit::drawMessage(int y, int h)
+{
+    screen_puts_centered(y, 1, "Long press OK to");
+    y += h;
+    screen_puts_centered(y, 1, "exit to main menu");
+}
+
+//------------------------------------------------------------------------------
+void CDialogExit::close(bool wasOkay)
+{
+    if (wasOkay)
+    {
+        // Exit this gui app context
+        guiEnabled = false;
+    }
+    CDialogLongPress::close(wasOkay);
+}
+
+//------------------------------------------------------------------------------
+void CDialogBind::drawMessage(int y, int h)
+{
+    y -= h >> 1;
+    screen_puts_centered(y, 1, "Long press OK to");
+    y += h;
+    screen_puts_centered(y, 1, "reset TX");
+    y += h;
+    screen_puts_centered(y, 1, "and rebind");
+}
+
+//------------------------------------------------------------------------------
+void CDialogBind::close(bool wasOkay)
+{
+    if (wasOkay)
+    {
+        // TODO, XXX
+        // Reset TX here
+    }
+    CDialogLongPress::close(wasOkay);
+}
 
 //------------------------------------------------------------------------------
 // Returns:
@@ -108,28 +218,21 @@ static void ReloadModelTimer()
 void gui_handle_buttons() 
 {
     static CShortLongPress timerLongPress(kBtn_Ok, 15);
-    static CShortLongPress exitDialogLongPress(kBtn_Ok, 10);
 
-    if (exitDialogActive)
+    if (activeDialog)
     {
-        if (button_toggledActive(kBtn_Cancel))
-        {
-            exitDialogLongPress.reset();
-            exitDialogActive = false;
-        }
-        if (exitDialogLongPress.check() > 0)
-        {
-            exitDialogActive = false;
-
-            // Exit this gui app context
-            guiEnabled = false;
-        }
+        timerLongPress.reset();
+        activeDialog->checkOkCancel();
         return;
     }
     else if (button_toggledActive(kBtn_Cancel))
     {
-        timerLongPress.reset();
-        exitDialogActive = true;
+        activeDialog = &exitDialog;
+        return;
+    }
+    else if (button_toggledActive(kBtn_Bind))
+    {
+        activeDialog = &bindDialog;
         return;
     }
 
@@ -308,10 +411,7 @@ static void gui_render_exit_dialog() {
     screen_draw_hline((LCD_WIDTH - len) / 2, y, len, 1);
     y += 15;
 
-    // Render message
-    screen_puts_centered(y, 1, "Long press OK to");
-    y += h;
-    screen_puts_centered(y, 1, "exit to main menu");
+    activeDialog->drawMessage(y, h);
 }
 
 
@@ -372,7 +472,7 @@ static void txCtxRender() {
     // render time
     screen_put_time(x, y, color, modelTimer);
 
-    if (exitDialogActive)
+    if (activeDialog)
     {
         gui_render_exit_dialog();   
     }
