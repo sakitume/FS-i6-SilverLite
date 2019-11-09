@@ -20,7 +20,7 @@ uint16_t tx_get_rssi_fc()
 
 
 
-
+void tx_update(){}
 void tx_start() {}
 void tx_stop()  {}
 void tx_reset() {}

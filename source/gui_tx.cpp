@@ -570,6 +570,11 @@ static void txCtxLoop()
         return;
     }
 
+    if (txRunning)
+    {
+        tx_update();
+    }
+
     txCtxRender();
 }
 
