@@ -166,7 +166,7 @@ void screen_set_pixels(uint8_t x, uint8_t y, uint8_t x2, uint8_t y2, uint8_t col
             } else {
                 screen_buffer[dpos] &= ~mask;
             }
-        dpos++;
+            dpos++;
         }
     }
 }
@@ -894,3 +894,149 @@ void screen_fill(uint8_t color) {
         }
     }
 }
+
+void screen_put_sprite(uint32_t destX, uint32_t destY, uint32_t width, uint32_t height, const uint8_t* sprite, uint8_t color)
+{
+    if (!width || !height) {
+        return;
+    }
+
+    // last but not least, draw the character
+
+    /*
+    * Paint font data bits and write them to LCD memory 1 LCD page at a time.
+    * This is very different from simply reading 1 byte of font data
+    * and writing all 8 bits to LCD memory and expecting the write data routine
+    * to fragement the 8 bits across LCD 2 memory pages when necessary.
+    * That method(really doesn't work) and reads and writes the same LCD page
+    * more than once as well as not do sequential writes to memory.
+    *
+    * This method of rendering while much more complicated, somewhat scrambles the font
+    * data reads to ensure that all writes to LCD pages are always sequential and a given LCD
+    * memory page is never read or written more than once.
+    * And reads of LCD pages are only done at the top or bottom of the font data rendering
+    * when necessary.
+    * i.e it ensures the absolute minimum number of LCD page accesses
+    * as well as does the sequential writes as much as possible.
+    *
+    */
+
+    uint32_t pixels = height;
+    uint32_t p;
+    uint32_t dy;
+    uint32_t tfp;
+    uint32_t dp;
+    uint32_t dbyte;
+    uint8_t fdata;
+    uint32_t j;
+
+    for (p = 0; p < pixels;) {
+        dy = destY + p;
+
+        // align to proper Column and page in LCD memory
+        uint32_t screen_dpos = ((dy & ~7)/ 8)*128 + destX;
+
+        uint32_t page = p/8 * width;  // page must be 16 bit to prevent overflow
+
+        // each column of font data
+        for (j = 0; j < width; j++) {
+            /*
+            * Fetch proper byte of font data.
+            * Note:
+            * This code "cheats" to add the horizontal space/ pixel row
+            * below the font.
+            * It essentially creates a font pixel of 0/ off when the pixels are
+            * out of the defined pixel map.
+            *
+            * fake a fondata read read when we are on the very last
+            * bottom "pixel". This lets the loop logic continue to run
+            * with the extra fake pixel. If the loop is not the
+            * the last pixel the pixel will come from the actual
+            * font data, but that is ok as it is 0 padded.
+            *
+            */
+
+            if (p >= height) {
+                /*
+                * fake a font data read for padding below character.
+                */
+                fdata = 0;
+            } else {
+                fdata = sprite[page + j];
+            }
+
+            if (!color) {
+                fdata ^= 0xff;  /* inverted data for "white" font color */
+            }
+
+            /*
+            * Check to see if a quick full byte write of font
+            * data can be done.
+            */
+            if (!(dy & 7) && !(p & 7) && ((pixels -p) >= 8)) {
+                /*
+                * destination pixel is on a page boundary
+                * Font data is on byte boundary
+                * And there are 8 or more pixels left
+                * to paint so a full byte write can be done.
+                */
+                screen_buffer_write(screen_dpos, fdata);
+                screen_dpos++;
+                continue;
+            } else {
+                /*
+                * No, so must fetch byte from LCD memory.
+                */
+                dbyte = screen_buffer_read(screen_dpos);
+            }
+
+            /*
+            * At this point there is either not a full page of data
+            * left to be painted  or the font data spans multiple font
+            * data bytes. (or both) So, the font data bits will be painted
+            * into a byte and then written to the LCD memory.page.
+            */
+
+
+            tfp = p;    /* font pixel bit position    */
+            dp = dy & 7;  /* data byte pixel bit position */
+
+            /*
+            * paint bits until we hit bottom of page/ byte
+            * or run out of pixels to paint.
+            */
+            while ((dp <= 7) && (tfp) < pixels) {
+                if (fdata & (1 << (tfp & 7))) {
+                    dbyte |= (1 << dp);
+                } else {
+                    dbyte &= ~(1 << dp);
+                }
+
+                /*
+                * Check for crossing font data bytes
+                */
+                if ((tfp & 7)== 7) {
+                    fdata = sprite[page + j + width];
+
+                    if (!color) {
+                        fdata ^= 0xff;  /* inverted data for "white" color  */
+                    }
+                }
+                tfp++;
+                dp++;
+            }
+            /*
+            * Now flush out the painted byte.
+            */
+            screen_buffer_write(screen_dpos, dbyte);
+            screen_dpos++;
+        }
+
+        /*
+        * advance the font pixel for the pixels
+        * just painted.
+        */
+        p += 8 - (dy & 7);
+    }
+}
+
