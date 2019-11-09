@@ -59,7 +59,11 @@ void gui_init()
     menuPageMain.addMenuItem(menuItem_RunCalibrateCtx);
     menuPageMain.addMenuItem(menuItem_RunSlidersCtx);
     gGEM.setMenuPageCurrent(menuPageMain);
+#if 1   // Launch TX context directly    
+    RunTXCtx();
+#else    
     gGEM.drawMenu();
+#endif    
 }
 
 //------------------------------------------------------------------------------
