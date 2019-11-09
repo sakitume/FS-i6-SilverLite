@@ -124,7 +124,11 @@ void screen_set_pixels(uint8_t x, uint8_t y, uint8_t x2, uint8_t y2, uint8_t col
 
     dpos = (y/ 8)*128 + x;
     for (i = 0; i < width; i++) {
-        if (color) {
+        if (color == 0xFF) {    // XOR desired
+            uint8_t b = screen_buffer[dpos];
+            screen_buffer[dpos] = (b & ~mask) | (b ^ mask);
+        }
+        else if (color) {
             screen_buffer[dpos] |= mask;
         } else {
             screen_buffer[dpos] &= ~mask;
@@ -137,7 +141,10 @@ void screen_set_pixels(uint8_t x, uint8_t y, uint8_t x2, uint8_t y2, uint8_t col
         y += 8;
         dpos = (y/ 8)*128 + x;
         for (i = 0; i < width; i++) {
-            if (color) {
+            if (color == 0xFF) {    // XOR desired
+                screen_buffer[dpos] ^= 0xFF;
+            }
+            else if (color) {
                 screen_buffer[dpos] = 0xFF;
             } else {
                 screen_buffer[dpos] = 0x00;
@@ -150,7 +157,11 @@ void screen_set_pixels(uint8_t x, uint8_t y, uint8_t x2, uint8_t y2, uint8_t col
         mask = ~(0xFF << (height-h));
         dpos = (y/ 8+1)*128 + x;
         for (i = 0; i < width; i++) {
-            if (color) {
+            if (color == 0xFF) {    // XOR desired
+                uint8_t b = screen_buffer[dpos];
+                screen_buffer[dpos] = (b & ~mask) | (b ^ mask);
+            }
+            else if (color) {
                 screen_buffer[dpos] |= mask;
             } else {
                 screen_buffer[dpos] &= ~mask;
