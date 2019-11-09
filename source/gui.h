@@ -9,6 +9,9 @@ extern "C" {
 void gui_init();
 void gui_loop();
 
+void gui_header_render(const char *);
+extern volatile uint32_t gui_loop_100ms_counter;
+
 #if defined(__cplusplus)
 }
 #endif /* __cplusplus */

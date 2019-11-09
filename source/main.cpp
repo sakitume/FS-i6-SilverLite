@@ -276,7 +276,7 @@ int main(void)
 #if defined(__USE_TRAINER_PORT_UART__)
     uart_init();
 #endif
-    timer_init();   // Initializing this causes flash_write to reset the mcu!
+    timer_init();
     lcd_init();
     led_backlight_init();
     flash_init();
