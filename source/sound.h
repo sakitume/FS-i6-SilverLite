@@ -12,6 +12,7 @@ void sound_update();
 void sound_play_bind();
 void sound_play_click();
 void sound_play_low_time();
+void sound_play_low_voltage();
 
 #if defined(__cplusplus)
 }

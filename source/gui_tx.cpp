@@ -325,6 +325,15 @@ static void gui_process_logic() {
                 led_backlight_tickle();
             }
         }
+        uint16_t fcVoltage = tx_get_fc_voltage();
+        enum { fcLowVoltageThreshold = 340 };   // TODO: should be configurable, and exposed in storage
+        if ((gui_loop_100ms_counter % 10) == 0) 
+        {
+            if (fcVoltage && (fcVoltage < fcLowVoltageThreshold))
+            {
+                sound_play_low_voltage();
+            }
+        }
     }
 }
 

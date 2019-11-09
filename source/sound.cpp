@@ -204,3 +204,18 @@ void sound_play_low_time(void)
     sound_queue_state = 1;
 }
 
+//------------------------------------------------------------------------------
+void sound_play_low_voltage(void) 
+{
+	sound_tone_duration = 0;
+
+    sound_queue[0].frequency   = 1500;
+    sound_queue[0].duration_ms = 80;
+    sound_queue[1].frequency   = 2200;
+    sound_queue[1].duration_ms = 80;
+    sound_queue[2].frequency   = 1500;
+    sound_queue[2].duration_ms = 80;
+    sound_queue[3].duration_ms = 0;
+    sound_queue_state = 1;
+}
+
