@@ -2,8 +2,15 @@
 #include "storage.h"
 #include "flash.h"
 
+#define __HARDWARE_TIMER_WORKAROUND__
+#if defined(__HARDWARE_TIMER_WORKAROUND__)    
+    #include "timer.h"  // TODO, XXX: Hack workaround
+//    #include "delay.h"
+#endif
+
 //------------------------------------------------------------------------------
 
+static FlashStorage_t storageSnapshot;
 FlashStorage_t storage;
 static bool valid;
 
@@ -52,7 +59,7 @@ uint8_t storage_init()
     static_assert(sizeof(storage) < 256, "FlashStorage_t is too big");
 
     valid = false;
-    int result = flash_read(0, &storage, sizeof(storage));
+    int result = flash_read(&storage, sizeof(storage));
     if (result == sizeof(storage))
     {
         valid = storage_calc_crc() == storage.checksum;
@@ -71,23 +78,46 @@ uint8_t storage_init()
         strcpy(model.name, "TinyWhoop");
     }
 
+    storage_take_snapshot();
     return valid;
 }
 
 //------------------------------------------------------------------------------
 void storage_save()
 {
+#if defined(__HARDWARE_TIMER_WORKAROUND__)    
+    timer_stop_hardware();
+// delay doesn't seem necessary, simply stopping the timer is sufficient    
+//    delay_ms(2);
+#endif
+
     static_assert(sizeof(storage) % 4 == 0, "Unexpected size for FlashStorage_t");
     
     storage.checksum = storage_calc_crc();
 
-#if 1
-    PRINTF("storage_save: temporarily disabled");
-#else
-    int result = flash_write(0, &storage, sizeof(storage));
-    if (result)
+    int result = flash_write(&storage, sizeof(storage));
+    if (result != sizeof(storage))
     {
         PRINTF("storage_save(): flash_write error");
     }
+    else
+    {
+        storage_take_snapshot();
+    }
+
+#if defined(__HARDWARE_TIMER_WORKAROUND__)    
+    timer_start_hardware();
 #endif    
+}
+
+//------------------------------------------------------------------------------
+void storage_take_snapshot()
+{
+    storageSnapshot = storage;
+}
+
+//------------------------------------------------------------------------------
+void storage_restore_snapshot()
+{
+    storage = storageSnapshot;
 }

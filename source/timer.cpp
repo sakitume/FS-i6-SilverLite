@@ -55,8 +55,28 @@ void timer_init()
     /* Enable at the NVIC */
     EnableIRQ(PIT_IRQn);
 
-    // Finally let us start the timer
-    PIT_StartTimer(PIT, kPIT_Chnl_0);
+    timer_start_hardware();
+}
+
+//------------------------------------------------------------------------------
+static int timerStart;
+void timer_start_hardware()
+{
+    timerStart++;
+    if (timerStart == 1)
+    {
+        PIT_StartTimer(PIT, kPIT_Chnl_0);
+    }
+}
+
+//------------------------------------------------------------------------------
+void timer_stop_hardware()
+{
+    timerStart--;
+    if (timerStart == 0)
+    {
+        PIT_StopTimer(PIT, kPIT_Chnl_0);
+    }
 }
 
 //------------------------------------------------------------------------------

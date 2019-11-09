@@ -16,6 +16,8 @@ void timer_add_callback(milli_timer_cb_t callback);
 void timer_set_timeout(unsigned timerID, unsigned timeoutMillis);
 int timer_get_timeout(unsigned timerID);
 
+void timer_start_hardware();
+void timer_stop_hardware();
 
 #if defined(__cplusplus)
 }

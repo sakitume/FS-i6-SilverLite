@@ -11,8 +11,8 @@ void flash_test();
 
 int flash_ready();
 
-int flash_read(unsigned addr, void *dest, unsigned sizeBytes);
-int flash_write(unsigned addr, const void *dest, unsigned sizeBytes);
+int flash_read(void *dest, unsigned sizeBytes);
+int flash_write(const void *dest, unsigned sizeBytes);
 
 
 #if defined(__cplusplus)

@@ -103,7 +103,7 @@ int flash_ready()
 
 //------------------------------------------------------------------------------
 // Base address is set to last available sector of flash memory
-int flash_get_eeprom_base()
+uint32_t flash_get_eeprom_base()
 {
 #if defined(FSL_FEATURE_FLASH_HAS_PFLASH_BLOCK_SWAP) && FSL_FEATURE_FLASH_HAS_PFLASH_BLOCK_SWAP
     /* Note: we should make sure that the sector shouldn't be swap indicator sector*/
@@ -115,7 +115,7 @@ int flash_get_eeprom_base()
 }
 
 //------------------------------------------------------------------------------
-int flash_read(unsigned addr, void *dest, unsigned sizeBytes)
+int flash_read(void *dest, unsigned sizeBytes)
 {
     if (status != kReady)
     {
@@ -127,7 +127,7 @@ int flash_read(unsigned addr, void *dest, unsigned sizeBytes)
     SCB_CleanInvalidateDCache();
 #endif
 
-    uint32_t eepromAddr = flash_get_eeprom_base() + addr;
+    uint32_t eepromAddr = flash_get_eeprom_base();
     uint8_t *pDst = (uint8_t*)dest;
     int i;
     for (i=0; i<(int)sizeBytes; i++)
@@ -138,17 +138,17 @@ int flash_read(unsigned addr, void *dest, unsigned sizeBytes)
 }
 
 //------------------------------------------------------------------------------
-int flash_write(unsigned addr, const void *src, unsigned sizeBytes)
+int flash_write(const void *src, unsigned sizeBytes)
 {
     if (status != kReady)
     {
-        return -1;
+        return 0;
     }
 
     if (0x3 & (int)src)
     {
         PRINTF("flash_write source buffer isn't 32-bit aligned\n");
-        return -2;
+        return 0;
     }
 
     if (sizeBytes & 3)
@@ -157,23 +157,59 @@ int flash_write(unsigned addr, const void *src, unsigned sizeBytes)
         sizeBytes = (sizeBytes + 3) & ~0x3;
     }
 
-    uint32_t eepromAddr = flash_get_eeprom_base() + addr;
-    status_t result = FLASH_Program(&s_flashDriver, eepromAddr, (uint32_t*)src, sizeBytes);
+    /* Erase last sector on upper pflash block where there is (hopefully, ha-ha) no code */
+    PRINTF("Erasing last sector of flash\n");
+    uint32_t destAdrss = flash_get_eeprom_base();
+    status_t result = FLASH_Erase(&s_flashDriver, destAdrss, pflashSectorSize, kFLASH_ApiEraseKey);
     if (kStatus_FLASH_Success != result)
     {
-        PRINTF("FLASH_Program failure: %d\n", result);
-        return -2;
+        PRINTF("FLASH_Erase failure\n");
+        return 0;
+    }
+
+    /* Verify sector if it's been erased. */
+    result = FLASH_VerifyErase(&s_flashDriver, destAdrss, pflashSectorSize, kFLASH_MarginValueUser);
+    if (kStatus_FLASH_Success != result)
+    {
+        PRINTF("FLASH_VerifyErase failure\n");
+        return 0;
+    }
+
+    PRINTF("Writing buffer to last sector of flash\n");
+    result = FLASH_Program(&s_flashDriver, destAdrss, (uint32_t*)src, sizeBytes);
+    if (kStatus_FLASH_Success != result)
+    {
+        PRINTF("FLASH_Program failure\n");
+        return 0;
     }
 
     /* Verify programming by Program Check command with user margin levels */
     uint32_t failAddr, failDat;
-    result = FLASH_VerifyProgram(&s_flashDriver, eepromAddr, sizeBytes, (const uint32_t*)src, kFLASH_MarginValueUser, &failAddr, &failDat);
+    result = FLASH_VerifyProgram(&s_flashDriver, destAdrss, sizeBytes, (uint32_t*)src, kFLASH_MarginValueUser,
+                                    &failAddr, &failDat);
     if (kStatus_FLASH_Success != result)
     {
-        PRINTF("FLASH_VerifyProgram failure: %d\n", result);
-        return -3;
+        PRINTF("FLASH_VerifyProgram failure\n");
+        return 0;
     }
-    return 0;
+
+#if defined(__DCACHE_PRESENT) && __DCACHE_PRESENT
+    /* Clean the D-Cache before reading the flash data*/
+    SCB_CleanInvalidateDCache();
+#endif
+
+    /* Verify programming by reading back from flash directly*/
+    const uint32_t *pSrcCheck = (uint32_t*)src;
+    for (uint32_t i = 0; i < (sizeBytes/4); i++)
+    {
+        uint32_t check = *(volatile uint32_t *)(destAdrss + i * 4);
+        if (check != pSrcCheck[i])
+        {
+            PRINTF("byte verify failure\n");
+            return 0;
+        }
+    }
+    return sizeBytes;
 }
 
 

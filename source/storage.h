@@ -47,6 +47,8 @@ extern "C" {
 uint8_t storage_init();
 uint8_t storage_is_valid();
 void storage_save();
+void storage_take_snapshot();
+void storage_restore_snapshot();
 
 #if defined(__cplusplus)
 }
