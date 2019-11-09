@@ -116,6 +116,10 @@ int gui_handle_buttons() {
             {
                 lastActivated = millis_this_frame();
             }
+            else
+            {
+                lastActivated = 0;
+            }
         }
         else if (lastActivated)
         {
