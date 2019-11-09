@@ -24,19 +24,17 @@ extern GEM gGEM;
 
 //------------------------------------------------------------------------------
 // Used: https://javl.github.io/image2cpp/
-const unsigned char sprite_alarm_enabled[] =
+const unsigned char sprite_beeps_enabled[] =
 {
-    16, 16,
-    // 'alarm', 16x16px
-    0xff, 0x1f, 0xdf, 0x1f, 0xef, 0xef, 0xf7, 0x07, 0xff, 0xef, 0x9b, 0xf5, 0x09, 0xf7, 0x0f, 0xff, 
-    0xff, 0xf8, 0xfb, 0xf8, 0xf7, 0xf7, 0xef, 0xe0, 0xff, 0xf7, 0xd9, 0xaf, 0x90, 0xef, 0xf0, 0xff
+    12, 7,
+    // 'beep-on', 12x7px
+    0x77, 0x6b, 0x5d, 0x3e, 0x3e, 0x00, 0x7f, 0x55, 0x55, 0x55, 0x55, 0x7f
 };
-const unsigned char sprite_alarm_disabled[] =
+const unsigned char sprite_beeps_disabled[] =
 {
-    16, 16,
-    // 'alarm-off', 16x16px
-    0xff, 0x1f, 0xdf, 0x1f, 0xef, 0xef, 0xf7, 0x07, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 
-    0xff, 0xf8, 0xfb, 0xf8, 0xf7, 0xf7, 0xef, 0xe0, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff
+    12, 7,
+    // 'beep-off', 12x7px
+    0x77, 0x6b, 0x5d, 0x3e, 0x3e, 0x00, 0x7f, 0x7f, 0x7f, 0x7f, 0x7f, 0x7f, 
 };
 
 //------------------------------------------------------------------------------
@@ -45,6 +43,59 @@ const unsigned char sprite_alarm_disabled[] =
 //------------------------------------------------------------------------------
 static int16_t modelTimer;
 static uint8_t alarmBeepsDisabled;
+static bool exitDialogActive;
+
+//------------------------------------------------------------------------------
+class CShortLongPress
+{
+public:    
+    CShortLongPress(uint8_t _buttonID, uint8_t _millis100 = 25) : buttonID(_buttonID), millis100(_millis100) {}
+//    bool check();
+    int check();
+    void reset();
+
+private:    
+    uint8_t buttonID;
+    uint8_t millis100;
+    uint32_t lastActivated;
+};
+
+//------------------------------------------------------------------------------
+// Returns:
+//  1   if button was long pressed
+//  -1  if button was short pressed (released and it wasn't a long press)
+//  0   None of the above
+int CShortLongPress::check()
+{
+    if (button_toggled((e_BtnIndex)buttonID))
+    {
+        if (button_active((e_BtnIndex)buttonID))
+        {
+            lastActivated = millis_this_frame();
+        }
+        else if (lastActivated)
+        {
+            lastActivated = 0;
+            return -1;
+        }
+    }
+    else if (lastActivated)
+    {
+        // If held down for the requested number of 100millis
+        uint32_t delta = millis_this_frame() - lastActivated;
+        if (delta >= (millis100 * 100))
+        {
+            lastActivated = 0;
+            return 1;
+        }
+    }
+    return 0;
+}
+//------------------------------------------------------------------------------
+void CShortLongPress::reset()
+{
+    lastActivated = 0;
+}
 
 //------------------------------------------------------------------------------
 static void ReloadModelTimer() 
@@ -53,85 +104,47 @@ static void ReloadModelTimer()
 }
 
 //------------------------------------------------------------------------------
-int gui_handle_buttons() {
-    // TODO, check and respond to button presses here
-    enum { kTimerID_BindButton = 1 };
-    static bool bindActive;
-    if (button_toggledActive(kBtn_Bind))
+int gui_handle_buttons() 
+{
+    static CShortLongPress timerLongPress(kBtn_Ok, 15);
+    static CShortLongPress exitDialogLongPress(kBtn_Ok, 10);
+
+    if (exitDialogActive)
     {
-        timer_set_timeout(kTimerID_BindButton, 3000);
-        bindActive = true;
-    }
-    else if (bindActive)
-    {
-        if (0 == timer_get_timeout(kTimerID_BindButton))
+        if (button_toggledActive(kBtn_Cancel))
         {
-            bindActive = false;
-            // TODO: Re-init TX here
-            PRINTF("Bind button held down\n");
+            exitDialogLongPress.reset();
+            exitDialogActive = false;
+            return 1;
         }
+        if (exitDialogLongPress.check() > 0)
+        {
+            exitDialogActive = false;
+            return 0;
+        }
+        return 1;        
+    }
+    else if (button_toggledActive(kBtn_Cancel))
+    {
+        timerLongPress.reset();
+        exitDialogActive = true;
+        return 1;
     }
 
-    // If user presses OK button
-    {
-        static uint32_t lastActivated;
-        if (button_toggled(kBtn_Ok))
-        {
-            if (button_active(kBtn_Ok))
-            {
-                lastActivated = millis_this_frame();
-            }
-            else if (lastActivated)
-            {
-                uint32_t delta = millis_this_frame() - lastActivated;
-                lastActivated = 0;
 
-                // If it was a short button press
-                if (delta < 800)
-                {
-                    // toggle alarm beep enabled switch
-                    alarmBeepsDisabled = !alarmBeepsDisabled;
-                }
-            }
-        }
-        else if (lastActivated)
-        {
-            // If held down for 2.5 seconds
-            uint32_t delta = millis_this_frame() - lastActivated;
-            if (delta >= 2500)
-            {
-                lastActivated = 0;
-                sound_play_bind();
-                ReloadModelTimer();
-            }
-        }
+    // If user short or long presses OK button
+    int okButtonCheck = timerLongPress.check();
+    if (okButtonCheck > 0)
+    {
+        sound_play_bind();
+        ReloadModelTimer();
+    }
+    else if (okButtonCheck < 0)
+    {
+        // toggle alarm beep enabled switch
+        alarmBeepsDisabled = !alarmBeepsDisabled;
     }
 
-    // If user presses Cancel button
-    {
-        static uint32_t lastActivated;
-        if (button_toggled(kBtn_Cancel))
-        {
-            if (button_active(kBtn_Cancel))
-            {
-                lastActivated = millis_this_frame();
-            }
-            else
-            {
-                lastActivated = 0;
-            }
-        }
-        else if (lastActivated)
-        {
-            // If held down for 3 seconds
-            uint32_t delta = millis_this_frame() - lastActivated;
-            if (delta >= 3000)
-            {
-                lastActivated = 0;
-                return 0;
-            }
-        }
-    }
     return 1;
 }
 
@@ -249,11 +262,11 @@ static void gui_render_statusbar() {
     if (alarmBeepsDisabled)
     {
         // LCD_WIDTH-16
-        screen_put_sprite(0, 0, sprite_alarm_disabled, 0);
+        screen_put_sprite(0, 0, sprite_beeps_disabled, 0);
     }
     else
     {
-        screen_put_sprite(0, 0, sprite_alarm_enabled, 0);
+        screen_put_sprite(0, 0, sprite_beeps_enabled, 0);
     }
 }
 
@@ -267,6 +280,40 @@ static void gui_render_bottombar() {
     screen_puts_centered(LCD_HEIGHT - 6 + font_tomthumb3x5[FONT_HEIGHT]/2, 0,
                          storage.model[storage.current_model].name);
 }
+
+//------------------------------------------------------------------------------
+static void gui_render_exit_dialog() {
+
+    // render window
+    // clear region for window
+    uint32_t window_w = LCD_WIDTH - 20;
+    uint32_t window_h = 55;
+    uint32_t y = (LCD_HEIGHT - window_h) / 2;
+    uint32_t x = (LCD_WIDTH - window_w) / 2;
+    // clear
+    screen_fill_round_rect(x, y , window_w, window_h, 4, 0);
+    // render border
+    screen_draw_round_rect(x, y, window_w, window_h, 4, 1);
+    y += 5;
+
+    // font selection
+    screen_set_font(font_system5x7);
+    uint32_t h = font_system5x7[FONT_HEIGHT]+1;
+
+    // render text
+    const char *msg = "Alert";
+    screen_puts_centered(y, 1, msg);
+    y += h;
+    uint32_t len = screen_strlen(msg);
+    screen_draw_hline((LCD_WIDTH - len) / 2, y, len, 1);
+    y += 15;
+
+    // Render message
+    screen_puts_centered(y, 1, "Long press OK to");
+    y += h;
+    screen_puts_centered(y, 1, "exit to main menu");
+}
+
 
 //------------------------------------------------------------------------------
 static void txCtxRender() {
@@ -324,6 +371,11 @@ static void txCtxRender() {
 
     // render time
     screen_put_time(x, y, color, modelTimer);
+
+    if (exitDialogActive)
+    {
+        gui_render_exit_dialog();   
+    }
 }
 
 //------------------------------------------------------------------------------
