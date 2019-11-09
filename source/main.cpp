@@ -94,6 +94,165 @@ void required_updates()
 }
 
 //------------------------------------------------------------------------------
+#define __TEST_GEM__
+#if defined(__TEST_GEM__)
+#include "GEM.h"
+static GLCD gGLCD;
+static GEM gGEM(gGLCD);
+
+// Create variables that will be editable through the menu and assign them initial values
+int interval = 200;
+boolean strobe = false;
+
+// Create variable that will be editable through option select and create associated option select
+byte tempo = 0;
+SelectOptionByte selectTempoOptions[] = {{"Meh:(", 0}, {"Smooth", 1}, {"Hard", 2}, {"XTREME", 3}, {"Manual", 4}, {"Custom", 5}};
+GEMSelect selectTempo(sizeof(selectTempoOptions)/sizeof(SelectOptionByte), selectTempoOptions);
+
+// Values of interval variable associated with each select option
+int tempoInterval[] = {400, 250, 120, 100, 0, 200};
+
+// Create menu item objects of class GEMItem, linked to interval and strobe variables
+// with validateInterval() callback function attached to interval menu item,
+// that will make sure that interval variable is within allowable range (i.e. >= 0)
+void validateInterval(); // Forward declaration
+GEMItem menuItemInt("Interval:", interval, validateInterval);
+GEMItem menuItemStrobe("Strobe:", strobe);
+
+// Create menu item for option select with applyTempo() callback function
+void applyTempo(); // Forward declaration
+GEMItem menuItemTempo("Tempo:", tempo, selectTempo, applyTempo);
+
+// Create menu button that will trigger rock() function. It will run animation sequence.
+// We will write (define) this function later. However, we should
+// forward-declare it in order to pass to GEMItem constructor
+void rock(); // Forward declaration
+GEMItem menuItemButton("Let's Rock!", rock);
+
+// Create menu page object of class GEMPage. Menu page holds menu items (GEMItem) and represents menu level.
+// Menu can have multiple menu pages (linked to each other) with multiple menu items each
+GEMPage menuPageMain("Menu Title Goes Here");
+
+// ---
+
+// Validation routine of interval variable
+void validateInterval() {
+  // Check if interval variable is within allowable range (i.e. >= 0)
+  if (interval < 0) {
+    interval = 0;
+  }
+}
+
+// Apply preset based on tempo variable value
+void applyTempo() {
+  if (tempo != 5) {
+    // Set readonly mode for interval menu item
+    menuItemInt.setReadonly();
+    // Apply interval value based on preset selection
+    interval = tempoInterval[tempo];
+    // Turn on strobe effect for "XTREME" preset
+    strobe = tempo == 3;
+  } else {
+    // Disable readonly mode of interval menu item for "Custom" preset
+    menuItemInt.setReadonly(false);
+  }
+}
+
+// Invoked once when the button is pressed
+void rockContextEnter() {
+    screen_fill(1);
+}
+
+// Invoked every loop iteration
+void rockContextLoop() 
+{
+    if (button_toggledActive(kBtn_Cancel))
+    {
+        gGEM.context.exit();
+        return;
+    }
+
+    // Do something here
+}
+
+// Invoked once when the GEM_KEY_CANCEL key is pressed
+void rockContextExit() 
+{
+    // Draw menu back on screen and clear context
+    gGEM.drawMenu();
+    gGEM.clearContext();
+}
+
+// Setup context
+void rock() 
+{
+    gGEM.context.loop = rockContextLoop;
+    gGEM.context.enter = rockContextEnter;
+    gGEM.context.exit = rockContextExit;
+    gGEM.context.allowExit = false; // Setting to false will require manual exit from the loop
+    gGEM.context.enter();
+}
+
+//------------------------------------------------------------------------------
+static void gem_test()
+{
+    gGEM.init();
+
+    // Add menu items to menu page
+    menuPageMain.addMenuItem(menuItemTempo);
+    menuPageMain.addMenuItem(menuItemInt);
+    menuPageMain.addMenuItem(menuItemStrobe);
+    menuPageMain.addMenuItem(menuItemButton);
+
+    // Add menu page to menu and set it as current
+    gGEM.setMenuPageCurrent(menuPageMain);
+
+    gGEM.drawMenu();
+
+    while (1)
+    {
+        if (button_toggledActive(kBtn_Bind))
+        {
+            return;
+        }
+
+        // Call the required update functions of various systems
+        required_updates();
+        if (gGEM.readyForKey())
+        {
+            uint8_t keyCode = GEM_KEY_NONE;
+            if (button_toggledActive(kBtn_Cancel))
+            {
+                keyCode = GEM_KEY_CANCEL;
+            }
+            else if (button_toggledActive(kBtn_Ok))
+            {
+                keyCode = GEM_KEY_OK;
+            }
+            else if (button_toggledActive(kBtn_Up))
+            {
+                keyCode = GEM_KEY_UP;
+            }
+            else if (button_toggledActive(kBtn_Down))
+            {
+                keyCode = GEM_KEY_DOWN;
+            }
+            else if (button_toggledActive(kBtn_YawL))
+            {
+                keyCode = GEM_KEY_LEFT;
+            }
+            else if (button_toggledActive(kBtn_YawR))
+            {
+                keyCode = GEM_KEY_RIGHT;
+            }
+            gGEM.registerKeyPress(keyCode);
+            screen_update();
+        }
+    }
+}
+#endif
+
+//------------------------------------------------------------------------------
 int main(void)
 {
     /* Init board hardware. */
@@ -140,8 +299,14 @@ int main(void)
         tests();
     }
 
+#if defined(__TEST_GEM__)
+    gem_test();
+#endif    
+
+#if 1
     gui_init();
     gui_loop();
+#endif    
 }
 
 //------------------------------------------------------------------------------
@@ -183,3 +348,5 @@ static void tests()
 //        PRINTF("loop time: %d\n", micros_realtime() - micros_this_frame());
     }
 }
+
+
