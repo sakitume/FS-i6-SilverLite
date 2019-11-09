@@ -44,6 +44,12 @@ const unsigned char sprite_beeps_disabled[] =
 static bool guiEnabled;
 static int16_t modelTimer;
 static uint8_t alarmBeepsDisabled;
+static bool txRunning;
+
+// Forward declarations
+static void startTX();
+static void stopTX();
+static void resetTX();
 
 //------------------------------------------------------------------------------
 class CShortLongPress
@@ -92,6 +98,14 @@ public:
     virtual void close(bool wasOkay);
 };
 
+class CDialogStart : public CDialogBase
+{
+public:    
+    virtual void drawMessage(int y, int h);
+    virtual void checkOkCancel();
+};
+
+static CDialogStart startDialog;
 static CDialogBind bindDialog;
 static CDialogExit exitDialog;
 static CDialogBase *activeDialog;
@@ -165,10 +179,38 @@ void CDialogBind::close(bool wasOkay)
 {
     if (wasOkay)
     {
-        // TODO, XXX
-        // Reset TX here
+        resetTX();
     }
     CDialogLongPress::close(wasOkay);
+}
+
+//------------------------------------------------------------------------------
+void CDialogStart::drawMessage(int y, int h)
+{
+    y -= h >> 1;
+    screen_puts_centered(y, 1, "Reset switches");
+    y += h;
+    screen_puts_centered(y, 1, "and set Throttle");
+    y += h;
+    screen_puts_centered(y, 1, "to zero");
+}
+
+//------------------------------------------------------------------------------
+static bool SafeToStart()
+{
+    // Check switches and throttle, if any are active bring up the warning dialog
+    enum { kThrottleThreshold = 20 };
+    return ((adc_get_channel_calibrated(ADC_ID_THROTTLE) < kThrottleThreshold) && !button_active(kBtn_SwA) && !button_active(kBtn_SwD));
+}
+
+//------------------------------------------------------------------------------
+void CDialogStart::checkOkCancel()
+{
+    if (SafeToStart())
+    {
+        startTX();
+        close(true);
+    }
 }
 
 //------------------------------------------------------------------------------
@@ -263,21 +305,24 @@ static void gui_process_logic() {
         timer_set_timeout(kTimerID_SecondElapsed, 1000);
     }
 
-    // count down when throttle is past zero
-    enum { kThrottleThreshold = 40 };   // TODO
-    if (adc_get_channel_calibrated(ADC_ID_THROTTLE) >= kThrottleThreshold) {
-        // do timer logic, handle countdown
-        if (second_elapsed) {
-            modelTimer--;
-        }
-    }
-
-    if ((modelTimer >= 0) && (modelTimer < 15)) {
-        if ((gui_loop_100ms_counter % 10) == 0) {
-            if (!alarmBeepsDisabled) {
-                sound_play_low_time();
+    // Count down when throttle is past zero and TX is running
+    if (txRunning)
+    {
+        enum { kThrottleThreshold = 30 };   // TODO
+        if (adc_get_channel_calibrated(ADC_ID_THROTTLE) >= kThrottleThreshold) {
+            // do timer logic, handle countdown
+            if (second_elapsed) {
+                modelTimer--;
             }
-            led_backlight_tickle();
+        }
+
+        if ((modelTimer >= 0) && (modelTimer < 15)) {
+            if ((gui_loop_100ms_counter % 10) == 0) {
+                if (!alarmBeepsDisabled) {
+                        sound_play_low_time();
+                    }
+                led_backlight_tickle();
+            }
         }
     }
 }
@@ -365,11 +410,11 @@ static void gui_render_statusbar() {
     if (alarmBeepsDisabled)
     {
         // LCD_WIDTH-16
-        screen_put_sprite(0, 0, sprite_beeps_disabled, 0);
+            screen_put_sprite(0, 0, sprite_beeps_disabled, 0);
     }
     else
     {
-        screen_put_sprite(0, 0, sprite_beeps_enabled, 0);
+            screen_put_sprite(0, 0, sprite_beeps_enabled, 0);
     }
 }
 
@@ -385,7 +430,7 @@ static void gui_render_bottombar() {
 }
 
 //------------------------------------------------------------------------------
-static void gui_render_exit_dialog() {
+static void renderDialog() {
 
     // render window
     // clear region for window
@@ -416,7 +461,7 @@ static void gui_render_exit_dialog() {
 
 
 //------------------------------------------------------------------------------
-static void txCtxRender() {
+static void renderTX() {
     uint32_t x;
     uint32_t y;
 
@@ -471,11 +516,6 @@ static void txCtxRender() {
 
     // render time
     screen_put_time(x, y, color, modelTimer);
-
-    if (activeDialog)
-    {
-        gui_render_exit_dialog();   
-    }
 }
 
 //------------------------------------------------------------------------------
@@ -484,7 +524,30 @@ static void txCtxEnter()
     guiEnabled = true;
     ReloadModelTimer();
 
-    // TODO: Init TX system here
+    // Check switches and throttle, if any are active bring up the warning dialog
+    if (!SafeToStart())
+    {
+        activeDialog = &startDialog;
+    }
+    else
+    {
+        startTX();
+    }
+}
+
+//------------------------------------------------------------------------------
+static void txCtxRender() 
+{
+    screen_fill(0);
+    if (txRunning)
+    {
+        renderTX();
+    }
+    if (activeDialog)
+    {
+        renderDialog();   
+    }
+    screen_update();
 }
 
 //------------------------------------------------------------------------------
@@ -500,15 +563,13 @@ static void txCtxLoop()
         return;
     }
 
-    screen_fill(0);
     txCtxRender();
-    screen_update();
 }
 
 //------------------------------------------------------------------------------
 static void txCtxExit() 
 {
-    // TODO: Shutdown TX system
+    stopTX();
 
     // Exit back to GEM
     gGEM.drawMenu();
@@ -524,4 +585,22 @@ void RunTXCtx()
     gGEM.context.exit   = txCtxExit;
     gGEM.context.allowExit = false; // Setting to false will require manual exit from the loop
     gGEM.context.enter();
+}
+
+//------------------------------------------------------------------------------
+static void startTX()
+{
+    txRunning = true;   // TODO: Init TX system here
+}
+
+//------------------------------------------------------------------------------
+static void stopTX()
+{
+    txRunning = false;  // TODO: Shutdown TX system
+}
+
+//------------------------------------------------------------------------------
+static void resetTX()
+{
+    // TODO: Reset TX system
 }
