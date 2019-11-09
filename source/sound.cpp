@@ -198,8 +198,8 @@ void sound_play_low_time(void)
 {
 	sound_tone_duration = 0;
 
-    sound_queue[0].frequency   = 4000;
-    sound_queue[0].duration_ms = 300;
+    sound_queue[0].frequency   = 3000;
+    sound_queue[0].duration_ms = 100;
     sound_queue[1].duration_ms = 0;
     sound_queue_state = 1;
 }
