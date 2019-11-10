@@ -1,0 +1,7 @@
+si 1
+speed 4000
+device MKL16Z64XXX4
+r
+h
+loadbin fs-i6.bin, 0
+exit
