@@ -135,6 +135,7 @@ DEPS=$(addsuffix .d,$(addprefix $(OBJECT_DIR)/,$(basename $(SOURCES))))
 #-------------------------------------------------------------------------------
 TARGET_ELF=$(OBJECT_DIR)/$(TARGET).elf
 TARGET_HEX=$(OBJECT_DIR)/$(TARGET).hex
+TARGET_BIN=$(OBJECT_DIR)/$(TARGET).bin
 
 
 #-------------------------------------------------------------------------------
@@ -186,7 +187,10 @@ endif
 #
 #-------------------------------------------------------------------------------
 #$(TARGET_HEX): $(TARGET_ELF)
-#	$(CP) -O ihex --set-start 0x8000000 $< $@
+#	$(CP) -O ihex --set-start 0x0000000 $< $@
+
+$(TARGET_BIN): $(TARGET_ELF)
+	$(CP) -O binary $< $@
 
 $(TARGET_ELF): $(OBJECTS)
 	$(CXX) -o $@ $^ $(LDFLAGS)
@@ -225,6 +229,6 @@ clean:
 flash: $(TARGET_ELF)
 	openocd -f interface/stlink.cfg -f target/klx.cfg -c "program $(TARGET_ELF) verify reset exit"
 
-#all: $(TARGET_HEX)
+all: $(TARGET_BIN)
 
-all: $(TARGET_ELF)
+#all: $(TARGET_HEX)
