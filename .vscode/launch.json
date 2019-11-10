@@ -16,6 +16,16 @@
             ]
         },
         {
+            "name": "J-Link Debug config",
+            "type": "cortex-debug",
+            "request": "launch",
+            "servertype": "jlink",
+            "cwd": "${workspaceRoot}",
+            "executable": "./debug/fs-i6.elf",
+            "device": "MKL16Z64xxx4",
+            "svdFile": "${workspaceRoot}/.vscode/MKL16Z4.svd"
+        },
+        {
             "name": "Attach Debug config",
             "type": "cortex-debug",
             "request": "attach",
