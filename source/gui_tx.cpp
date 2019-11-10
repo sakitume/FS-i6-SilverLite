@@ -320,18 +320,21 @@ static void gui_process_logic() {
         if ((modelTimer >= 0) && (modelTimer < 15)) {
             if ((gui_loop_100ms_counter % 10) == 0) {
                 if (!alarmBeepsDisabled) {
-                        sound_play_low_time();
-                    }
+                    sound_play_low_time();
+                }
                 led_backlight_tickle();
             }
         }
         uint16_t fcVoltage = tx_get_fc_voltage();
-        enum { fcLowVoltageThreshold = 340 };   // TODO: should be configurable, and exposed in storage
+        enum { fcLowVoltageThreshold = 350 };   // TODO: should be configurable, and exposed in storage
         if ((gui_loop_100ms_counter % 10) == 0) 
         {
             if (fcVoltage && (fcVoltage < fcLowVoltageThreshold))
             {
-                sound_play_low_voltage();
+                if (!alarmBeepsDisabled) 
+                {
+                    sound_play_low_voltage();
+                }
             }
         }
     }
