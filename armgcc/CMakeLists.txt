@@ -180,39 +180,41 @@ SET(SDKDirPath ${ProjRoot}/SDK )
 SET(SrcPath ${ProjRoot}/source )
 
 # Include paths
-include_directories(${SDKDirPath}/CMSIS/Include)
-include_directories(${SDKDirPath}/devices)
-include_directories(${SDKDirPath}/devices/MKL16Z4/drivers)
-include_directories(${SDKDirPath}/devices/MKL16Z4/utilities)
-include_directories(${SDKDirPath}/devices/MKL16Z4)
+include_directories(${ProjRoot}/drivers)
+include_directories(${ProjRoot}/CMSIS)
 include_directories(${ProjRoot}/board)
+include_directories(${ProjRoot}/utilities)
+include_directories(${ProjRoot}/source)
+include_directories(${ProjRoot}/GEM)
 
 # Target executable
 add_executable(${TargetELF} 
-"${SDKDirPath}/devices/MKL16Z4/gcc/startup_MKL16Z4.S"
-"${SDKDirPath}/devices/MKL16Z4/utilities/fsl_debug_console.c"
-"${SDKDirPath}/devices/MKL16Z4/utilities/fsl_debug_console.h"
-"${SDKDirPath}/devices/MKL16Z4/system_MKL16Z4.c"
-"${SDKDirPath}/devices/MKL16Z4/system_MKL16Z4.h"
-"${SDKDirPath}/devices/MKL16Z4/drivers/fsl_adc16.h"
-"${SDKDirPath}/devices/MKL16Z4/drivers/fsl_adc16.c"
-"${SDKDirPath}/devices/MKL16Z4/drivers/fsl_clock.h"
-"${SDKDirPath}/devices/MKL16Z4/drivers/fsl_clock.c"
-"${SDKDirPath}/devices/MKL16Z4/drivers/fsl_common.h"
-"${SDKDirPath}/devices/MKL16Z4/drivers/fsl_common.c"
-"${SDKDirPath}/devices/MKL16Z4/drivers/fsl_lpsci.h"
-"${SDKDirPath}/devices/MKL16Z4/drivers/fsl_lpsci.c"
-"${SDKDirPath}/devices/MKL16Z4/drivers/fsl_uart.h"
-"${SDKDirPath}/devices/MKL16Z4/drivers/fsl_uart.c"
-"${SDKDirPath}/devices/MKL16Z4/drivers/fsl_port.h"
-"${SDKDirPath}/devices/MKL16Z4/drivers/fsl_flash.c"
-"${SDKDirPath}/devices/MKL16Z4/drivers/fsl_flash.h"
-"${SDKDirPath}/devices/MKL16Z4/drivers/fsl_gpio.h"
-"${SDKDirPath}/devices/MKL16Z4/drivers/fsl_gpio.c"
-"${SDKDirPath}/devices/MKL16Z4/drivers/fsl_pit.h"
-"${SDKDirPath}/devices/MKL16Z4/drivers/fsl_pit.c"
-"${SDKDirPath}/devices/MKL16Z4/drivers/fsl_smc.h"
-"${SDKDirPath}/devices/MKL16Z4/drivers/fsl_smc.c"
+"${ProjRoot}/gcc/startup_MKL16Z4.S"
+"${ProjRoot}/utilities/fsl_debug_console.c"
+"${ProjRoot}/utilities/fsl_debug_console.h"
+"${ProjRoot}/CMSIS/system_MKL16Z4.c"
+"${ProjRoot}/CMSIS/system_MKL16Z4.h"
+"${ProjRoot}/drivers/fsl_adc16.h"
+"${ProjRoot}/drivers/fsl_adc16.c"
+"${ProjRoot}/drivers/fsl_clock.h"
+"${ProjRoot}/drivers/fsl_clock.c"
+"${ProjRoot}/drivers/fsl_common.h"
+"${ProjRoot}/drivers/fsl_common.c"
+"${ProjRoot}/drivers/fsl_lpsci.h"
+"${ProjRoot}/drivers/fsl_lpsci.c"
+"${ProjRoot}/drivers/fsl_uart.h"
+"${ProjRoot}/drivers/fsl_uart.c"
+"${ProjRoot}/drivers/fsl_port.h"
+"${ProjRoot}/drivers/fsl_flash.c"
+"${ProjRoot}/drivers/fsl_flash.h"
+"${ProjRoot}/drivers/fsl_gpio.h"
+"${ProjRoot}/drivers/fsl_gpio.c"
+"${ProjRoot}/drivers/fsl_pit.h"
+"${ProjRoot}/drivers/fsl_pit.c"
+"${ProjRoot}/drivers/fsl_smc.h"
+"${ProjRoot}/drivers/fsl_smc.c"
+"${ProjRoot}/drivers/fsl_tpm.h"
+"${ProjRoot}/drivers/fsl_tpm.c"
 "${ProjRoot}/board/board.c"
 "${ProjRoot}/board/board.h"
 "${ProjRoot}/board/clock_config.c"
@@ -236,18 +238,38 @@ add_executable(${TargetELF}
 "${SrcPath}/flash.h"
 "${SrcPath}/font.c"
 "${SrcPath}/font.h"
+"${SrcPath}/gui_calibrate.cpp"
+"${SrcPath}/gui_main.cpp"
+"${SrcPath}/gui_sliders.cpp"
+"${SrcPath}/gui_tx.cpp"
 "${SrcPath}/lcd.c"
 "${SrcPath}/lcd.h"
-"${SrcPath}/main.c"
+"${SrcPath}/main.cpp"
 "${SrcPath}/screen.c"
 "${SrcPath}/screen.h"
+"${SrcPath}/sound.cpp"
+"${SrcPath}/sound.h"
+"${SrcPath}/storage.cpp"
+"${SrcPath}/storage.h"
+"${SrcPath}/timer.cpp"
+"${SrcPath}/timer.h"
 "${SrcPath}/uart.c"
 "${SrcPath}/uart.h"
+"${SrcPath}/tx_interface.cpp"
+"${ProjRoot}/GEM/GEMItem.h"
+"${ProjRoot}/GEM/GEMItem.cpp"
+"${ProjRoot}/GEM/GEMSelect.cpp"
+"${ProjRoot}/GEM/GEMPage.h"
+"${ProjRoot}/GEM/GEMPage.cpp"
+"${ProjRoot}/GEM/GEM.h"
+"${ProjRoot}/GEM/GEM.cpp"
+"${ProjRoot}/GEM/FakeGLCD.h"
+"${ProjRoot}/GEM/FakeGLCD.cpp"
 )
 
 
-set(CMAKE_EXE_LINKER_FLAGS_DEBUG "${CMAKE_EXE_LINKER_FLAGS_DEBUG} -T${SDKDirPath}/devices/MKL16Z4/gcc/MKL16Z64xxx4_flash.ld -static")
-set(CMAKE_EXE_LINKER_FLAGS_RELEASE "${CMAKE_EXE_LINKER_FLAGS_RELEASE} -T${SDKDirPath}/devices/MKL16Z4/gcc/MKL16Z64xxx4_flash.ld -static")
+set(CMAKE_EXE_LINKER_FLAGS_DEBUG "${CMAKE_EXE_LINKER_FLAGS_DEBUG} -T${ProjRoot}/gcc/MKL16Z64xxx4_flash.ld -static")
+set(CMAKE_EXE_LINKER_FLAGS_RELEASE "${CMAKE_EXE_LINKER_FLAGS_RELEASE} -T${ProjRoot}/gcc/MKL16Z64xxx4_flash.ld -static")
 
 TARGET_LINK_LIBRARIES(${TargetELF} -Wl,--start-group)
 target_link_libraries(${TargetELF} debug m)
