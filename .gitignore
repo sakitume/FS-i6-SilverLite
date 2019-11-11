@@ -12,3 +12,5 @@
 /armgcc/build_log.txt
 /armgcc/Makefile
 /armgcc/CMakeFiles/
+/Debug/
+/Release/
