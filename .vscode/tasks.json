@@ -67,21 +67,21 @@
             "problemMatcher": []
         },
         {
-            "label": "Load Debug Firmware",
+            "label": "OpenOCD Flash Debug Firmware",
             "type": "shell",
             "command": "openocd -f interface/stlink.cfg -f target/klx.cfg -c \"program fs-i6.elf verify reset exit\"",
             "options": {
-                "cwd": "${workspaceRoot}/debug"
+                "cwd": "${workspaceRoot}/gcc_debug"
             },
             "group": "build",
             "problemMatcher": []
         },
         {
-            "label": "Load Release Firmware",
+            "label": "OpenOCD Flash Release Firmware",
             "type": "shell",
             "command": "openocd -f interface/stlink.cfg -f target/klx.cfg -c \"program fs-i6.elf verify reset exit\"",
             "options": {
-                "cwd": "${workspaceRoot}/release"
+                "cwd": "${workspaceRoot}/gcc_release"
             },
             "group": "build",
             "problemMatcher": []
@@ -101,7 +101,7 @@
                 "command": "JLink -CommanderScript ../.vscode/load-release.jlink",
             },
             "options": {
-                "cwd": "${workspaceRoot}/release",
+                "cwd": "${workspaceRoot}/gcc_release",
             },
             "group": "build",
             "problemMatcher": []

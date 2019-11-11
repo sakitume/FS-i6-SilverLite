@@ -21,10 +21,10 @@ A2L=arm-none-eabi-addr2line
 DEBUG ?= 0
 ifeq ($(DEBUG), 1)
 	# Careful! This folder will be destroyed when building "clean" target
-	OBJECT_DIR	= debug
+	OBJECT_DIR	= gcc_debug
 else
 	# Careful! These folders are destroyed when building "clean" target
-	OBJECT_DIR	= release
+	OBJECT_DIR	= gcc_release
 endif
 
 BOARD_DIR	 	= board
