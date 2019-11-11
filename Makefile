@@ -29,38 +29,42 @@ endif
 
 BOARD_DIR	 	= board
 SDK_DIR			= SDK
+DRIVERS_DIR		= drivers
 SRC_DIR		 	= source
 GEM_DIR			= GEM
+CMSIS_DIR		= CMSIS
+GCC_DIR			= gcc
+UTILITIES_DIR	= utilities
 
 #-------------------------------------------------------------------------------
 # Source Files
 #-------------------------------------------------------------------------------
 SOURCES =  \
-	${SDK_DIR}/devices/MKL16Z4/gcc/startup_MKL16Z4.S \
-	${SDK_DIR}/devices/MKL16Z4/utilities/fsl_debug_console.c \
-	${SDK_DIR}/devices/MKL16Z4/utilities/fsl_debug_console.h \
-	${SDK_DIR}/devices/MKL16Z4/system_MKL16Z4.c \
-	${SDK_DIR}/devices/MKL16Z4/system_MKL16Z4.h \
-	${SDK_DIR}/devices/MKL16Z4/drivers/fsl_adc16.h \
-	${SDK_DIR}/devices/MKL16Z4/drivers/fsl_adc16.c \
-	${SDK_DIR}/devices/MKL16Z4/drivers/fsl_clock.h \
-	${SDK_DIR}/devices/MKL16Z4/drivers/fsl_clock.c \
-	${SDK_DIR}/devices/MKL16Z4/drivers/fsl_common.h \
-	${SDK_DIR}/devices/MKL16Z4/drivers/fsl_common.c \
-	${SDK_DIR}/devices/MKL16Z4/drivers/fsl_lpsci.h \
-	${SDK_DIR}/devices/MKL16Z4/drivers/fsl_lpsci.c \
-	${SDK_DIR}/devices/MKL16Z4/drivers/fsl_uart.h \
-	${SDK_DIR}/devices/MKL16Z4/drivers/fsl_uart.c \
-	${SDK_DIR}/devices/MKL16Z4/drivers/fsl_flash.c \
-	${SDK_DIR}/devices/MKL16Z4/drivers/fsl_flash.h \
-	${SDK_DIR}/devices/MKL16Z4/drivers/fsl_gpio.h \
-	${SDK_DIR}/devices/MKL16Z4/drivers/fsl_gpio.c \
-	${SDK_DIR}/devices/MKL16Z4/drivers/fsl_pit.h \
-	${SDK_DIR}/devices/MKL16Z4/drivers/fsl_pit.c \
-	${SDK_DIR}/devices/MKL16Z4/drivers/fsl_smc.h \
-	${SDK_DIR}/devices/MKL16Z4/drivers/fsl_smc.c \
-	${SDK_DIR}/devices/MKL16Z4/drivers/fsl_tpm.h \
-	${SDK_DIR}/devices/MKL16Z4/drivers/fsl_tpm.c \
+	${GCC_DIR}/startup_MKL16Z4.S \
+	${UTILITIES_DIR}/fsl_debug_console.c \
+	${UTILITIES_DIR}/fsl_debug_console.h \
+	${CMSIS_DIR}/system_MKL16Z4.c \
+	${CMSIS_DIR}/system_MKL16Z4.h \
+	${DRIVERS_DIR}/fsl_adc16.h \
+	${DRIVERS_DIR}/fsl_adc16.c \
+	${DRIVERS_DIR}/fsl_clock.h \
+	${DRIVERS_DIR}/fsl_clock.c \
+	${DRIVERS_DIR}/fsl_common.h \
+	${DRIVERS_DIR}/fsl_common.c \
+	${DRIVERS_DIR}/fsl_lpsci.h \
+	${DRIVERS_DIR}/fsl_lpsci.c \
+	${DRIVERS_DIR}/fsl_uart.h \
+	${DRIVERS_DIR}/fsl_uart.c \
+	${DRIVERS_DIR}/fsl_flash.c \
+	${DRIVERS_DIR}/fsl_flash.h \
+	${DRIVERS_DIR}/fsl_gpio.h \
+	${DRIVERS_DIR}/fsl_gpio.c \
+	${DRIVERS_DIR}/fsl_pit.h \
+	${DRIVERS_DIR}/fsl_pit.c \
+	${DRIVERS_DIR}/fsl_smc.h \
+	${DRIVERS_DIR}/fsl_smc.c \
+	${DRIVERS_DIR}/fsl_tpm.h \
+	${DRIVERS_DIR}/fsl_tpm.c \
 	${BOARD_DIR}/board.c \
 	${BOARD_DIR}/board.h \
 	${BOARD_DIR}/clock_config.c \
@@ -115,10 +119,9 @@ SOURCES =  \
 # Include directories
 #-------------------------------------------------------------------------------
 INCLUDE_DIRS = \
-	$(SDK_DIR)/CMSIS/Include \
-	$(SDK_DIR)/devices/MKL16Z4 \
-	$(SDK_DIR)/devices/MKL16Z4/drivers \
-	$(SDK_DIR)/devices/MKL16Z4/utilities \
+	$(DRIVERS_DIR) \
+	$(CMSIS_DIR) \
+	$(UTILITIES_DIR) \
 	$(BOARD_DIR) \
 	$(SRC_DIR) \
 	$(GEM_DIR)
@@ -162,7 +165,7 @@ CXXFLAGS+=-U__STRICT_ANSI__ -fno-rtti -fno-exceptions
 ASMFLAGS=-D__STARTUP_CLEAR_BSS $(MCFLAGS) $(COMMON_FLAGS) -std=gnu99
 
 LDFLAGS=${MCFLAGS} ${COMMON_FLAGS} --specs=nano.specs --specs=nosys.specs -Xlinker --gc-sections -Xlinker -static -Xlinker -z -Xlinker muldefs
-LDFLAGS+=-T${SDK_DIR}/devices/MKL16Z4/gcc/MKL16Z64xxx4_flash.ld -static
+LDFLAGS+=-T${GCC_DIR}/MKL16Z64xxx4_flash.ld -static
 
 
 ifeq ($(DEBUG), 1)
