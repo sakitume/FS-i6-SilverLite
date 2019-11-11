@@ -164,7 +164,7 @@ CXXFLAGS+=-U__STRICT_ANSI__ -fno-rtti -fno-exceptions
 
 ASMFLAGS=-D__STARTUP_CLEAR_BSS $(MCFLAGS) $(COMMON_FLAGS) -std=gnu99
 
-LDFLAGS=${MCFLAGS} ${COMMON_FLAGS} --specs=nano.specs --specs=nosys.specs -Xlinker --gc-sections -Xlinker -static -Xlinker -z -Xlinker muldefs
+LDFLAGS=${MCFLAGS} ${COMMON_FLAGS} --specs=nano.specs --specs=nosys.specs -Xlinker --gc-sections -Xlinker -static -Xlinker -z -Xlinker muldefs -Xlinker -print-memory-usage
 LDFLAGS+=-T${GCC_DIR}/MKL16Z64xxx4_flash.ld -static
 
 
