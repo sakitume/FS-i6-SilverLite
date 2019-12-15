@@ -1,5 +1,4 @@
 #include "fsl_gpio.h"
-#include "fsl_debug_console.h"
 #include "pin_mux.h"
 #include "sound.h"
 #include "drv_time.h"

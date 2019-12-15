@@ -1,5 +1,3 @@
-#include "fsl_debug_console.h"
-
 #include "gui.h"
 #include "debug.h"
 #include "console.h"

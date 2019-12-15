@@ -1,4 +1,3 @@
-#include "fsl_debug_console.h"
 #include "fsl_pit.h"
 #include "timer.h"
 

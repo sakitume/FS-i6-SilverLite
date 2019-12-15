@@ -1,6 +1,7 @@
-#include "fsl_debug_console.h"
 #include "storage.h"
 #include "flash.h"
+#include <stddef.h>
+#include <memory.h>
 
 #define __HARDWARE_TIMER_WORKAROUND__
 #if defined(__HARDWARE_TIMER_WORKAROUND__)    
@@ -98,7 +99,7 @@ void storage_save()
     int result = flash_write(&storage, sizeof(storage));
     if (result != sizeof(storage))
     {
-        PRINTF("storage_save(): flash_write error");
+        //XXX printf("storage_save(): flash_write error");
     }
     else
     {

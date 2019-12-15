@@ -21,7 +21,6 @@
 #include "debug.h"
 #include "console.h"
 #include "fsl_adc16.h"
-#include "fsl_debug_console.h"
 #include "fsl_port.h"
 #include "delay.h"
 #include "storage.h"
@@ -205,7 +204,7 @@ static void LoadCalibrationData()
 {
     if (!storage_is_valid())
     {
-        PRINTF("Unable to load stick calibration data from flash\n");
+        //XXX printf("Unable to load stick calibration data from flash\n");
         SetupSaneDefaults();
     }
     else
@@ -221,13 +220,13 @@ static void LoadCalibrationData()
 
             if (cmin >= cmax)
             {
-                PRINTF("Stick calibration is required: bad min/max for channel: %d\n", chan);
+                //XXX printf("Stick calibration is required: bad min/max for channel: %d\n", chan);
                 bNeedRecalibrate = true;
                 break;
             }
             if ((cmax - cmin) > 4096)
             {
-                PRINTF("Stick calibration is required: bad range for channel: %d\n", chan);
+                //XXX printf("Stick calibration is required: bad range for channel: %d\n", chan);
                 bNeedRecalibrate = true;
                 break;
             }
@@ -235,7 +234,7 @@ static void LoadCalibrationData()
             if (diff < 0) diff = -diff;
             if (diff > 300)
             {
-                PRINTF("Stick calibration is required: bad mid value for channel: %d\n", chan);
+                //XXX printf("Stick calibration is required: bad mid value for channel: %d\n", chan);
                 bNeedRecalibrate = true;
                 break;
             }
