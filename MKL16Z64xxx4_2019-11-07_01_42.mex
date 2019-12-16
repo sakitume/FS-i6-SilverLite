@@ -3,8 +3,8 @@
    <common>
       <processor>MKL16Z64xxx4</processor>
       <package>MKL16Z64VLH4</package>
+      <board></board>
       <mcu_data>ksdk2_0</mcu_data>
-      <example></example>
       <cores selected="core0">
          <core name="Cortex-M0P" id="core0" description="M0P core"/>
       </cores>
@@ -17,6 +17,10 @@
    </preferences>
    <tools>
       <pins name="Pins" version="6.0" enabled="true" update_project_code="true">
+         <generated_project_files>
+            <file path="board/pin_mux.c" update_enabled="true"/>
+            <file path="board/pin_mux.h" update_enabled="true"/>
+         </generated_project_files>
          <pins_profile>
             <processor_version>6.0.0</processor_version>
             <pin_labels>
@@ -198,6 +202,10 @@
          </functions_list>
       </pins>
       <clocks name="Clocks" version="6.0" enabled="true" update_project_code="true">
+         <generated_project_files>
+            <file path="board/clock_config.c" update_enabled="true"/>
+            <file path="board/clock_config.h" update_enabled="true"/>
+         </generated_project_files>
          <clocks_profile>
             <processor_version>6.0.0</processor_version>
          </clocks_profile>
@@ -258,5 +266,28 @@
             </clock_configuration>
          </clock_configurations>
       </clocks>
+      <dcdx name="DCDx" version="2.0" enabled="false" update_project_code="true">
+         <generated_project_files/>
+         <dcdx_profile>
+            <processor_version>N/A</processor_version>
+         </dcdx_profile>
+         <dcdx_configurations/>
+      </dcdx>
+      <periphs name="Peripherals" version="6.0" enabled="false" update_project_code="true">
+         <generated_project_files/>
+         <peripherals_profile>
+            <processor_version>N/A</processor_version>
+         </peripherals_profile>
+         <functional_groups/>
+         <components/>
+      </periphs>
+      <tee name="TEE" version="1.0" enabled="false" update_project_code="true">
+         <generated_project_files/>
+         <tee_profile>
+            <processor_version>N/A</processor_version>
+         </tee_profile>
+         <global_options/>
+         <user_memory_regions/>
+      </tee>
    </tools>
 </configuration>
