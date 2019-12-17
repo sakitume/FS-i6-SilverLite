@@ -564,7 +564,26 @@ static void txCtxRender()
     {
         renderDialog();   
     }
+#if 1
+    // If throttle trim(up) is pressed while pitch trim(up) is held down
+    // then toggle between normal UI vs showing debug screen
+    static bool bShowDebug = false;
+    if (button_toggledActive(kBtn_ThrottleU) && button_active(kBtn_PitchU))
+    {
+        bShowDebug = !bShowDebug;
+    }
+    if (bShowDebug)
+    {
+        debug_flush();    
+        led_backlight_tickle();
+    }
+    else
+    {
+        screen_update();
+    }
+#else
     screen_update();
+#endif    
 }
 
 //------------------------------------------------------------------------------
