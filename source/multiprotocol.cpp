@@ -11,6 +11,7 @@
 #include "debug.h"
 #include "adc.h"
 #include "buttons.h"
+#include "storage.h"
 
 #define MPM_UART UART2
 #define MPM_UART_CLK_FREQ CLOCK_GetFreq(BUS_CLK)
@@ -32,9 +33,10 @@ static uart_transfer_t receiveXfer;
 static uint8_t g_txBuffer[TX_BUFFER_SIZE] = {0};
 static uart_transfer_t sendXfer;
 
-volatile bool rxBufferEmpty = true;
-volatile bool txOnGoing = false;
-volatile bool rxOnGoing = false;
+static unsigned rxBufferFillLevel;
+static volatile bool rxBufferEmpty = true;
+static volatile bool txOnGoing = false;
+static volatile bool rxOnGoing = false;
 
 static bool bWaitingForTLMHeader;
 static uint8_t telemetryType;
@@ -42,6 +44,8 @@ static uint8_t expectedTLMDataLength;
 
 static uint8_t multi4in1_bind = 0;
 static uint8_t multi4in1_range_check = 0;
+
+static int telemetryFrame[17];
 
 #define MULTI_CHANS 16
 #define MULTI_CHAN_BITS 11
@@ -74,6 +78,11 @@ void multiprotocol_init()
     sendXfer.data = g_txBuffer;
     receiveXfer.data = g_rxBuffer;
     bWaitingForTLMHeader = true;
+
+    for (unsigned i=0; i < (sizeof(telemetryFrame)/sizeof(telemetryFrame[0])); i++)
+    {
+        telemetryFrame[i] = 0;
+    }
 
     /*
      * config.baudRate_Bps = 115200U;
@@ -124,6 +133,7 @@ void multiprotocol_update(void)
             // Header is 4 bytes
             const size_t kNumBytesToReceive = bWaitingForTLMHeader ? 4 : expectedTLMDataLength;
             receiveXfer.dataSize = kNumBytesToReceive;
+            rxBufferFillLevel = kNumBytesToReceive;
 
             size_t receivedBytes;
             UART_TransferReceiveNonBlocking(MPM_UART, &g_uartHandle, &receiveXfer, &receivedBytes);
@@ -217,10 +227,11 @@ void multiprotocol_update(void)
     // If TX is idle
     if (!txOnGoing)
     {
-        uint32_t    now = micros_this_frame();
+#if 1        
         bool bTimeToSend = false;
+        uint32_t    now = micros_this_frame();
         static uint32_t lastTX = 0;
-        if ((now - lastTX) >= 1000)
+        if ((now - lastTX) >= 2000)
         {
             bTimeToSend = true;
         }
@@ -228,21 +239,49 @@ void multiprotocol_update(void)
         if (bTimeToSend && bTXEnabled)
         {
             lastTX = now;
+#else
+        if (bTXEnabled)
+        {
+#endif        
 
             uint8_t *p = sendXfer.data;
             uint8_t data;
 
-            // TODO: Put these into a model definition structure
-            const uint8_t kBayangProtocol = 14;
-            const uint8_t settings_protocol = kBayangProtocol;
-            const uint8_t settings_sub_protocol = 0;    // 0 == Bayang
-            const uint8_t settings_option = 1;          // 1 == Bayang telemetry. Note: When using test RX board, don't use telemetry (you get lots of bad CRC packets)
-
-            const uint8_t settings_auto_bind = 0;
-            const uint8_t settings_rx_num = 0;
-            const uint8_t settings_low_power = 0;
+            // Get current model so we can use its multiprotocol config
+            const ModelDesc_t &model = storage.model[storage.current_model];
 
 #if 0   
+
+From Protocol_Details.md (Multiprotocol repo):
+
+```
+## BAYANG - *14*
+Autobind protocol
+
+CH1|CH2|CH3|CH4|CH5|CH6|CH7|CH8|CH9|CH10|CH11|-|-|CH14|CH15
+---|---|---|---|---|---|---|---|---|----|----|---|---|----|----
+A|E|T|R|FLIP|RTH|PICTURE|VIDEO|HEADLESS|INVERTED|RATES|-|-|ANAAUX1|ANAAUX2
+
+RATES: -100%(default)=>higher rates by enabling dynamic trims (except for Headless), 100%=>disable dynamic trims
+
+Channels 14 and 15 (ANAAUX1 and ANAAUX2) only available with analog aux channel option, indicated below.
+
+### Sub_protocol BAYANG - *0*
+Models: Eachine H8(C) mini, BayangToys X6/X7/X9, JJRC JJ850, Floureon H101 ...
+
+Option=0 -> normal Bayang protocol
+
+Option=1 -> enable telemetry with [Silverxxx firmware](https://github.com/silver13/H101-acro/tree/master). Value returned to the TX using FrSkyD Hub are RX RSSI, TX RSSI, A1=uncompensated battery voltage, A2=compensated battery voltage
+
+Option=2 -> enable analog aux channels with [NFE Silverware firmware](https://github.com/NotFastEnuf/NFE_Silverware). Two otherwise static bytes in the protocol overridden to add two 'analog' (non-binary) auxiliary channels.
+
+Option=3 -> both Silverware telemetry and analog aux channels enabled.
+
+```
+
+
+
+
 Bayang send packet code from multiprotocol module source code
 CH5_SW thru CH13_SW is used. These are defined as:
 #define CH5_SW	(Channel_AUX & _BV(0))      -> BAYANG_FLAG_FLIP
@@ -335,12 +374,12 @@ So something like this will be needed
 #endif            
 
             // Header
-            *p++ = settings_protocol < 32 ? 0x55 : 0x54;
+            *p++ = model.mpm_protocol < 32 ? 0x55 : 0x54;
 
             // Stream[1] = sub_protocol|RangeCheckBit|AutoBindBit|BindBit;
-            data = settings_protocol & 0x1f;
+            data = model.mpm_protocol & 0x1f;
             data |= multi4in1_range_check << 5;
-            data |= settings_auto_bind << 6;
+            data |= model.mpm_auto_bind << 6;
             if (multi4in1_bind)
             {
                 data |= 1 << 7;
@@ -349,13 +388,13 @@ So something like this will be needed
             *p++ = data;
 
             // Stream[2] = RxNum | Type | Power;
-            data = settings_rx_num & 0x0f;
-            data |= (settings_sub_protocol & 0x07) << 4;
-            data |= settings_low_power << 7;
+            data = model.mpm_rx_num & 0x0f;
+            data |= (model.mpm_sub_protocol & 0x07) << 4;
+            data |= model.mpm_low_power << 7;
             *p++ = data;
 
             // Stream[3] = option_protocol;
-            *p++ = settings_option;
+            *p++ = model.mpm_option;
 
             // Stream[4] to [25] = Channels
             uint32_t bits = 0;
@@ -380,7 +419,7 @@ So something like this will be needed
             	// 4095	+100%
                 int value = (i <= ADC_ID_SwC) ? adc_data[i] : 0;
 
-                if (settings_protocol == kBayangProtocol)
+                if (model.mpm_protocol == kBayangProtocol)
                 {
                     // The following channels correspond to various
                     // Bayang flags that we care about
@@ -489,12 +528,151 @@ void multiprotocol_test(void)
     debug_flush();
 }
 
+// telemetryType parameter to ProcessTelemetry() should be one of the
+// following (Bayang protocol will be MULTI_TELEMETRY_HUB)
+enum MultiPacketTypes
+{
+	MULTI_TELEMETRY_STATUS			= 1,
+	MULTI_TELEMETRY_SPORT			= 2,
+	MULTI_TELEMETRY_HUB				= 3,
+	MULTI_TELEMETRY_DSM				= 4,
+	MULTI_TELEMETRY_DSMBIND			= 5,
+	MULTI_TELEMETRY_AFHDS2A			= 6,
+	MULTI_TELEMETRY_REUSE_1			= 7,
+	MULTI_TELEMETRY_SYNC			= 8,
+	MULTI_TELEMETRY_REUSE_2			= 9,
+	MULTI_TELEMETRY_HITEC			= 10,
+	MULTI_TELEMETRY_SCANNER			= 11,
+	MULTI_TELEMETRY_AFHDS2A_AC		= 12,
+	MULTI_TELEMETRY_RX_CHANNELS		= 13,
+	MULTI_TELEMETRY_HOTT			= 14,
+};
+
 static void ProcessTelemetry(uint8_t telemetryType, const uint8_t* data, uint8_t dataLen)
 {
-    debug("TLM: ");
-    debug_put_uint8(dataLen);
-    debug_put_newline();
+#if 0
+
+
+	frame[0] = 0xFE;			// Link frame
+	if (protocol==PROTO_FRSKYD)
+	{		
+		frame[1] = telemetry_in_buffer[3];		// A1
+		frame[2] = telemetry_in_buffer[4];		// A2
+		frame[3] = telemetry_in_buffer[5];		// RX_RSSI
+		telemetry_link &= ~1 ;		// Sent
+		telemetry_link |= 2 ;		// Send hub if available
+	}
+	else
+	{//PROTO_HUBSAN, PROTO_AFHDS2A, PROTO_BAYANG, PROTO_NCC1701, PROTO_CABELL, PROTO_HITEC, PROTO_BUGS, PROTO_BUGSMINI, PROTO_FRSKYX
+		frame[1] = v_lipo1;
+		frame[2] = v_lipo2;
+		frame[3] = RX_RSSI;
+		telemetry_link=0;
+	}
+	frame[4] = TX_RSSI;
+	frame[5] = RX_LQI;
+	frame[6] = TX_LQI;
+	frame[7] = frame[8] = 0;
+
+    static void multi_send_header(uint8_t type, uint8_t len)
+    {
+        Serial_write('M');
+        Serial_write('P');
+        Serial_write(type);
+        Serial_write(len);
+    }
+	multi_send_header(MULTI_TELEMETRY_HUB, 9);
+
+	for (uint8_t i = 0; i < 9; i++)
+		Serial_write(frame[i]);
+#endif
+
+    // Every 500ms the MPM sends "STATUS" info
+    if (telemetryType == MULTI_TELEMETRY_STATUS)
+    {
+        // TODO: Review multi_send_status() in Telemetry.ino
+#if 0
+0	Serial_write(flags);
+
+	// Version number example: 1.1.6.1
+1	Serial_write(VERSION_MAJOR);
+2	Serial_write(VERSION_MINOR);
+3	Serial_write(VERSION_REVISION);
+4	Serial_write(VERSION_PATCH_LEVEL);
+	// Channel order
+5	Serial_write(RUDDER<<6|THROTTLE<<4|ELEVATOR<<2|AILERON);
+    // Protocol next/prev
+    if(multi_protocols[multi_protocols_index+1].protocol != 0)
+6       Serial_write(multi_protocols[multi_protocols_index+1].protocol);		// next protocol number
+    else
+6       Serial_write(protocol);													// end of list
+    if(multi_protocols_index>0)
+7       Serial_write(multi_protocols[multi_protocols_index-1].protocol);		// prev protocol number
+    else
+7       Serial_write(protocol);													// begining of list
+    // Protocol
+    for(uint8_t i=0;i<7;i++)
+8-14     Serial_write(multi_protocols[multi_protocols_index].ProtoString[i]);	// protocol name
+    // Sub-protocol
+    uint8_t nbr=multi_protocols[multi_protocols_index].nbrSubProto;
+    Serial_write(nbr | (multi_protocols[multi_protocols_index].optionType<<4));	// number of sub protocols && option type
+    uint8_t j=0;
+    if(nbr && (sub_protocol&0x07)<nbr)
+    {
+        uint8_t len=multi_protocols[multi_protocols_index].SubProtoString[0];
+        uint8_t offset=len*(sub_protocol&0x07)+1;
+        for(;j<len;j++)
+            Serial_write(multi_protocols[multi_protocols_index].SubProtoString[j+offset]);	// current sub protocol name
+    }
+    for(;j<8;j++)
+        Serial_write(0x00);
+#endif
+        debug("Flags: ");
+        uint8_t flags = data[0];
+        debug_put_hex8(flags);
+        debug(", ");
+
+        char name[12];
+        uint8_t i;
+        for(i=0;i<7;i++)
+        {
+            name[i] = data[i+8];
+        }
+        name[i] = 0;
+        debug(name);
+        debug_put_newline();
+    }
+    else if (telemetryType == MULTI_TELEMETRY_HUB)
+    {
+        if (data[0] == 0xFE)    // 0xFE == link frame
+        {
+#if 0            
+            data[1] = v_lipo1;  // uncompensated battery volts*100/2
+            data[2] = v_lipo2;  // compensated battery volts*100/2
+            data[3] = RX_RSSI;  // reception in packets / sec
+            data[4] = TX_RSSI;
+            data[5] = RX_LQI;
+            data[6] = TX_LQI;
+            data[7] = 0;
+            data[8] = 0;
+#endif            
+            for (int i=0; i<8; i++)
+            {
+                telemetryFrame[i] = data[i+1];
+            }
+        }
+    }
 }
+
+unsigned multiprotocol_get_telemetry(int id)
+{
+    if ((unsigned)id < (sizeof(telemetryFrame)/sizeof(telemetryFrame[0])))
+    {
+        return telemetryFrame[id];
+    }
+    return 0;
+}
+
 
 void multiprotocol_enable(void)
 {
@@ -508,5 +686,10 @@ void multiprotocol_disable(void)
 
 void multiprotocol_rebind(void)
 {
+    for (unsigned i=0; i < (sizeof(telemetryFrame)/sizeof(telemetryFrame[0])); i++)
+    {
+        telemetryFrame[i] = 0;
+    }
+
     multi4in1_bind = 1;
 }

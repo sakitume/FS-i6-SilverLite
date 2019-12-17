@@ -2,6 +2,7 @@
 #include "flash.h"
 #include <stddef.h>
 #include <memory.h>
+#include "multiprotocol.h"
 
 #define __HARDWARE_TIMER_WORKAROUND__
 #if defined(__HARDWARE_TIMER_WORKAROUND__)    
@@ -55,6 +56,26 @@ uint8_t storage_is_valid()
 }
 
 //------------------------------------------------------------------------------
+static void setDefaults()
+{
+    memset(&storage, 0, sizeof(storage));
+    storage.current_model = 0;
+    for (int i=0; i<STORAGE_MODEL_MAX_COUNT; i++)
+    {
+        ModelDesc_t &model = storage.model[i];
+        model.timer = 4 * 60;
+        strcpy(model.name, "TinyWhoop");
+
+        model.mpm_protocol = kBayangProtocol;
+        model.mpm_sub_protocol = 0;    // 0 == Bayang
+        model.mpm_option = 1;          // 1 == Bayang telemetry
+        model.mpm_auto_bind = 0;
+        model.mpm_rx_num = 0;
+        model.mpm_low_power = 0;
+    }
+}
+
+//------------------------------------------------------------------------------
 uint8_t storage_init()
 {
     static_assert(sizeof(storage) < 256, "FlashStorage_t is too big");
@@ -68,16 +89,11 @@ uint8_t storage_init()
     if (!valid)
     {
         memset(&storage, 0, sizeof(storage));
-        // TODO: Provide defaults?
+        setDefaults();
     }
 
     // TODO
-    for (int i=0; i<STORAGE_MODEL_MAX_COUNT; i++)
-    {
-        ModelDesc_t &model = storage.model[i];
-        model.timer = 4 * 60;
-        strcpy(model.name, "TinyWhoop");
-    }
+    setDefaults();
 
     storage_take_snapshot();
     return valid;

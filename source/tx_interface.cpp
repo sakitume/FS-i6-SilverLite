@@ -4,19 +4,20 @@
 // Voltage of flight controller
 uint16_t tx_get_fc_voltage()
 {
-    return 400;
+//    return multiprotocol_get_telemetry(0) * 2;
+    return multiprotocol_get_telemetry(1) * 2;
 }
 
 // RSSI of tx receiving from flight controller
 uint16_t tx_get_rssi_tx()
 {
-    return 100;
+    return multiprotocol_get_telemetry(2);
 }
 
 // RSSI reported by flight controller
 uint16_t tx_get_rssi_fc()
 {
-    return 100;
+    return multiprotocol_get_telemetry(3);
 }
 
 

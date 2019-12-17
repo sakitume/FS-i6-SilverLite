@@ -14,6 +14,14 @@ struct ModelDesc_t
     enum        {   kModelNameLen = 10  };
     char        name[kModelNameLen];
     uint16_t    timer;
+
+    // Multiprotocol params
+    uint8_t mpm_protocol;
+    uint8_t mpm_sub_protocol;
+    uint8_t mpm_option;
+    uint8_t mpm_auto_bind;;
+    uint8_t mpm_rx_num;
+    uint8_t mpm_low_power;
 };
 
 struct FlashStorage_t 
