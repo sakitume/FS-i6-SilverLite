@@ -46,6 +46,7 @@ void adc_test(void);
 
 uint16_t adc_get_channel_raw(int id);
 uint16_t adc_get_channel_calibrated(int id);
+uint16_t adc_get_channel_calibrated_unscaled(int id);
 
 // Return a fixed point number of the battery voltage: 1230 = 12.3 V
 uint32_t adc_get_battery_voltage(void);

@@ -94,6 +94,8 @@ SOURCES =  \
 	${SRC_DIR}/lcd.c \
 	${SRC_DIR}/lcd.h \
 	${SRC_DIR}/main.cpp \
+	${SRC_DIR}/multiprotocol.cpp \
+	${SRC_DIR}/multiprotocol.h \
 	${SRC_DIR}/screen.c \
 	${SRC_DIR}/screen.h \
 	${SRC_DIR}/sound.cpp \
@@ -102,8 +104,6 @@ SOURCES =  \
 	${SRC_DIR}/storage.h \
 	${SRC_DIR}/timer.cpp \
 	${SRC_DIR}/timer.h \
-	${SRC_DIR}/uart.c \
-	${SRC_DIR}/uart.h \
 	${SRC_DIR}/tx_interface.cpp \
 	${GEM_DIR}/GEMItem.h \
 	${GEM_DIR}/GEMItem.cpp \

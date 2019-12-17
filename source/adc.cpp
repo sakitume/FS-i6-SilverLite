@@ -266,7 +266,7 @@ uint16_t adc_get_channel_raw(int id)
 }
 
 //------------------------------------------------------------------------------
-uint16_t adc_get_channel_calibrated(int id) 
+uint16_t adc_get_channel_calibrated_unscaled(int id)
 {
     uint16_t rawVal = adc_get_channel_raw(id);
     int32_t calVal;
@@ -302,6 +302,13 @@ uint16_t adc_get_channel_calibrated(int id)
     {
         calVal = rawVal;
     }
+    return calVal;
+}
+
+//------------------------------------------------------------------------------
+uint16_t adc_get_channel_calibrated(int id) 
+{
+    int32_t calVal = adc_get_channel_calibrated_unscaled(id);
 
     // Scale the value from range 4096 to range 1024
     calVal >>= 2;
