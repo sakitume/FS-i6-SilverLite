@@ -98,7 +98,7 @@ void multiprotocol_init()
 
 
 //------------------------------------------------------------------------------
-static bool bDoTest = false;
+static bool bTXEnabled = false;
 
 //------------------------------------------------------------------------------
 static inline int constrain(int amt, int low, int high) 
@@ -218,18 +218,14 @@ void multiprotocol_update(void)
     if (!txOnGoing)
     {
         uint32_t    now = micros_this_frame();
-        bool bDoTX = false;
+        bool bTimeToSend = false;
         static uint32_t lastTX = 0;
-        if (lastTX == 0)
+        if ((now - lastTX) >= 1000)
         {
-            bDoTX = true;
-        }
-        else if ((now - lastTX) >= 1000)
-        {
-            bDoTX = true;
+            bTimeToSend = true;
         }
 
-        if (bDoTX && bDoTest)
+        if (bTimeToSend && bTXEnabled)
         {
             lastTX = now;
 
@@ -282,18 +278,21 @@ void multiprotocol_update(void)
 
             for (int i = 0; i < MULTI_CHANS; i++) 
             {
+            	// adc values:
+            	// 0	-100%
+            	// 2048    0%
+            	// 4095	+100%
+                int value = (i <= ADC_ID_SwC) ? adc_data[i] : 0;
+                value -= 2047;
+
                 // Channel value constrained to 11 bits (0 to 2047 inclusive)
                 //	0		-125%
                 //  204		-100%
                 //	1024	   0%
                 //	1843	+100%
                 //	2047	+125%
-
-                int value = (i <= ADC_ID_SwC) ? adc_data[i] : 0;
-
-                // Scale to 82%
-//                value = value * 820 / 4095 + 1024;
-                value = value * 1024 / 4095 + 1024;
+                // Scale to 82% (1024-204 == 820)
+                value = value * 820 / 2048 + 1024;
                 bits |= constrain(value, 0, 2047) << bitsavailable;
                 bitsavailable += MULTI_CHAN_BITS;
                 while (bitsavailable >= 8) 
@@ -313,19 +312,19 @@ void multiprotocol_test(void)
 {
     if (button_toggledActive(kBtn_Up))
     {
-        bDoTest = true;
+        bTXEnabled = true;
         debug("MPM on");
         debug_put_newline();
     }
     else if (button_toggledActive(kBtn_Down))
     {
-        bDoTest = false;
+        bTXEnabled = false;
         debug("MPM off");
         debug_put_newline();
     }
     else if (button_active(kBtn_Bind))
     {
-        if (bDoTest)
+        if (bTXEnabled)
         {
             multi4in1_bind = 1;
         }
@@ -340,14 +339,24 @@ void multiprotocol_test(void)
     debug_flush();
 }
 
-void multiprotocol_enable_bind() 
-{
-    multi4in1_bind = 1;
-}
-
 static void ProcessTelemetry(uint8_t telemetryType, const uint8_t* data, uint8_t dataLen)
 {
     debug("TLM: ");
     debug_put_uint8(dataLen);
     debug_put_newline();
+}
+
+void multiprotocol_enable(void)
+{
+    bTXEnabled = true;
+}
+
+void multiprotocol_disable(void)
+{
+    bTXEnabled = false;
+}
+
+void multiprotocol_rebind(void)
+{
+    multi4in1_bind = 1;
 }

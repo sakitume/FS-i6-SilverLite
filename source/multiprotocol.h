@@ -8,6 +8,11 @@ void multiprotocol_init(void);
 void multiprotocol_update(void);
 void multiprotocol_test(void);
 
+void multiprotocol_enable(void);
+void multiprotocol_disable(void);
+void multiprotocol_rebind(void);
+
+
 #if defined(__cplusplus)
 }
 #endif /* __cplusplus */

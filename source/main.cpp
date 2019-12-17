@@ -122,7 +122,9 @@ int main(void)
         delay_ms(20);
     }
 
-#if 1
+#if 0
+    // This test mode doesn't emit proper channel data because the
+    // sticks won't be calibrated
     console_clear();
     debug("MPM TEST");
     debug_put_newline();

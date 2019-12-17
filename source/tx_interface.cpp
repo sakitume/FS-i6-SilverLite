@@ -1,4 +1,5 @@
 #include "tx_interface.h"
+#include "multiprotocol.h"
 
 // Voltage of flight controller
 uint16_t tx_get_fc_voltage()
@@ -21,7 +22,18 @@ uint16_t tx_get_rssi_fc()
 
 
 void tx_update(){}
-void tx_start() {}
-void tx_stop()  {}
-void tx_reset() {}
+void tx_start()
+{
+    multiprotocol_enable();
+}
+
+void tx_stop()  
+{
+    multiprotocol_disable();
+}
+
+void tx_reset()
+{
+    multiprotocol_rebind();
+}
 
