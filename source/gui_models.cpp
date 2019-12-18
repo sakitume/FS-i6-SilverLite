@@ -343,6 +343,10 @@ static void applyProtocolOption();
 static uint8_t protocolOption;
 static GEMItem miProtocolOption("Option:", protocolOption, applyProtocolOption);
 
+static void applyAutoBind();
+static bool autoBind;
+static GEMItem miAutoBind("Auto-bind:", autoBind, applyAutoBind);
+
 
 static void applyModelIndex();
 static uint8_t selectedModelIndex;
@@ -376,6 +380,12 @@ static void applySecondsTimer()
     storage_save();
 }
 
+static void applyAutoBind()
+{
+    storage.model[storage.current_model].mpm_auto_bind = autoBind ? 1 : 0;
+    storage_save();
+}
+
 static void applyProtocolOption()
 {
     storage.model[storage.current_model].mpm_option = protocolOption;
@@ -397,6 +407,7 @@ static void updateSubprotocolParams(uint8_t newProtocol)
             }
             subprotocol = subprotocols[i].options[0].val_byte;
             protocolOption = 0;
+            autoBind = true;
             selectSubprotocol.changeOptions(numOptions, subprotocols[i].options);
             break;
         }
@@ -415,6 +426,7 @@ static void applyProtocol()
     model.mpm_protocol = protocol;
     model.mpm_sub_protocol = subprotocol;
     model.mpm_option = protocolOption;
+    model.mpm_auto_bind = autoBind;
 
     storage_save();
 }
@@ -436,6 +448,7 @@ static void updateModelDataParams(int modelIndex)
     // must be sure to initialize subprotocol *after* calling updateSubprotocolParams()
     subprotocol = model.mpm_sub_protocol;
     protocolOption = model.mpm_option;
+    autoBind = model.mpm_auto_bind ? 1 : 0;
 }
 
 static void applyModelIndex()
@@ -462,5 +475,6 @@ void gui_init_models()
     menuPageModels.addMenuItem(miSelectProtocol);
     menuPageModels.addMenuItem(miSelectSubprotocol);
     menuPageModels.addMenuItem(miProtocolOption);
+    menuPageModels.addMenuItem(miAutoBind);
     menuPageModels.setParentMenuPage(menuPageMain);
 }
