@@ -43,6 +43,11 @@ GEMItem menuItem_RunSlidersCtx("View Sliders", RunSlidersCtx);
 extern void RunCalibrateCtx();
 GEMItem menuItem_RunCalibrateCtx("Calibrate Sticks", RunCalibrateCtx);
 
+extern void gui_init_models();
+extern GEMPage menuPageModels;  // gui_models.cpp
+
+GEMItem menuItem_Models("Models", menuPageModels);
+
 //------------------------------------------------------------------------------
 void gui_init() 
 {
@@ -53,10 +58,14 @@ void gui_init()
     }
 
     gGEM.init();
+    gui_init_models();
+
+    menuPageMain.addMenuItem(menuItem_Models);
     menuPageMain.addMenuItem(menuItem_RunTXCtx);
     menuPageMain.addMenuItem(menuItem_RunCalibrateCtx);
     menuPageMain.addMenuItem(menuItem_RunSlidersCtx);
     gGEM.setMenuPageCurrent(menuPageMain);
+    
 #if 1   // Launch TX context directly    
     RunTXCtx();
 #else    
