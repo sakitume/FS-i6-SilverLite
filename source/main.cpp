@@ -122,20 +122,6 @@ int main(void)
         delay_ms(20);
     }
 
-#if 0
-    // This test mode doesn't emit proper channel data because the
-    // sticks won't be calibrated
-    console_clear();
-    debug("MPM TEST");
-    debug_put_newline();
-    while (1)
-    {
-        // Call the required update functions of various systems
-        required_updates();
-        multiprotocol_test();   // XXX, TEMP, TODO
-    }
-#else    
-
     // Call buttons_update() once so we can use button_raw_state()
     buttons_update();
     if (button_raw_state(kBtn_ThrottleU))
@@ -145,7 +131,6 @@ int main(void)
 
     gui_init();
     gui_loop();
-#endif    
     return 0;
 }
 
