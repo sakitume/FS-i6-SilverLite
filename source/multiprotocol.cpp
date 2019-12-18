@@ -382,8 +382,8 @@ So something like this will be needed
             data |= model.mpm_auto_bind << 6;
             if (multi4in1_bind)
             {
+                multi4in1_bind--;
                 data |= 1 << 7;
-                multi4in1_bind = 0;
             }
             *p++ = data;
 
@@ -400,24 +400,31 @@ So something like this will be needed
             uint32_t bits = 0;
             uint8_t bitsavailable = 0;
 
-            // fetch adc channel data for the sticks
-            uint16_t adc_data[8];
+            // FlySky-i6 can support 10 channels, 8 are true analog, 2 are digital (on/off):
+            //  4 adc channels (sticks): ADC_ID_AILERON, ADC_ID_ELEVATION, ADC_ID_THROTTLE, ADC_ID_RUDDER
+            //  2 adc channels (VrA, VrB): ADC_ID_CH0, ADC_ID_CH1
+            //  2 adc channels (SwB, SwC): ADC_ID_SwB, ADC_ID_SwC
+            //  2 digital channels (SwA, SwD)
+            //
+            uint16_t adc_data[10];
             for (int i = ADC_ID_AILERON; i <= ADC_ID_SwC; i++) 
             {
                 // ADC value will be between 0x0 to 0xFFF inclusive
                 int value = adc_get_channel_calibrated_unscaled(i);
                 adc_data[i] = value;
             }
+            adc_data[8] = button_active(kBtn_SwA) ? 4095 : 0;
+            adc_data[9] = button_active(kBtn_SwD) ? 4095 : 0;
 
             // Multiprotocol module expects 16 channels to be provided
             const uint16_t SwC = adc_get_channel_calibrated(ADC_ID_SwC);
             for (int i = 0; i < MULTI_CHANS; i++) 
             {
-                // Stick adc values:
+                // adc_data[] values:
             	// 0	-100%
             	// 2048    0%
             	// 4095	+100%
-                int value = (i <= ADC_ID_SwC) ? adc_data[i] : 0;
+                int value = (i < 10) ? adc_data[i] : 0;
 
                 if (model.mpm_protocol == kBayangProtocol)
                 {
@@ -470,6 +477,7 @@ So something like this will be needed
                             break;
                     }
                 }
+                
 
                 // Channel value constrained to 11 bits (0 to 2047 inclusive)
                 //	0		-125%
@@ -691,5 +699,5 @@ void multiprotocol_rebind(void)
         telemetryFrame[i] = 0;
     }
 
-    multi4in1_bind = 1;
+    multi4in1_bind = 100;
 }
