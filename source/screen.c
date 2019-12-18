@@ -575,6 +575,10 @@ void screen_puts_xy(uint8_t x, uint8_t y, uint8_t color, const char *str) {
     while (*str) {
         screen_put_char(*str);
         str++;
+        if (screen_font_x >= LCD_WIDTH)
+        {
+            break;
+        }
     }
 }
 
