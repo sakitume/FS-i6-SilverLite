@@ -92,9 +92,6 @@ uint8_t storage_init()
         setDefaults();
     }
 
-    // TODO
-    setDefaults();
-
     storage_take_snapshot();
     return valid;
 }
