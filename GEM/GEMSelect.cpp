@@ -129,3 +129,9 @@ void GEMSelect::setValue(void* variable, int index) {
     }
   }
 }
+
+void GEMSelect::changeOptions(byte length_, void* options_)
+{
+  this->_options = options_;
+  this->_length = length_;
+}

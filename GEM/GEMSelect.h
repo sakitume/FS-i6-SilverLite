@@ -65,6 +65,9 @@ class GEMSelect {
     GEMSelect(byte length_, SelectOptionInt* options_);
     GEMSelect(byte length_, SelectOptionByte* options_);
     GEMSelect(byte length_, SelectOptionChar* options_);
+
+    void changeOptions(byte length_, void* options_);
+
   private:
     byte _type;
     byte _length;
