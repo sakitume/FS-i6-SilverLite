@@ -19,7 +19,7 @@ struct ModelDesc_t
     uint8_t mpm_protocol;
     uint8_t mpm_sub_protocol;
     uint8_t mpm_option;
-    uint8_t mpm_auto_bind;;
+    uint8_t mpm_auto_bind;
     uint8_t mpm_rx_num;
     uint8_t mpm_low_power;
 };

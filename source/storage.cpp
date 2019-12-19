@@ -1,7 +1,7 @@
 #include "storage.h"
 #include "flash.h"
 #include <stddef.h>
-#include <memory.h>
+#include <string.h>
 #include "multiprotocol.h"
 
 #define __HARDWARE_TIMER_WORKAROUND__

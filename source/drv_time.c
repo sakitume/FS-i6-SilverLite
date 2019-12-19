@@ -1,5 +1,7 @@
 // Based on drv_time.c from Silverware
 #include "drv_time.h"
+#include "delay.h"
+
 #include "board.h"
 #include "clock_config.h"
 #include "screen.h"
@@ -147,7 +149,7 @@ unsigned long time_update()
 //    }
 void delay_us(int32_t us)
 {
-#if 1
+#if defined(__GNUC__)
     // based on https:// github.com/leaflabs/libmaple
     us *= 16;
 

@@ -302,11 +302,6 @@ static GEMItem miSelectProtocol("Protocol:", protocol, selectProtocol, applyProt
 
 static void applySubprotocol();
 static uint8_t subprotocol;
-static SelectOptionByte selectSubprotocolOptions[] = 
-{
-    {"Bayang", PROTO_BAYANG},
-    {"FSky 2A", PROTO_AFHDS2A},
-};
 static SelectOptionByte BayangSubprotocolOptions[] = 
 {
     {"BAYANG", BAYANG},

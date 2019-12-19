@@ -31,7 +31,6 @@
 /**
  * This is template for main module created by New Kinetis SDK 2.x Project Wizard. Enjoy!
  **/
-#include <fsl_debug_console.h>
 #include "board.h"
 #include "pin_mux.h"
 #include "clock_config.h"
