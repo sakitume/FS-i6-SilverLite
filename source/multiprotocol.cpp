@@ -437,7 +437,10 @@ So something like this will be needed
                         CH8_SW  = 7,
                         CH9_SW  = 8,
                         CH10_SW = 9,
-                        CH11_SW = 10
+                        CH11_SW = 10,
+
+                        CH14_ANALOG = 13,
+                        CH15_ANALOG = 14
                     };
 
                     // On my NFE Silverware quads I setup ARMING, IDLE_UP, etc
@@ -474,6 +477,20 @@ So something like this will be needed
                         // Disable dyntrim (because I don't know what it does exactly and it seems wrong to have it on based on code in Silverware)
                         case CH11_SW:
                             value = 4095;
+                            break;
+
+                        case CH14_ANALOG:
+                            if (model.mpm_option & 2)   // 2 == BAYANG_OPTION_FLAG_ANALOGAUX
+                            {
+                                value = adc_data[ADC_ID_CH0];   // VrA
+                            }
+                            break;
+
+                        case CH15_ANALOG:
+                            if (model.mpm_option & 2)   // 2 == BAYANG_OPTION_FLAG_ANALOGAUX
+                            {
+                                value = adc_data[ADC_ID_CH1];   // VrB
+                            }
                             break;
                     }
                 }
