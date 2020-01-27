@@ -147,7 +147,7 @@ TARGET_BIN=$(OBJECT_DIR)/$(TARGET).bin
 #-------------------------------------------------------------------------------
 ifeq ($(DEBUG), 1)
 	# Debug
-	OPTIMIZE = -g -O0
+	OPTIMIZE = -g -O1
 else
 	# Release
 	OPTIMIZE = -Os
@@ -236,3 +236,7 @@ flash: $(TARGET_ELF)
 all: $(TARGET_BIN)
 
 #all: $(TARGET_HEX)
+
+$(DEPS):
+
+include $(wildcard $(DEPS))
