@@ -72,7 +72,10 @@ enum PROTOCOLS
     PROTO_HOTT		= 57,	// =>CC2500
     PROTO_FX816		= 58,	// =>NRF24L01
     PROTO_BAYANG_RX	= 59,	// =>NRF24L01
-    PROTO_XN297DUMP	= 63,	// =>NRF24L01
+	PROTO_PELIKAN	= 60,	// =>A7105
+	PROTO_TIGER		= 61,	// =>NRF24L01
+	PROTO_SILVERLITE= 62,   // =>NRF24L01
+	PROTO_XN297DUMP	= 63,	// =>NRF24L01
 };
 
 enum Flysky
@@ -169,6 +172,7 @@ enum BAYANG
     X16_AH  = 2,
 	IRDRONE = 3,
 	DHD_D4	= 4,
+    LT8900  = 5
 };
 enum MT99XX
 {
@@ -292,10 +296,7 @@ static SelectOptionByte selectProtocolOptions[] =
 {
     {"Bayang", PROTO_BAYANG},
     {"FSky 2A", PROTO_AFHDS2A},
-    {"FlySky", PROTO_FLYSKY},
-    {"FrSky D", PROTO_FRSKYD},
-    {"FrSky X", PROTO_FRSKYX},
-    {"FrSky V", PROTO_FRSKYV}
+    {"SilvrLt", PROTO_SILVERLITE}
 };
 static GEMSelect selectProtocol(sizeof(selectProtocolOptions)/sizeof(selectProtocolOptions[0]), selectProtocolOptions);
 static GEMItem miSelectProtocol("Protocol:", protocol, selectProtocol, applyProtocol);
@@ -309,6 +310,7 @@ static SelectOptionByte BayangSubprotocolOptions[] =
     {"X16_AH", X16_AH},
     {"IRDRONE", IRDRONE},
     {"DHD_D4", DHD_D4},
+    {"LT8900", LT8900},
     {nullptr,}
 };
 static SelectOptionByte FSky2ASubprotocolOptions[] = 
@@ -329,6 +331,7 @@ static Subprotocols_t subprotocols[] =
 {
     { PROTO_BAYANG, BayangSubprotocolOptions },
     { PROTO_AFHDS2A, FSky2ASubprotocolOptions },
+    { PROTO_SILVERLITE, BayangSubprotocolOptions }  // SilverLite is Bayang with special extensions/additions
 };
 
 static GEMSelect selectSubprotocol(sizeof(BayangSubprotocolOptions)/sizeof(BayangSubprotocolOptions[0]), BayangSubprotocolOptions);
@@ -341,6 +344,10 @@ static GEMItem miProtocolOption("Option:", protocolOption, applyProtocolOption);
 static void applyAutoBind();
 static bool autoBind;
 static GEMItem miAutoBind("Auto-bind:", autoBind, applyAutoBind);
+
+static void applyRXNum();
+static uint8_t rxNum;
+static GEMItem miRXNum("RX Num:", rxNum, applyRXNum);
 
 
 static void applyModelIndex();
@@ -380,6 +387,13 @@ static void applyAutoBind()
     storage.model[storage.current_model].mpm_auto_bind = autoBind ? 1 : 0;
     storage_save();
 }
+
+static void applyRXNum()
+{
+    storage.model[storage.current_model].mpm_rx_num = rxNum;
+    storage_save();
+}
+
 
 static void applyProtocolOption()
 {
@@ -444,6 +458,7 @@ static void updateModelDataParams(int modelIndex)
     subprotocol = model.mpm_sub_protocol;
     protocolOption = model.mpm_option;
     autoBind = model.mpm_auto_bind ? 1 : 0;
+    rxNum = model.mpm_rx_num;
 }
 
 static void applyModelIndex()
@@ -471,5 +486,6 @@ void gui_init_models()
     menuPageModels.addMenuItem(miSelectSubprotocol);
     menuPageModels.addMenuItem(miProtocolOption);
     menuPageModels.addMenuItem(miAutoBind);
+    menuPageModels.addMenuItem(miRXNum);
     menuPageModels.setParentMenuPage(menuPageMain);
 }
