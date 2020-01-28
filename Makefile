@@ -35,6 +35,7 @@ GEM_DIR			= GEM
 CMSIS_DIR		= CMSIS
 GCC_DIR			= gcc
 UTILITIES_DIR	= utilities
+BAYANG_DIR		= bayang
 
 #-------------------------------------------------------------------------------
 # Source Files
@@ -115,6 +116,21 @@ SOURCES =  \
 	${GEM_DIR}/GEM.cpp \
 	${GEM_DIR}/FakeGLCD.h \
 	${GEM_DIR}/FakeGLCD.cpp \
+
+
+SOURCES +=  \
+	${BAYANG_DIR}/bayang.cpp \
+	${BAYANG_DIR}/bayang.h \
+	${BAYANG_DIR}/bayang_rx.cpp \
+	${BAYANG_DIR}/bayang_tx.cpp \
+	${BAYANG_DIR}/bayang_tx_main.cpp \
+	${BAYANG_DIR}/drv_nRF24L01.cpp \
+	${BAYANG_DIR}/drv_nRF24L01.h \
+	${BAYANG_DIR}/drv_softspi.cpp \
+	${BAYANG_DIR}/drv_softspi.h \
+	${BAYANG_DIR}/drv_XN297_emu.cpp \
+	${BAYANG_DIR}/drv_XN297_emu.h \
+	
 	
 #-------------------------------------------------------------------------------
 # Include directories
@@ -125,7 +141,8 @@ INCLUDE_DIRS = \
 	$(UTILITIES_DIR) \
 	$(BOARD_DIR) \
 	$(SRC_DIR) \
-	$(GEM_DIR)
+	$(GEM_DIR) \
+	$(BAYANG_DIR) \
 
 #-------------------------------------------------------------------------------
 # Object List

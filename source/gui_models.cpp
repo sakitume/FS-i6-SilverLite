@@ -2,6 +2,7 @@
 #include "console.h"
 #include "GEM.h"
 #include "storage.h"
+#include "config.h"
 #include <string.h>
 
 extern GEM gGEM;
@@ -294,6 +295,9 @@ static void applyProtocol();
 static uint8_t protocol;
 static SelectOptionByte selectProtocolOptions[] = 
 {
+#if defined(__USING_INTERNAL_TRX__)    
+    {"Internl", 0xFF},  // 0xFF means use internal TRX
+#endif    
     {"Bayang", PROTO_BAYANG},
     {"FSky 2A", PROTO_AFHDS2A},
     {"SilvrLt", PROTO_SILVERLITE}

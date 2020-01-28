@@ -183,6 +183,10 @@ SET(SDKDirPath ${ProjRoot}/SDK )
 # "source" folder
 SET(SrcPath ${ProjRoot}/source )
 
+# "bayang" folder
+SET(BayangPath ${ProjRoot}/bayang )
+
+
 # Include paths
 include_directories(${ProjRoot}/drivers)
 include_directories(${ProjRoot}/CMSIS)
@@ -190,6 +194,7 @@ include_directories(${ProjRoot}/board)
 include_directories(${ProjRoot}/utilities)
 include_directories(${ProjRoot}/source)
 include_directories(${ProjRoot}/GEM)
+include_directories(${BayangPath})
 
 # Target executable
 add_executable(${TargetELF} 
@@ -269,6 +274,17 @@ add_executable(${TargetELF}
 "${ProjRoot}/GEM/GEM.cpp"
 "${ProjRoot}/GEM/FakeGLCD.h"
 "${ProjRoot}/GEM/FakeGLCD.cpp"
+"${BayangPath}/bayang.cpp"
+"${BayangPath}/bayang.h"
+"${BayangPath}/bayang_rx.cpp"
+"${BayangPath}/bayang_tx.cpp"
+"${BayangPath}/bayang_tx_main.cpp"
+"${BayangPath}/drv_nRF24L01.cpp"
+"${BayangPath}/drv_nRF24L01.h"
+"${BayangPath}/drv_softspi.cpp"
+"${BayangPath}/drv_softspi.h"
+"${BayangPath}/drv_XN297_emu.cpp"
+"${BayangPath}/drv_XN297_emu.h"
 )
 
 

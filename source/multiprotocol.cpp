@@ -683,7 +683,7 @@ static void ProcessTelemetry(uint8_t telemetryType, const uint8_t* data, uint8_t
 #endif            
             for (int i=0; i<8; i++)
             {
-                telemetryFrame[i] = data[i+1];
+                telemetryFrame[i] = data[i];
             }
         }
     }
