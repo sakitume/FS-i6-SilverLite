@@ -307,6 +307,15 @@ static GEMItem miSelectProtocol("Protocol:", protocol, selectProtocol, applyProt
 
 static void applySubprotocol();
 static uint8_t subprotocol;
+#if defined(__USING_INTERNAL_TRX__)    
+static SelectOptionByte InternalSubprotocolOptions[] = 
+{
+    {"Stock", 0},
+    {"SilvrWr", 1},
+    {"LT8900", 2},
+    {nullptr,}
+};
+#endif
 static SelectOptionByte BayangSubprotocolOptions[] = 
 {
     {"BAYANG", BAYANG},
@@ -333,6 +342,9 @@ struct Subprotocols_t
 };
 static Subprotocols_t subprotocols[] =
 {
+#if defined(__USING_INTERNAL_TRX__)    
+    { 0xFF, InternalSubprotocolOptions },
+#endif    
     { PROTO_BAYANG, BayangSubprotocolOptions },
     { PROTO_AFHDS2A, FSky2ASubprotocolOptions },
     { PROTO_SILVERLITE, BayangSubprotocolOptions }  // SilverLite is Bayang with special extensions/additions

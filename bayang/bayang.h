@@ -12,15 +12,22 @@ void Bayang_tx_test2();
 void Bayang_rx_test();
 
 //------------------------------------------------------------------------------
-enum ESubProtocol
+enum EProtocol
 {
-    kDisabled,
-    kStock,
-    kSilverware,
-    kSilverwareTelemetry
+    kBayangDisabled,
+    kBayangStock,
+    kBayangSilverware
 };
+
+enum EBayangOptionFlags
+{
+	BAYANG_OPTION_FLAG_TELEMETRY	= 0x01,
+	BAYANG_OPTION_FLAG_ANALOGAUX	= 0x02,
+    BAYANG_OPTION_FLAG_SILVERLITE   = 0x04
+};
+
 void Bayang_init();
-void Bayang_tx_reset(enum ESubProtocol protocol);
+void Bayang_tx_reset(enum EProtocol protocol, uint8_t options);
 void Bayang_tx_update();
 void Bayang_tx_ui();
 void Bayang_disable();

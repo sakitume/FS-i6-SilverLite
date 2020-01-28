@@ -72,11 +72,13 @@ extern struct SilverLiteData_t gSilverLiteData;
 struct TXContext_t
 {
     uint16_t    bindCounter;        // number of bind packets remaining to be sent
-    uint8_t     protocol;           // ESubProtocol
-    uint8_t     resetToProtocol;    // If non-zero, this is the telemetry we should reset to
+    uint8_t     protocol;           // EProtocol
+    uint8_t     options;            // Bit flags: 0x01 == use telemetry, 0x02 use aux analog channels
+    uint8_t     resetToProtocol;    // If non-zero, this is the protocol we should reset to
+    uint8_t     resetToOptions;     // ..and these are the options that go along with it
     uint8_t     expectTelemetry;    // true if expecting telemetry
     uint8_t     awaitingTelemetry;  // true if awaiting telemetry response for last packet
-    uint8_t     silverLiteDesired;  // true if we want to signal to flight controller that we support SilverLite extension
+    uint8_t     _unused;            //
     uint8_t     silverLiteEnabled;  // true if flight controller reported back that it has enabled SilverLite extension
     int8_t      sendInterval;       // Interval in milliseconds between sending TX packets
     int8_t      intervalCounter;    // Countdown timer used by ISR

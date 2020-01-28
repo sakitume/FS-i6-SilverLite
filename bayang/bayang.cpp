@@ -74,7 +74,7 @@ void Bayang_init()
 void Bayang_disable()
 {
     // Ensure ISR stops running
-    gTXContext.protocol = kDisabled;
+    gTXContext.protocol = kBayangDisabled;
 
     // Turn off nRF24L01
     NRF24L01_SetTxRxMode(TXRX_OFF);

@@ -71,6 +71,9 @@ void screen_put_hex8(uint8_t x, uint8_t y, uint8_t color, uint8_t val);
 void screen_put_fixed2(uint8_t x, uint8_t y, uint8_t color, uint16_t c);
 __attribute__((section (".TestCODE")))  void screen_fill(uint8_t color);
 
+void screen_put_fixed1_3digit(uint8_t x, uint8_t y, uint8_t color, uint32_t v);
+
+
 #define screen_buffer_read(_addr) (screen_buffer[_addr])
 #define screen_buffer_write(_addr, _val) {\
     if (_addr >= SCREEN_BUFFER_SIZE) { \

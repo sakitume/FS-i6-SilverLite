@@ -45,6 +45,14 @@ static int16_t modelTimer;
 static uint8_t alarmBeepsDisabled;
 static bool txRunning;
 
+enum class ERenderMode
+{
+    kDefault,
+    kPIDTuning,
+    _kMax
+};
+static ERenderMode txRenderMode;
+
 // Forward declarations
 static void startTX();
 static void stopTX();
@@ -287,8 +295,13 @@ void gui_handle_buttons()
     }
     else if (okButtonCheck < 0)
     {
+#if 1        
+        // cycle to next display mode
+        txRenderMode = ERenderMode(((int)txRenderMode + 1) % (int)ERenderMode::_kMax);
+#else
         // toggle alarm beep enabled switch
         alarmBeepsDisabled = !alarmBeepsDisabled;
+#endif        
     }
 }
 
@@ -476,6 +489,115 @@ static void renderDialog() {
     activeDialog->drawMessage(y, h);
 }
 
+//------------------------------------------------------------------------------
+static void gui_render_RollPitchYaw()
+{
+    screen_set_font(font_tomthumb3x5);
+
+//    // draw black border
+ //   screen_fill_rect(0, 0, LCD_WIDTH, 7, 1);
+
+    uint8_t y = 0;
+    uint8_t x = 14;
+    uint8_t fntWd = font_metric7x12[FONT_FIXED_WIDTH];
+    uint8_t digitsWd = fntWd * 5;
+    uint8_t cellWd = digitsWd + 3;
+
+
+    screen_puts_xy(x, y, 1, "ROLL");
+    x += cellWd;
+    screen_puts_xy(x, y, 1, "PITCH");
+    x += cellWd;
+    screen_puts_xy(x, y, 1, "YAW");
+}
+
+//------------------------------------------------------------------------------
+static void renderPIDTuning()
+{
+    // Header: "roll pitch yaw"
+    gui_render_RollPitchYaw();
+
+    // Draw the grid
+    uint8_t x, y;
+    uint8_t fntHt = font_metric7x12[FONT_HEIGHT];
+    uint8_t fntWd = font_metric7x12[FONT_FIXED_WIDTH];
+    uint8_t digitsWd = fntWd * 5;
+    uint8_t cellWd = digitsWd + 3;
+    uint8_t cellHt = fntHt + 3;
+    uint8_t gridWd = cellWd * 3;
+    uint8_t gridHt = cellHt * 3;
+    uint8_t row, col;
+    x = 8;
+    y = 7;
+    for (row=0; row<=3; row++)
+    {
+        screen_draw_hline(x, y, gridWd, 1);
+        y += cellHt;
+    }
+    x = 8;
+    y = 7;
+    for (col=0; col<=3; col++)
+    {
+        screen_draw_vline(x, y, gridHt, 1);
+        x += cellWd;
+    }
+
+    // The 3x3 matrix
+    screen_set_font(font_metric7x12);
+    uint8_t color = 1;
+    y = 9;
+    for (row = 0; row<3; row++)
+    {
+        x = 10;
+        char s[2]; s[1] = 0;
+        switch (row)
+        {
+            case 0: s[0] = 'P'; break;
+            case 1: s[0] = 'I'; break;
+            case 2: s[0] = 'D'; break;
+        }
+        screen_puts_xy(0, y, 1, s);
+
+        for (col = 0; col<3; col++)
+        {
+            screen_put_fixed1_3digit(x, y, 1, tx_get_pid(row, col));
+            x += cellWd;
+        }
+        y += cellHt;
+    }
+
+    // Render SwA and SwB as sliders
+    screen_set_font(font_tomthumb3x5);
+    fntHt = font_tomthumb3x5[FONT_HEIGHT];
+    y = LCD_HEIGHT - (fntHt * 2 + 1);
+    for (uint8_t i = 0; i < 2; i++) 
+    {
+        // render channel names
+        screen_puts_xy(1, y, 1, adc_get_channel_name(i + ADC_ID_CH0, true));
+
+        // render sliders
+        uint32_t y2 = y + (font_tomthumb3x5[FONT_HEIGHT]+1)/2;
+        screen_draw_hline(8, y2 - 1, 50-1, 1);
+        screen_draw_hline(8, y2 + 1, 50-1, 1);
+        screen_draw_hline(8 + 50 + 1, y2 - 1, 50-1, 1);
+        screen_draw_hline(8 + 50 + 1, y2 + 1, 50-1, 1);
+
+        // From 0..1023 (inclusive)
+        // To -100..+100
+        int32_t cal = (int32_t)adc_get_channel_calibrated(i + ADC_ID_CH0);
+        int val = ((cal * 200) / 1023) - 100;
+
+        // render val as text
+        screen_put_int8(8 + 100 + 2, y, 1, val);
+
+        // rescale from +/-100 to 0..100
+        val = 50 + val/2;
+        screen_draw_vline(8 + val - 1, y+1, 5, 1);
+        screen_draw_vline(8 + val    , y+1, 5, 1);
+
+        y += fntHt + 1;
+    }
+}
 
 //------------------------------------------------------------------------------
 static void renderTX() {
@@ -558,7 +680,13 @@ static void txCtxRender()
     screen_fill(0);
     if (txRunning)
     {
-        renderTX();
+        switch (txRenderMode)
+        {
+            case ERenderMode::kPIDTuning:    renderPIDTuning();  break;
+
+            default:
+            case ERenderMode::kDefault:      renderTX(); break;
+        }
     }
     if (activeDialog)
     {

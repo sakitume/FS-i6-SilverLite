@@ -30,11 +30,12 @@
 #include "adc.h"
 
 //------------------------------------------------------------------------------
-void Bayang_tx_reset(enum ESubProtocol protocol)
+void Bayang_tx_reset(enum EProtocol protocol, uint8_t options)
 {
     // Our ISR will notice the protocol value on the next timer interrupt
     // and perform the necessary reset sequence
-    gTXContext.resetToProtocol = protocol;
+    gTXContext.resetToProtocol  = protocol;
+    gTXContext.resetToOptions   = options;
 }
 
 //------------------------------------------------------------------------------
@@ -174,7 +175,7 @@ void Bayang_tx_ui()
         if (millis_this_frame() >= msTimeToReset)
         {
             msTimeToReset = 0;
-            Bayang_tx_reset(kSilverwareTelemetry);
+            Bayang_tx_reset(kBayangSilverware, BAYANG_OPTION_FLAG_TELEMETRY);
             PRINTF("Bayang reset");
         }
     }

@@ -84,12 +84,12 @@ void Bayang_tx_isr(unsigned long /*millis*/)
 {
     uint32_t us_now = micros();
 
-    if (gTXContext.resetToProtocol != kDisabled)
+    if (gTXContext.resetToProtocol != kBayangDisabled)
     {
         ResetProtocol();    // takes about 727us
         gTXContext.resetTime = micros() - us_now;
     }
-    else if (gTXContext.protocol == kDisabled)
+    else if (gTXContext.protocol == kBayangDisabled)
     {
         return;
     }
@@ -152,12 +152,38 @@ void Bayang_tx_isr(unsigned long /*millis*/)
 //------------------------------------------------------------------------------
 static void SendBindPacket()
 {
-    packet[0] = (gTXContext.protocol == kSilverwareTelemetry) ? 0xA3 : 0xA4;
+    // 0xA4 = Stock Bayang or Silverware with no telemetry
+    // 0xA3 = Silverware with telemetry
+    // 0xA1 = Silverware with telemetry, with 2 aux analog channels
+    // 0xA2 = Silverware no telemetry, with 2 aux analog channels
+    if (gTXContext.protocol == kBayangStock)
+    {
+        packet[0]= 0xA4;	// Stock Bayang
+    }
+    else //..protocol is kBayangSilverware
+    {
+        const uint8_t option = gTXContext.options;
+        if (option & (BAYANG_OPTION_FLAG_TELEMETRY | BAYANG_OPTION_FLAG_SILVERLITE))
+        {
+            if (option & BAYANG_OPTION_FLAG_ANALOGAUX)
+                packet[0]= 0xA1;	// Silverware with telemetry, with 2 aux analog channels
+            else
+                packet[0]= 0xA3;    // Silverware with telemetry
+        }
+        else if(option & BAYANG_OPTION_FLAG_ANALOGAUX)
+        {
+            packet[0]= 0xA2;    // Silverware no telemetry, with 2 aux analog channels
+        }
+        else
+        {
+            packet[0]= 0xA4;	// Silverware with no telemetry
+        }
+    }
+
     memcpy(&packet[1], Bayang_rx_tx_addr, 5);
     memcpy(&packet[6], Bayang_rf_channels, 4);
 
-    // SilverLite extension requires telemetry
-    if (gTXContext.silverLiteDesired && (gTXContext.protocol == kSilverwareTelemetry))
+    if ((gTXContext.options & BAYANG_OPTION_FLAG_SILVERLITE) && (gTXContext.protocol == kBayangSilverware))
     {
         // Use special magic bytes to indicate to flight controller that this
         // TX supports SilverLite extension.
@@ -165,7 +191,7 @@ static void SendBindPacket()
         // SilverLite feature will not be enabled until receiver replies
         // back (via telemetry) to enable SilverLite
         //
-        // Note: We can still successfully bind and operate a BWhoop B03 Pro with this change
+        // Note: We can still successfully bind and operate a stock BWhoop B03 Pro with this change
         //
         packet[10] = packet[1] ^ 0xAA;
         packet[11] = packet[2] ^ 0xAA;
@@ -200,10 +226,9 @@ static void SendBindPacket()
 // And: https://github.com/pascallanger/DIY-Multiprotocol-TX-Module/blob/master/Multiprotocol/Bayang_nrf24l01.ino
 static void SendTXPacket()
 {
-    const bool bSendAuxAnalog = false;
-
     packet[0] = 0xA5;   // 0xA5 means normal TX packet (not bind packet)
 
+    const uint8_t bSendAuxAnalog = (gTXContext.protocol == kBayangSilverware) && (gTXContext.options & BAYANG_OPTION_FLAG_ANALOGAUX);
     if (bSendAuxAnalog)
     {
         packet[1] = txPkt_AuxAnalog[0];
@@ -229,14 +254,19 @@ static void SendTXPacket()
     packet[10] = bytes[7] | 0x7C;
     packet[11] = bytes[6];
 
-    // The values for these next 2 bytes depends on the sub protocol
-    packet[12] = Bayang_rx_tx_addr[2];
+    // The values for bytes[12], bytes[13] depends on the sub protocol
+    // If silverLite is desired then we use byte 12 to indicate we are silverLite capable
+    // Note: The magic bytes we sent during the bind phase are never seen if the flight controller
+    // was using auto-bind, that is why we still do this here
+    const uint8_t bSendSilverLiteFlag = (gTXContext.protocol == kBayangSilverware) && (gTXContext.options & BAYANG_OPTION_FLAG_SILVERLITE);
     if (bSendAuxAnalog)
     {
+        packet[12] = bSendSilverLiteFlag ? Bayang_rx_tx_addr[2] ^ 0xAA : Bayang_rx_tx_addr[2];
         packet[13] = txPkt_AuxAnalog[1];
     }
     else
     {
+        packet[12] = bSendSilverLiteFlag ? Bayang_rx_tx_addr[2] ^ 0xAA : Bayang_rx_tx_addr[2];
         packet[13] = 0x0A;
     }
 
@@ -333,7 +363,6 @@ static void HandleSilverLitePacket(const uint8_t* packet)
 //------------------------------------------------------------------------------
 static void HandleBayangPacket(const uint8_t* packet)
 {
-    uint16_t temp;
     gSilverLiteData.vbattFilt   = ((packet[3] & 0x7) << 8) | packet[4];
     gSilverLiteData.vbattComp   = ((packet[5] & 0x7) << 8) | packet[6];
     gSilverLiteData.pktsPerSec  = packet[7];
@@ -356,7 +385,9 @@ static void StopTimer()
 static void ResetProtocol()
 {
     gTXContext.protocol = gTXContext.resetToProtocol;
-    gTXContext.resetToProtocol = kDisabled;
+    gTXContext.options  = gTXContext.resetToOptions;
+    gTXContext.resetToProtocol  = kBayangDisabled;
+    gTXContext.resetToOptions   = 0;
 
     // We must first send out 1000 bind packets before sending any TX packets
     gTXContext.bindCounter = 1000;
@@ -377,25 +408,25 @@ static void ResetProtocol()
     gTXContext.telemetryTimeout = 0;
     gTXContext.telemetryTimeoutLoad = 500;
 
-    // If protocol supports telemetry then we'll want to inform flight
-    // controller that we support SilverLite extension and would like the
-    // controller to enable this extension
-    gTXContext.silverLiteDesired = (gTXContext.protocol == kSilverwareTelemetry);
     gTXContext.silverLiteEnabled = false;
 
     // Different subprotocols expect to send packets at a different period
     // and may also send back telemetry
     switch (gTXContext.protocol)
     {
-        case kStock:
+        case kBayangStock:
             gTXContext.sendInterval = 2;
             break;
-        case kSilverware:
-            gTXContext.sendInterval = 3;
-            break;
-        case kSilverwareTelemetry:
-            gTXContext.sendInterval = 5;
-            gTXContext.expectTelemetry = true;
+        case kBayangSilverware:
+            if (gTXContext.options & (BAYANG_OPTION_FLAG_TELEMETRY | BAYANG_OPTION_FLAG_SILVERLITE))
+            {
+                gTXContext.sendInterval = 5;
+                gTXContext.expectTelemetry = true;
+            }
+            else
+            {
+                gTXContext.sendInterval = 3;
+            }
             break;
     }
 

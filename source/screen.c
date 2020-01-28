@@ -690,6 +690,27 @@ void screen_put_fixed2_1digit(uint8_t x, uint8_t y, uint8_t color, uint32_t v) {
 }
 
 
+void screen_put_fixed1_3digit(uint8_t x, uint8_t y, uint8_t color, uint32_t v) {
+    int16_t full = v / 100;
+    int16_t frac = (v % 100)/10;  // keep only one digit
+
+    uint8_t fntWd = screen_font_ptr[FONT_FIXED_WIDTH];
+    v %= 10000;
+    screen_put_uint8_1dec(x, y, color, (v / 1000));
+    x = x + (fntWd + 1) * 1;
+
+    screen_fill_rect(x, y + screen_font_ptr[FONT_HEIGHT]*7/8, 2, 2, color);
+
+    x = x + 3;
+    v %= 1000;
+    screen_put_uint8_1dec(x, y, color, (v / 100));
+    v %= 100;
+    screen_put_char('0' + (v / 10));
+    v %= 10;
+    screen_put_char('0' + v);
+}
+
+
 // output a unsigned 8-bit, only two decimals
 void screen_put_uint8_2dec(uint8_t x, uint8_t y, uint8_t color, uint8_t c) {
     screen_font_x = x;
