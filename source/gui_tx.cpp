@@ -514,6 +514,8 @@ static void gui_render_RollPitchYaw()
 //------------------------------------------------------------------------------
 static void renderPIDTuning()
 {
+    led_backlight_tickle();
+
     // Header: "roll pitch yaw"
     gui_render_RollPitchYaw();
 
