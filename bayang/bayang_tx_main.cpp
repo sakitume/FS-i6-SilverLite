@@ -132,8 +132,9 @@ void Bayang_tx_update()
     }
 
     // Auxliary analog channels
-    txPkt_AuxAnalog[0] = adc_get_channel_calibrated(ADC_ID_CH0);
-    txPkt_AuxAnalog[1] = adc_get_channel_calibrated(ADC_ID_CH1);
+    // Note: We convert from range 0..1023 to 0..255
+    txPkt_AuxAnalog[0] = adc_get_channel_calibrated(ADC_ID_CH0) >> 2;
+    txPkt_AuxAnalog[1] = adc_get_channel_calibrated(ADC_ID_CH1) >> 2;
 }
 
 //------------------------------------------------------------------------------
