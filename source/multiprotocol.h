@@ -4,7 +4,6 @@
 extern "C" {
 #endif /* __cplusplus */
 
-void multiprotocol_init(void);
 void multiprotocol_update(void);
 void multiprotocol_test(void);
 

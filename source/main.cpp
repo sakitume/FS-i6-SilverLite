@@ -96,7 +96,6 @@ int main(void)
         GPIO_PinInit(BOARD_INITPINS_SOFT_SPI_CS_A7105_GPIO, BOARD_INITPINS_SOFT_SPI_CS_A7105_PIN, &pin_config_output_high); // PORTC, 4
     }
 
-    multiprotocol_init();
     timer_init();
     lcd_init();
     led_backlight_init();

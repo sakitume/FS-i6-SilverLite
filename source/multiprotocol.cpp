@@ -33,7 +33,6 @@ static uart_transfer_t receiveXfer;
 static uint8_t g_txBuffer[TX_BUFFER_SIZE] = {0};
 static uart_transfer_t sendXfer;
 
-static unsigned rxBufferFillLevel;
 static volatile bool rxBufferEmpty = true;
 static volatile bool txOnGoing = false;
 static volatile bool rxOnGoing = false;
@@ -46,6 +45,8 @@ static uint8_t multi4in1_bind = 0;
 static uint8_t multi4in1_range_check = 0;
 
 static int telemetryFrame[17];
+
+static bool bTXEnabled = false;
 
 #define MULTI_CHANS 16
 #define MULTI_CHAN_BITS 11
@@ -72,44 +73,6 @@ static void UART_UserCallback(UART_Type *base, uart_handle_t *handle, status_t s
 }
 
 //------------------------------------------------------------------------------
-void multiprotocol_init()
-{
-    printf("multiprotocol_init\r\n");
-    sendXfer.data = g_txBuffer;
-    receiveXfer.data = g_rxBuffer;
-    bWaitingForTLMHeader = true;
-
-    for (unsigned i=0; i < (sizeof(telemetryFrame)/sizeof(telemetryFrame[0])); i++)
-    {
-        telemetryFrame[i] = 0;
-    }
-
-    /*
-     * config.baudRate_Bps = 115200U;
-     * config.parityMode = kUART_ParityDisabled;
-     * config.stopBitCount = kUART_OneStopBit;
-     * config.txFifoWatermark = 0;
-     * config.rxFifoWatermark = 1;
-     * config.enableTx = false;
-     * config.enableRx = false;
-     */
-    uart_config_t config;
-    UART_GetDefaultConfig(&config);
-    config.baudRate_Bps = 100000;
-    config.parityMode = kUART_ParityEven;
-    config.stopBitCount = kUART_TwoStopBit;
-    config.enableTx = true;
-    config.enableRx = true;
-    UART_Init(MPM_UART, &config, MPM_UART_CLK_FREQ);
-    UART_TransferCreateHandle(MPM_UART, &g_uartHandle, UART_UserCallback, NULL);
-    UART_TransferStartRingBuffer(MPM_UART, &g_uartHandle, g_rxRingBuffer, RX_RING_BUFFER_SIZE);
-}
-
-
-//------------------------------------------------------------------------------
-static bool bTXEnabled = false;
-
-//------------------------------------------------------------------------------
 static inline int constrain(int amt, int low, int high) 
 {
     if (amt < low)
@@ -123,6 +86,10 @@ static inline int constrain(int amt, int low, int high)
 //------------------------------------------------------------------------------
 void multiprotocol_update(void)
 {
+    if (!bTXEnabled)
+    {
+        return;
+    }
     for (;;)
     {
         // If RX is idle and g_rxBuffer is empty, start to read data to g_rxBuffer
@@ -133,7 +100,6 @@ void multiprotocol_update(void)
             // Header is 4 bytes
             const size_t kNumBytesToReceive = bWaitingForTLMHeader ? 4 : expectedTLMDataLength;
             receiveXfer.dataSize = kNumBytesToReceive;
-            rxBufferFillLevel = kNumBytesToReceive;
 
             size_t receivedBytes;
             UART_TransferReceiveNonBlocking(MPM_UART, &g_uartHandle, &receiveXfer, &receivedBytes);
@@ -236,7 +202,7 @@ void multiprotocol_update(void)
             bTimeToSend = true;
         }
 
-        if (bTimeToSend && bTXEnabled)
+        if (bTimeToSend)
         {
             lastTX = now;
 #else
@@ -526,22 +492,19 @@ void multiprotocol_test(void)
 {
     if (button_toggledActive(kBtn_Up))
     {
-        bTXEnabled = true;
+        multiprotocol_enable();
         debug("MPM on");
         debug_put_newline();
     }
     else if (button_toggledActive(kBtn_Down))
     {
-        bTXEnabled = false;
+        multiprotocol_disable();
         debug("MPM off");
         debug_put_newline();
     }
     else if (button_active(kBtn_Bind))
     {
-        if (bTXEnabled)
-        {
-            multi4in1_bind = 1;
-        }
+        multiprotocol_rebind();
     }
 
 //       debug_put_fixed2(adc_get_battery_voltage());
@@ -691,30 +654,74 @@ static void ProcessTelemetry(uint8_t telemetryType, const uint8_t* data, uint8_t
 
 unsigned multiprotocol_get_telemetry(int id)
 {
-    if ((unsigned)id < (sizeof(telemetryFrame)/sizeof(telemetryFrame[0])))
+    if (bTXEnabled)
     {
-        return telemetryFrame[id];
+        if ((unsigned)id < (sizeof(telemetryFrame)/sizeof(telemetryFrame[0])))
+        {
+            return telemetryFrame[id];
+        }
     }
     return 0;
 }
 
-
 void multiprotocol_enable(void)
 {
-    bTXEnabled = true;
+    if (!bTXEnabled)
+    {
+        bTXEnabled = true;
+
+        sendXfer.data = g_txBuffer;
+        receiveXfer.data = g_rxBuffer;
+        bWaitingForTLMHeader = true;
+
+        rxBufferEmpty = true;
+        txOnGoing = false;
+        rxOnGoing = false;
+
+        for (unsigned i=0; i < (sizeof(telemetryFrame)/sizeof(telemetryFrame[0])); i++)
+        {
+            telemetryFrame[i] = 0;
+        }
+
+        /*
+        * config.baudRate_Bps = 115200U;
+        * config.parityMode = kUART_ParityDisabled;
+        * config.stopBitCount = kUART_OneStopBit;
+        * config.txFifoWatermark = 0;
+        * config.rxFifoWatermark = 1;
+        * config.enableTx = false;
+        * config.enableRx = false;
+        */
+        uart_config_t config;
+        UART_GetDefaultConfig(&config);
+        config.baudRate_Bps = 100000;
+        config.parityMode = kUART_ParityEven;
+        config.stopBitCount = kUART_TwoStopBit;
+        config.enableTx = true;
+        config.enableRx = true;
+        UART_Init(MPM_UART, &config, MPM_UART_CLK_FREQ);
+        UART_TransferCreateHandle(MPM_UART, &g_uartHandle, UART_UserCallback, NULL);
+        UART_TransferStartRingBuffer(MPM_UART, &g_uartHandle, g_rxRingBuffer, RX_RING_BUFFER_SIZE);
+    }
 }
 
 void multiprotocol_disable(void)
 {
-    bTXEnabled = false;
+    if (bTXEnabled)
+    {
+        bTXEnabled = false;
+        UART_Deinit(MPM_UART);
+    }
 }
 
 void multiprotocol_rebind(void)
 {
-    for (unsigned i=0; i < (sizeof(telemetryFrame)/sizeof(telemetryFrame[0])); i++)
+    if (bTXEnabled)
     {
-        telemetryFrame[i] = 0;
+        for (unsigned i=0; i < (sizeof(telemetryFrame)/sizeof(telemetryFrame[0])); i++)
+        {
+            telemetryFrame[i] = 0;
+        }
+        multi4in1_bind = 100;
     }
-
-    multi4in1_bind = 100;
 }
