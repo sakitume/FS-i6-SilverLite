@@ -421,6 +421,7 @@ static void applyProtocolOption()
 // Call this when protocol changes so we can update the subprotocol parameters
 static void updateSubprotocolParams(uint8_t newProtocol)
 {
+    selectSubprotocol.changeOptions(0, nullptr);
     for (int i=0; i<sizeof(subprotocols)/sizeof(subprotocols[0]); i++)
     {
         if (subprotocols[i].protocol == newProtocol)
