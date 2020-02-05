@@ -300,6 +300,13 @@ static SelectOptionByte selectProtocolOptions[] =
 #endif    
     {"Bayang", PROTO_BAYANG},
     {"FSky 2A", PROTO_AFHDS2A},
+
+    {"CX10", PROTO_CX10},
+    {"H8 3D", PROTO_H8_3D},
+    {"KN", PROTO_KN},
+    {"SymaX", PROTO_SYMAX},
+    {"V2x2", PROTO_V2X2},
+
     {"SilvrLt", PROTO_SILVERLITE}
 };
 static GEMSelect selectProtocol(sizeof(selectProtocolOptions)/sizeof(selectProtocolOptions[0]), selectProtocolOptions);
@@ -347,6 +354,9 @@ static Subprotocols_t subprotocols[] =
 #endif    
     { PROTO_BAYANG, BayangSubprotocolOptions },
     { PROTO_AFHDS2A, FSky2ASubprotocolOptions },
+
+    // TODO. Should add subprotocols for PROTO_CX10, PROTO_H8_3D, PROTO_KN, PROTO_SYMAX, PROTO_V2X2
+
     { PROTO_SILVERLITE, BayangSubprotocolOptions }  // SilverLite is Bayang with special extensions/additions
 };
 
