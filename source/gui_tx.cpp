@@ -587,6 +587,7 @@ static void renderPIDTuning()
         // From 0..1023 (inclusive)
         // To -100..+100
         int32_t cal = (int32_t)adc_get_channel_calibrated(i + ADC_ID_CH0);
+
         int val = ((cal * 200) / 1023) - 100;
 
         // render val as text
@@ -594,8 +595,18 @@ static void renderPIDTuning()
 
         // rescale from +/-100 to 0..100
         val = 50 + val/2;
+#if 1        
+        screen_draw_vline(8 + val - 1, y+1, 4, 1);
+        screen_draw_vline(8 + val    , y+1, 4, 1);
+#else        
+        // Leaving this here as a warning/reminder!
+        // Do not draw off bottom edge of screen. You'll get
+        // weird lockups or hard faults, sometimes short
+        // lockups that clear themselves. Maybe bad code/logic
+        // in screen_draw_vline()
         screen_draw_vline(8 + val - 1, y+1, 5, 1);
         screen_draw_vline(8 + val    , y+1, 5, 1);
+#endif    
 
         y += fntHt + 1;
     }
