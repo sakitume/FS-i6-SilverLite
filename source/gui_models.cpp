@@ -507,7 +507,8 @@ void gui_init_models()
     updateModelDataParams(selectedModelIndex);
 
     menuPageModels.addMenuItem(miSelectModel);
-    menuPageModels.addMenuItem(miEditName);
+    miEditName.setTypeToSimpleString();
+    menuPageModels.addMenuItem(miEditName); 
     menuPageModels.addMenuItem(miSeconds);
     menuPageModels.addMenuItem(miSelectProtocol);
     menuPageModels.addMenuItem(miSelectSubprotocol);
