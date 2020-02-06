@@ -76,8 +76,12 @@ void gui_init()
 //------------------------------------------------------------------------------
 void gui_loop()
 {
+    e_BtnIndex  autoRepeatButtonCode = kBtn_Cancel;
+    uint8_t     autoRepeatKeyCode = GEM_KEY_NONE;
+    uint32_t    autoRepeatTime = 0;
     while (1)
     {
+
         // Call the required update functions of various systems
         extern void required_updates();
         required_updates();
@@ -105,31 +109,63 @@ void gui_loop()
         // Update the GEM system
         if (gGEM.readyForKey())
         {
-            uint8_t keyCode = GEM_KEY_NONE;
+            uint8_t     keyCode = GEM_KEY_NONE;
+            e_BtnIndex  buttonCode;
             if (button_toggledActive(kBtn_Cancel))
             {
                 keyCode = GEM_KEY_CANCEL;
+                buttonCode = kBtn_Cancel;
             }
             else if (button_toggledActive(kBtn_Ok))
             {
                 keyCode = GEM_KEY_OK;
+                buttonCode = kBtn_Ok;
             }
             else if (button_toggledActive(kBtn_Up))
             {
                 keyCode = GEM_KEY_UP;
+                buttonCode = kBtn_Up;
             }
             else if (button_toggledActive(kBtn_Down))
             {
                 keyCode = GEM_KEY_DOWN;
+                buttonCode = kBtn_Down;
             }
             else if (button_toggledActive(kBtn_YawL))
             {
                 keyCode = GEM_KEY_LEFT;
+                buttonCode = kBtn_YawL;
             }
             else if (button_toggledActive(kBtn_YawR))
             {
                 keyCode = GEM_KEY_RIGHT;
+                buttonCode = kBtn_YawR;
             }
+
+            // If up/down/left/right button was pushed
+            if ((keyCode >= GEM_KEY_UP) && (keyCode <= GEM_KEY_LEFT))
+            {
+                autoRepeatKeyCode = keyCode;
+                autoRepeatButtonCode = buttonCode;
+                autoRepeatTime = millis_this_frame() + 500;
+            }
+            else if (keyCode == GEM_KEY_NONE)
+            {
+                // No button press, check if autorepeat should be performed
+                if (autoRepeatKeyCode != GEM_KEY_NONE)
+                {
+                    if (!button_active(autoRepeatButtonCode))
+                    {
+                        autoRepeatKeyCode = GEM_KEY_NONE;
+                    }
+                    else if (millis_this_frame() >= autoRepeatTime)
+                    {
+                        keyCode = autoRepeatKeyCode;
+                        autoRepeatTime = millis_this_frame() + 200;
+                    }
+                }
+            }
+
             gGEM.registerKeyPress(keyCode);
             screen_update();
         }
