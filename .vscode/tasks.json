@@ -105,6 +105,26 @@
             },
             "group": "build",
             "problemMatcher": []
+        },
+        {
+            "label": "JLink Flash Debug Firmware",
+            "type": "shell",
+            "windows": {
+                "options": {
+                    "shell": {
+                        "executable": "cmd.exe",
+                        "args": [
+                            "/d", "/c"
+                        ]
+                    }
+                },
+                "command": "JLink -CommanderScript ../.vscode/load-release.jlink",
+            },
+            "options": {
+                "cwd": "${workspaceRoot}/gcc_debug",
+            },
+            "group": "build",
+            "problemMatcher": []
         }
     ]
 }
