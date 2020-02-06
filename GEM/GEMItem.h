@@ -124,6 +124,10 @@ class GEMItem {
                                             // (relevant for GEM_VAL_INTEGER, GEM_VAL_BYTE, GEM_VAL_CHAR, GEM_VAL_BOOLEAN variable
                                             // menu items and GEM_VAL_SELECT option select)
     boolean getReadonly();                  // Get readonly state for variable that menu item is associated with
+
+    // Changes "char*" linked variable type to be a limited (simple) character set string rather than full character set string
+    bool setTypeToSimpleString();
+
   private:
     const char* title;
     byte type;

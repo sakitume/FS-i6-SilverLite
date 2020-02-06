@@ -220,6 +220,7 @@ void GEM::printMenuItems() {
             printMenuItemValue(_valueString);
             break;
           case GEM_VAL_CHAR:
+          case GEM_VAL_SIMPLESTR:
             printMenuItemValue((char*)menuItemTmp->linkedVariable);
             break;
           case GEM_VAL_BOOLEAN:
@@ -363,6 +364,7 @@ void GEM::enterEditValueMode() {
       initEditValueCursor();
       break;
     case GEM_VAL_CHAR:
+    case GEM_VAL_SIMPLESTR:
       strcpy(_valueString, (char*)menuItemTmp->linkedVariable);
       _editValueLength = GEM_STR_LEN - 1;
       initEditValueCursor();
@@ -458,7 +460,30 @@ void GEM::drawEditValueCursor() {
 void GEM::nextEditValueDigit() {
   char chr = _valueString[_editValueVirtualCursorPosition];
   byte code = (byte)chr;
-  if (_editValueType == GEM_VAL_CHAR) {
+  if (_editValueType == GEM_VAL_SIMPLESTR) {
+    // 'A'-'Z', 'a'-'z', '0'-'9', ' ', '-'
+    switch (code) {
+      case 'Z':
+        code = 'a';
+        break;
+      case 'z':
+        code = '0';
+        break;
+      case '9':
+        code = ' ';
+        break;
+      case ' ':
+        code = '-';
+        break;
+      case '-':
+        code = 'A';
+        break;
+      default:
+        code++;
+        break;
+    }
+  }
+  else if (_editValueType == GEM_VAL_CHAR) {
     switch (code) {
       case 0:
         code = GEM_CHAR_CODE_SPACE;
@@ -498,7 +523,31 @@ void GEM::nextEditValueDigit() {
 void GEM::prevEditValueDigit() {
   char chr = _valueString[_editValueVirtualCursorPosition];
   byte code = (byte)chr;
-  if (_editValueType == GEM_VAL_CHAR) {
+  if (_editValueType == GEM_VAL_SIMPLESTR) {
+    // 'A'-'Z', 'a'-'z', '0'-'9', ' ', '-'
+    switch (code) {
+      case 'A':
+        code = '-';
+        break;
+      case 'a':
+        code = 'Z';
+        break;
+      case '0':
+        code = 'z';
+        break;
+      case ' ':
+        code = '9';
+        break;
+      case '-':
+        code = ' ';
+        break;
+      default:
+        code--;
+        break;
+    }
+  }
+  else if (_editValueType == GEM_VAL_CHAR)
+  {
     switch (code) {
       case 0:
         code = GEM_CHAR_CODE_TILDA;
@@ -585,6 +634,7 @@ void GEM::saveEditValue() {
       *(byte*)menuItemTmp->linkedVariable = atoi(_valueString);
       break;
     case GEM_VAL_CHAR:
+    case GEM_VAL_SIMPLESTR:
       strcpy((char*)menuItemTmp->linkedVariable, trimString(_valueString)); // Potential overflow if string length is not defined
       break;
     case GEM_VAL_SELECT:

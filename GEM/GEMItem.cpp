@@ -188,3 +188,15 @@ void GEMItem::setReadonly(boolean mode) {
 boolean GEMItem::getReadonly() {
   return readonly;
 }
+
+bool GEMItem::setTypeToSimpleString() {
+  switch (linkedType) {
+    case GEM_VAL_CHAR:
+      linkedType = GEM_VAL_SIMPLESTR;
+      // purposefully fall thru (rather than break)
+    case GEM_VAL_SIMPLESTR:
+      return true;
+    default:
+      return false;
+  }
+}
