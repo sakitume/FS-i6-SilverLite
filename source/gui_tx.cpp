@@ -76,6 +76,7 @@ private:
 class CDialogBase
 {
 public:    
+    virtual void getWidthHeight(uint8_t *wd, uint8_t *ht) { *wd = LCD_WIDTH - 20; * ht = 55; }
     virtual void drawMessage(int y, int h) = 0;
     virtual void checkOkCancel();
     virtual void close(bool wasOkay);
@@ -108,8 +109,13 @@ public:
 class CDialogStart : public CDialogBase
 {
 public:    
+    CDialogStart() : exitDialogLongPress(kBtn_Cancel, 10) {}
+    virtual void getWidthHeight(uint8_t *wd, uint8_t *ht) override { *wd = LCD_WIDTH; *ht = LCD_HEIGHT; }
     virtual void drawMessage(int y, int h);
     virtual void checkOkCancel();
+
+private:
+    CShortLongPress exitDialogLongPress;
 };
 
 static CDialogStart startDialog;
@@ -195,11 +201,13 @@ void CDialogBind::close(bool wasOkay)
 void CDialogStart::drawMessage(int y, int h)
 {
     y -= h >> 1;
-    screen_puts_centered(y, 1, "Reset switches");
+    screen_puts_centered(y, 1, "Reset switches and");
     y += h;
-    screen_puts_centered(y, 1, "and set Throttle");
+    screen_puts_centered(y, 1, "set Throttle to zero");
     y += h;
-    screen_puts_centered(y, 1, "to zero");
+    screen_puts_centered(y, 1, "or long press Cancel");
+    y += h;
+    screen_puts_centered(y, 1, "to exit.");
 }
 
 //------------------------------------------------------------------------------
@@ -213,6 +221,14 @@ static bool SafeToStart()
 //------------------------------------------------------------------------------
 void CDialogStart::checkOkCancel()
 {
+    // If cancel button held down
+    if (exitDialogLongPress.check() > 0)
+    {
+        close(true);
+        // Set this to false to exit this gui app context
+        guiEnabled = false;
+    }
+
     if (SafeToStart())
     {
         startTX();
@@ -464,10 +480,11 @@ static void renderDialog() {
 
     // render window
     // clear region for window
-    uint32_t window_w = LCD_WIDTH - 20;
-    uint32_t window_h = 55;
-    uint32_t y = (LCD_HEIGHT - window_h) / 2;
-    uint32_t x = (LCD_WIDTH - window_w) / 2;
+    uint8_t window_w, window_h;
+    activeDialog->getWidthHeight(&window_w, &window_h);
+
+    uint8_t y = (LCD_HEIGHT - window_h) / 2;
+    uint8_t x = (LCD_WIDTH - window_w) / 2;
     // clear
     screen_fill_round_rect(x, y , window_w, window_h, 4, 0);
     // render border
@@ -546,7 +563,6 @@ static void renderPIDTuning()
 
     // The 3x3 matrix
     screen_set_font(font_metric7x12);
-    uint8_t color = 1;
     y = 9;
     for (row = 0; row<3; row++)
     {
