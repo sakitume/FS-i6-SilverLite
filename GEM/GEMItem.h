@@ -128,8 +128,10 @@ class GEMItem {
     // Changes "char*" linked variable type to be a limited (simple) character set string rather than full character set string
     bool setTypeToSimpleString();
 
-  private:
     const char* title;
+    void (*buttonAction)();
+
+  private:
     byte type;
     void* linkedVariable;
     byte linkedType;
@@ -137,7 +139,6 @@ class GEMItem {
     GEMSelect* select;
     GEMPage* linkedPage;
     GEMItem* menuItemNext;
-    void (*buttonAction)();
     void (*saveAction)();
 };
   

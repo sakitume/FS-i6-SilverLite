@@ -91,6 +91,7 @@ SOURCES =  \
 	${SRC_DIR}/gui_calibrate.cpp \
 	${SRC_DIR}/gui_main.cpp \
 	${SRC_DIR}/gui_models.cpp \
+	${SRC_DIR}/gui_select_model.cpp \
 	${SRC_DIR}/gui_sliders.cpp \
 	${SRC_DIR}/gui_tx.cpp \
 	${SRC_DIR}/lcd.c \

@@ -8,7 +8,7 @@
 extern GEM gGEM;
 extern GEMPage menuPageMain;
 
-GEMPage menuPageModels("Models");
+GEMPage menuPageEditModel("Edit Model");
 
 //-- From Multiprotocol.h ------------------------------------------------------
 enum PROTOCOLS
@@ -375,25 +375,6 @@ static void applyRXNum();
 static uint8_t rxNum;
 static GEMItem miRXNum("RX Num:", rxNum, applyRXNum);
 
-
-static void applyModelIndex();
-static uint8_t selectedModelIndex;
-static SelectOptionByte selectModelOptions[] = 
-{
-    {"1", 0},
-    {"2", 1},
-    {"3", 2},
-    {"4", 3},
-    {"5", 4},
-    {"6", 5},
-    {"7", 6},
-    {"8", 7},
-    {"9", 8},
-    {"10", 9}
-};
-static GEMSelect selectModel(sizeof(selectModelOptions)/sizeof(selectModelOptions[0]), selectModelOptions);
-static GEMItem miSelectModel("Select Model:", selectedModelIndex, selectModel, applyModelIndex);
-
 static void applySecondsTimer();
 static int secondsTimer;
 static GEMItem miSeconds("Seconds:", secondsTimer, applySecondsTimer);
@@ -432,7 +413,7 @@ static void applyProtocolOption()
 static void updateSubprotocolParams(uint8_t newProtocol)
 {
     selectSubprotocol.changeOptions(0, nullptr);
-    for (int i=0; i<sizeof(subprotocols)/sizeof(subprotocols[0]); i++)
+    for (unsigned int i=0; i<sizeof(subprotocols)/sizeof(subprotocols[0]); i++)
     {
         if (subprotocols[i].protocol == newProtocol)
         {
@@ -473,9 +454,9 @@ static void applySubprotocol()
     storage_save();
 }
 
-static void updateModelDataParams(int modelIndex)
+void gui_init_edit_model_properties()
 {
-    ModelDesc_t &model = storage.model[modelIndex];
+    ModelDesc_t &model = storage.model[storage.current_model];
     strncpy(modelName, model.name, GEM_STR_LEN - 1);
     secondsTimer = model.timer;
     protocol = model.mpm_protocol;
@@ -488,32 +469,28 @@ static void updateModelDataParams(int modelIndex)
     rxNum = model.mpm_rx_num;
 }
 
-static void applyModelIndex()
-{
-    storage.current_model = selectedModelIndex;
-    updateModelDataParams(selectedModelIndex);
-    storage_save();
-}
+
 
 static void applyModelName()
 {
-    strncpy(storage.model[storage.current_model].name, modelName, sizeof(storage.model[0].name)-1);
+    char *dst = storage.model[storage.current_model].name;
+    strncpy(dst, modelName, sizeof(storage.model[0].name)-1);
+    dst[sizeof(storage.model[0].name)-1] = 0;
     storage_save();
 }
 
-void gui_init_models()
+void gui_init_edit_model()
 {
-    selectedModelIndex = storage.current_model;
-    updateModelDataParams(selectedModelIndex);
+    // Need to initialize the variables that our various menu items reference
+    gui_init_edit_model_properties();
 
-    menuPageModels.addMenuItem(miSelectModel);
     miEditName.setTypeToSimpleString();
-    menuPageModels.addMenuItem(miEditName); 
-    menuPageModels.addMenuItem(miSeconds);
-    menuPageModels.addMenuItem(miSelectProtocol);
-    menuPageModels.addMenuItem(miSelectSubprotocol);
-    menuPageModels.addMenuItem(miProtocolOption);
-    menuPageModels.addMenuItem(miAutoBind);
-    menuPageModels.addMenuItem(miRXNum);
-    menuPageModels.setParentMenuPage(menuPageMain);
+    menuPageEditModel.addMenuItem(miEditName); 
+    menuPageEditModel.addMenuItem(miSeconds);
+    menuPageEditModel.addMenuItem(miSelectProtocol);
+    menuPageEditModel.addMenuItem(miSelectSubprotocol);
+    menuPageEditModel.addMenuItem(miProtocolOption);
+    menuPageEditModel.addMenuItem(miAutoBind);
+    menuPageEditModel.addMenuItem(miRXNum);
+    menuPageEditModel.setParentMenuPage(menuPageMain);
 }

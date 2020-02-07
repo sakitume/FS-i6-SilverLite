@@ -37,16 +37,21 @@ static void onEveryMillisecond(unsigned long millis)
 GEMPage menuPageMain("FS-i6 SilverLite");
 
 extern void RunTXCtx();
-GEMItem menuItem_RunTXCtx("Use Transmitter", RunTXCtx);
+GEMItem menuItem_RunTXCtx("Use Model", RunTXCtx);
 extern void RunSlidersCtx();
 GEMItem menuItem_RunSlidersCtx("View Sliders", RunSlidersCtx);
 extern void RunCalibrateCtx();
 GEMItem menuItem_RunCalibrateCtx("Calibrate Sticks", RunCalibrateCtx);
 
-extern void gui_init_models();
-extern GEMPage menuPageModels;  // gui_models.cpp
+extern void gui_init_edit_model();
+extern GEMPage menuPageEditModel;  // gui_models.cpp
 
-GEMItem menuItem_Models("Models", menuPageModels);
+GEMItem menuItem_Models("Edit current model", menuPageEditModel);
+
+extern void gui_init_select_model();
+extern GEMPage menuPageSelectModel;  // gui_select_model.cpp
+GEMItem menuItem_SelectModel("Select model", menuPageSelectModel);
+
 
 //------------------------------------------------------------------------------
 void gui_init() 
@@ -58,13 +63,16 @@ void gui_init()
     }
 
     gGEM.init();
-    gui_init_models();
-
+    gui_init_edit_model();
+    gui_init_select_model();
+    menuPageMain.addMenuItem(menuItem_SelectModel);
     menuPageMain.addMenuItem(menuItem_Models);
     menuPageMain.addMenuItem(menuItem_RunTXCtx);
     menuPageMain.addMenuItem(menuItem_RunCalibrateCtx);
     menuPageMain.addMenuItem(menuItem_RunSlidersCtx);
     gGEM.setMenuPageCurrent(menuPageMain);
+
+    menuPageMain.title = storage.model[storage.current_model].name;
     
 #if 1   // Launch TX context directly    
     RunTXCtx();
