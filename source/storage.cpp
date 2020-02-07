@@ -7,7 +7,7 @@
 #define __HARDWARE_TIMER_WORKAROUND__
 #if defined(__HARDWARE_TIMER_WORKAROUND__)    
     #include "timer.h"  // TODO, XXX: Hack workaround
-//    #include "delay.h"
+    #include "delay.h"
 #endif
 
 //------------------------------------------------------------------------------
@@ -101,8 +101,10 @@ void storage_save()
 {
 #if defined(__HARDWARE_TIMER_WORKAROUND__)    
     timer_stop_hardware();
-// delay doesn't seem necessary, simply stopping the timer is sufficient    
-//    delay_ms(2);
+
+    // After a fair amount of usage I did encounter resets during a storage_save()
+    // so I'm thinking a short delay to let the timer truly stop is worth performing
+    delay_ms(5);
 #endif
 
     static_assert(sizeof(storage) % 4 == 0, "Unexpected size for FlashStorage_t");
