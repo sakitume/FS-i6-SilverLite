@@ -2,6 +2,7 @@
 #include "multiprotocol.h"
 #include "storage.h"
 #include "config.h"
+#include "multiprotocol_enums.h"
 
 #if defined(__USING_INTERNAL_TRX__)
     #include "bayang.h"
@@ -9,6 +10,26 @@
     #include "drv_time.h"
     #include "sound.h"
 #endif
+
+//------------------------------------------------------------------------------
+// Multiprotocol telemetry data
+//
+// data[1] = v_lipo1;  // uncompensated battery volts*100/2
+// data[2] = v_lipo2;  // compensated battery volts*100/2
+// data[3] = RX_RSSI;  // reception in packets / sec
+// data[4] = TX_RSSI;
+// data[5] = RX_LQI;
+// data[6] = TX_LQI;
+//
+// For FlySky protocol, above yields:
+// data[1], data[2] (Batt): 86, 00
+// data[3], data[4] (RSSI): CC, F8
+// data[5], data[6] (LQI):  00, 00
+//
+// For Bayang protocol, above yields:
+// data[1], data[2] (Batt): 15, 9B
+// data[3], data[4] (RSSI): AA, 00
+// data[5], data[6] (LQI):  AA, 55
 
 //------------------------------------------------------------------------------
 static bool usingInternal()
@@ -29,8 +50,16 @@ uint16_t tx_get_fc_voltage()
     }
 #endif    
 
-//  return multiprotocol_get_telemetry(0) * 2;
-    return multiprotocol_get_telemetry(1) * 2;
+    //
+    const ModelDesc_t &model = storage.model[storage.current_model];
+    if (model.mpm_protocol == PROTO_BAYANG)
+    {
+        return multiprotocol_get_telemetry(2) * 2;
+    }
+    else
+    {
+        return multiprotocol_get_telemetry(1);
+    }
 }
 
 //------------------------------------------------------------------------------
@@ -45,7 +74,16 @@ uint16_t tx_get_rssi_tx()
     }
 #endif    
 
-    return multiprotocol_get_telemetry(6) * 2;
+    //
+    const ModelDesc_t &model = storage.model[storage.current_model];
+    if (model.mpm_protocol == PROTO_BAYANG)
+    {
+        return multiprotocol_get_telemetry(6) * 2;
+    }
+    else
+    {
+        return multiprotocol_get_telemetry(4) * 2;
+    }
 }
 
 //------------------------------------------------------------------------------
@@ -59,7 +97,16 @@ uint16_t tx_get_rssi_fc()
         return gTXContext.telemetryTimeout ? gSilverLiteData.pktsPerSec : 0;
     }
 #endif
-    return multiprotocol_get_telemetry(5) * 2;
+    //
+    const ModelDesc_t &model = storage.model[storage.current_model];
+    if (model.mpm_protocol == PROTO_BAYANG)
+    {
+        return multiprotocol_get_telemetry(5) * 2;
+    }
+    else
+    {
+        return multiprotocol_get_telemetry(3);
+    }
 }
 
 //------------------------------------------------------------------------------

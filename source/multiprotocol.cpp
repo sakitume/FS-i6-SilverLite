@@ -643,7 +643,40 @@ static void ProcessTelemetry(uint8_t telemetryType, const uint8_t* data, uint8_t
             data[6] = TX_LQI;
             data[7] = 0;
             data[8] = 0;
-#endif            
+#endif
+
+#if 0
+            debug("Batt: ");
+            debug_put_hex8(data[1]);
+            debug(", ");
+            debug_put_hex8(data[2]);
+            debug_put_newline();
+
+            debug("RSSI: ");
+            debug_put_hex8(data[3]);
+            debug(", ");
+            debug_put_hex8(data[4]);
+            debug_put_newline();
+
+
+            debug("LQI: ");
+            debug_put_hex8(data[5]);
+            debug(", ");
+            debug_put_hex8(data[6]);
+            debug_put_newline();
+
+// For FlySky protocol, above yields:
+//          Batt: 86, 00
+//			RSSI: CC, F8
+//			LQI: 00, 00
+
+// For Bayang w/ Telemetry protocol, above yields:
+//          Batt: 15, 9B
+//			RSSI: AA, 00
+//			LQI: AA, 55
+
+#endif
+
             for (int i=0; i<8; i++)
             {
                 telemetryFrame[i] = data[i];

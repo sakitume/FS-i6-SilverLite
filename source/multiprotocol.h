@@ -10,6 +10,8 @@ void multiprotocol_test(void);
 void multiprotocol_enable(void);
 void multiprotocol_disable(void);
 void multiprotocol_rebind(void);
+
+unsigned multiprotocol_get_telemetry(int id);
 unsigned multiprotocol_get_telemetry(int id);
 
 enum e_Protocols
