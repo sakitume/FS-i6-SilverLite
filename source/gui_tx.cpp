@@ -311,13 +311,14 @@ void gui_handle_buttons()
     }
     else if (okButtonCheck < 0)
     {
-#if 1        
-        // cycle to next display mode
-        txRenderMode = ERenderMode(((int)txRenderMode + 1) % (int)ERenderMode::_kMax);
-#else
         // toggle alarm beep enabled switch
         alarmBeepsDisabled = !alarmBeepsDisabled;
-#endif        
+    }
+
+    if (button_toggledActive(kBtn_RollL) || button_toggledActive(kBtn_RollR))
+    {
+        // cycle to next display mode
+        txRenderMode = ERenderMode(((int)txRenderMode + 1) % (int)ERenderMode::_kMax);
     }
 }
 
@@ -336,8 +337,9 @@ static void gui_process_logic() {
     // Count down when throttle is past zero and TX is running
     if (txRunning)
     {
+        uint8_t isArmed = tx_is_armed();
         enum { kThrottleThreshold = 30 };   // TODO
-        if (adc_get_channel_calibrated(ADC_ID_THROTTLE) >= kThrottleThreshold) {
+        if ((adc_get_channel_calibrated(ADC_ID_THROTTLE) >= kThrottleThreshold) && isArmed) {
             // do timer logic, handle countdown
             if (second_elapsed) {
                 modelTimer--;
@@ -346,22 +348,23 @@ static void gui_process_logic() {
 
         if ((modelTimer >= 0) && (modelTimer < 15)) {
             if ((gui_loop_100ms_counter % 10) == 0) {
-                if (!alarmBeepsDisabled) {
+                if (isArmed && !alarmBeepsDisabled) {
                     sound_play_low_time();
                 }
                 led_backlight_tickle();
             }
         }
         uint16_t fcVoltage = tx_get_fc_voltage();
-        enum { fcLowVoltageThreshold = 350 };   // TODO: should be configurable, and exposed in storage
-        if ((gui_loop_100ms_counter % 10) == 0) 
+        enum { fcLowVoltageThreshold = 310 };   // TODO: should be configurable, and exposed in storage
+        if ((gui_loop_100ms_counter % 10) == 0)
         {
             if (fcVoltage && (fcVoltage < fcLowVoltageThreshold))
             {
-                if (!alarmBeepsDisabled) 
+                if (isArmed && !alarmBeepsDisabled) 
                 {
                     sound_play_low_voltage();
                 }
+                led_backlight_tickle();
             }
         }
     }

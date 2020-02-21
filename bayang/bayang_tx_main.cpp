@@ -30,6 +30,9 @@
 #include "adc.h"
 
 //------------------------------------------------------------------------------
+extern uint8_t tx_is_armed();
+
+//------------------------------------------------------------------------------
 void Bayang_tx_reset(enum EProtocol protocol, uint8_t options)
 {
     // Our ISR will notice the protocol value on the next timer interrupt
@@ -123,7 +126,7 @@ void Bayang_tx_update()
     }
 
 
-    txPkt_Flags3 = button_active(kBtn_SwA) ? BAYANG_FLAG_INVERT : 0;
+    txPkt_Flags3 = tx_is_armed() ? BAYANG_FLAG_INVERT : 0;
 
     // AETR channel values
     for (int i=0; i<4; i++)

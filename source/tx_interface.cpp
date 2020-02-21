@@ -3,6 +3,7 @@
 #include "storage.h"
 #include "config.h"
 #include "multiprotocol_enums.h"
+#include "buttons.h"
 
 #if defined(__USING_INTERNAL_TRX__)
     #include "bayang.h"
@@ -129,6 +130,13 @@ uint16_t tx_get_pid(int row, int col)
 #endif
     return 0;
 }
+
+//------------------------------------------------------------------------------
+uint8_t tx_is_armed()
+{
+    return button_active(kBtn_SwA);
+}
+
 
 //------------------------------------------------------------------------------
 void tx_update()
