@@ -92,7 +92,7 @@ private:
     CShortLongPress exitDialogLongPress;    
 };
 
-class CDialogExit : public CDialogLongPress
+class CDialogExit : public CDialogBase
 {
 public:
     virtual void drawMessage(int y, int h);
@@ -160,7 +160,7 @@ void CDialogLongPress::checkOkCancel()
 //------------------------------------------------------------------------------
 void CDialogExit::drawMessage(int y, int h)
 {
-    screen_puts_centered(y, 1, "Long press OK to");
+    screen_puts_centered(y, 1, "Press OK to");
     y += h;
     screen_puts_centered(y, 1, "exit to main menu");
 }
@@ -173,7 +173,7 @@ void CDialogExit::close(bool wasOkay)
         // Exit this gui app context
         guiEnabled = false;
     }
-    CDialogLongPress::close(wasOkay);
+    CDialogBase::close(wasOkay);
 }
 
 //------------------------------------------------------------------------------
