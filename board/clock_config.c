@@ -46,11 +46,9 @@ processor_version: 6.0.0
 /*******************************************************************************
  * Definitions
  ******************************************************************************/
-#define MCG_IRCLK_DISABLE                                 0U  /*!< MCGIRCLK disabled */
 #define OSC_CAP0P                                         0U  /*!< Oscillator 0pF capacitor load */
-#define OSC_ER_CLK_DISABLE                                0U  /*!< Disable external reference clock */
 #define SIM_OSC32KSEL_OSC32KCLK_CLK                       0U  /*!< OSC32KSEL select: OSC32KCLK clock */
-#define SIM_PLLFLLSEL_MCGFLLCLK_CLK                       0U  /*!< PLLFLL select: MCGFLLCLK clock */
+#define SIM_PLLFLLSEL_MCGPLLCLK_CLK                       1U  /*!< PLLFLL select: MCGPLLCLK clock */
 
 /*******************************************************************************
  * Variables
@@ -94,6 +92,9 @@ outputs:
 - {id: Core_clock.outFreq, value: 48 MHz}
 - {id: Flash_clock.outFreq, value: 24 MHz}
 - {id: LPO_clock.outFreq, value: 1 kHz}
+- {id: MCGIRCLK.outFreq, value: 32.768 kHz}
+- {id: OSCERCLK.outFreq, value: 8 MHz}
+- {id: PLLFLLCLK.outFreq, value: 48 MHz}
 - {id: System_clock.outFreq, value: 48 MHz}
 settings:
 - {id: MCGMode, value: PEE}
@@ -101,11 +102,16 @@ settings:
 - {id: MCG.IREFS.sel, value: MCG.FRDIV}
 - {id: MCG.PLLS.sel, value: MCG.PLL}
 - {id: MCG.PRDIV.scale, value: '2'}
+- {id: MCG_C1_IRCLKEN_CFG, value: Enabled}
 - {id: MCG_C2_OSC_MODE_CFG, value: ModeOscLowPower}
 - {id: MCG_C2_RANGE0_CFG, value: Very_high}
 - {id: MCG_C2_RANGE0_FRDIV_CFG, value: Very_high}
 - {id: MCG_C5_PLLCLKEN0_CFG, value: Enabled}
+- {id: OSC0_CR_ERCLKEN_CFG, value: Enabled}
+- {id: OSC_CR_ERCLKEN_CFG, value: Enabled}
 - {id: SIM.OUTDIV1.scale, value: '2'}
+- {id: SIM.PLLFLLSEL.sel, value: SIM.MCGPLLCLK_DIV2}
+- {id: SIM.TPMSRCSEL.sel, value: OSC.OSCERCLK}
 sources:
 - {id: OSC.OSC.outFreq, value: 8 MHz, enabled: true}
  * BE CAREFUL MODIFYING THIS COMMENT - IT IS YAML SETTINGS FOR TOOLS **********/
@@ -117,7 +123,7 @@ sources:
 const mcg_config_t mcgConfig_BOARD_BootClockRUN =
     {
         .mcgMode = kMCG_ModePEE,                  /* PEE - PLL Engaged External */
-        .irclkEnableMode = MCG_IRCLK_DISABLE,     /* MCGIRCLK disabled */
+        .irclkEnableMode = kMCG_IrclkEnable,      /* MCGIRCLK enabled, MCGIRCLK disabled in STOP mode */
         .ircs = kMCG_IrcSlow,                     /* Slow internal reference clock selected */
         .fcrdiv = 0x1U,                           /* Fast IRC divider: divided by 2 */
         .frdiv = 0x0U,                            /* FLL reference clock divider: divided by 32 */
@@ -132,7 +138,7 @@ const mcg_config_t mcgConfig_BOARD_BootClockRUN =
     };
 const sim_clock_config_t simConfig_BOARD_BootClockRUN =
     {
-        .pllFllSel = SIM_PLLFLLSEL_MCGFLLCLK_CLK, /* PLLFLL select: MCGFLLCLK clock */
+        .pllFllSel = SIM_PLLFLLSEL_MCGPLLCLK_CLK, /* PLLFLL select: MCGPLLCLK clock */
         .er32kSrc = SIM_OSC32KSEL_OSC32KCLK_CLK,  /* OSC32KSEL select: OSC32KCLK clock */
         .clkdiv1 = 0x10010000U,                   /* SIM_CLKDIV1 - OUTDIV1: /2, OUTDIV4: /2 */
     };
@@ -143,7 +149,7 @@ const osc_config_t oscConfig_BOARD_BootClockRUN =
         .workMode = kOSC_ModeOscLowPower,         /* Oscillator low power */
         .oscerConfig =
             {
-                .enableMode = OSC_ER_CLK_DISABLE, /* Disable external reference clock */
+                .enableMode = kOSC_ErClkEnable,   /* Enable external reference clock, disable external reference clock in STOP mode */
             }
     };
 
@@ -163,6 +169,10 @@ void BOARD_BootClockRUN(void)
     CLOCK_BootToPeeMode(kMCG_OscselOsc,
                         kMCG_PllClkSelPll0,
                         &mcgConfig_BOARD_BootClockRUN.pll0Config);
+    /* Configure the Internal Reference clock (MCGIRCLK). */
+    CLOCK_SetInternalRefClkConfig(mcgConfig_BOARD_BootClockRUN.irclkEnableMode,
+                                  mcgConfig_BOARD_BootClockRUN.ircs, 
+                                  mcgConfig_BOARD_BootClockRUN.fcrdiv);
     /* Set the clock configuration in SIM module. */
     CLOCK_SetSimConfig(&simConfig_BOARD_BootClockRUN);
     /* Set SystemCoreClock variable. */
