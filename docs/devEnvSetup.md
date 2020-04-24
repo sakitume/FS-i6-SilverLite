@@ -1,16 +1,44 @@
+
 # Setting up your development environment
 This page will walk you through the steps of setting up your development environment so that you can build and deploy this project onto your FlySky FS-i6 transmitter.
+
+For editing, compiling and flashing the firmware you have two choices:
+
+* Install and use [MCUXpresso Integrated Development Environment (IDE)](https://www.nxp.com/design/software/development-software/mcuxpresso-software-and-tools/mcuxpresso-integrated-development-environment-ide:MCUXpresso-IDE)
+* Install the indvidual tools/systems (arm compiler toolchain, make, openocd, vscode, etc) and configure them accordingly.
+
+> Note: I once had this project set up to also use Keil MDK (free evaluation version) but the code size of this project now exceeds the 32k limit of Keil. The project files are still in the repo and can probably be updated to work (assuming you have an upgraded Keil without the size limit).
+
+## The easy way
+Installing and using MCUXpresso is by far the simplest solution. It is "A free-of-charge, code size unlimited, easy-to-use IDE for Kinetis and LPC MCUs, and i.MX RT crossover MCUs". Visit the NXP website [here](https://www.nxp.com/design/software/development-software/mcuxpresso-software-and-tools/mcuxpresso-integrated-development-environment-ide:MCUXpresso-IDE) to download the latest version.
+
+> Note: You will need to register with NXP in order to download MCUXpresso.
+
+MCUXpresso is based on Eclipse with various plugins preinstalled and customized. The repo contains a `.project` and a `.cproject` file that MCUXpresso should be able to open.
+I'll leave it to you to figure out how to use MCUXpresso. With it you should be able to build (compile) the project, flash the firmware (via ST-Link or J-Link), and even debug the code.
+
+## The hard way
+
+The other choice (installing the discrete tools) is a lot more work but something I feel is worth it. By doing so, it sets up your development computer so that you can develop for many more platforms and hardware devices. 
+
+The tools/systems you'll be installing will consist of:
+* A code editor (Visual Studio Code is what I'll suggest and describe here)
+* A compiler toolchain
+* `make` as your build system
+* OpenOCD. A software tool for flashing firmware via ST-Link adapter
 
 It should be possible to develop on Mac OS, Linux and Windows platforms. This is due to using a variety of open source tools and technologies that are supported on all of these operating systems.
 
 > Note: The specific examples provided here will often be written from the perspective of using a Windows development PC. I hope to update this document in the future to provide more specific examples for Mac OS and Linux platforms.
 
-# Developing with VSCode
+## Developing with VSCode
 
 I really like Visual Studio Code. It's readily available for Mac OS, Windows and Linux. Plus it's very fast and extensible!
+I use it not only for editing the code, but also the documentation. And because it has integrated terminal windows I also
+use it for building and monitoring.
 
 It can be an excellent (and lightweight) development envrironment for embedded devices. I've used it with great success when
-developing for ESP8266, ESP32, Arduino (AVR), STM32, etc.
+developing for ESP8266, ESP32, Arduino (AVR), STM32, etc. I often use it with Platform IO (but not so with this project).
 
 I'll describe how to set up VSCode and associated tools so that we can develop for the (ARM cortex m0+ based) Kinetis KL16 micro used
 on the FlySky FS-i6 transmitter.
@@ -18,7 +46,7 @@ on the FlySky FS-i6 transmitter.
 > Note: Some of what is described here was learned from this (most excellent) article: ["Using Visual Studio Code with STM32CubeMX for ARM Development"](https://hbfsrobotics.com/blog/configuring-vs-code-arm-development-stm32cubemx). It's worth the time to read it for yourself.
 
 
-# What we'll need
+## What we'll need
 Here are the list of software tools we'll need for this project.
 
 * [ARM gnu toolchain](https://developer.arm.com/tools-and-software/open-source-software/developer-tools/gnu-toolchain/gnu-rm/downloads)
@@ -318,12 +346,12 @@ Replace the contents of this file with the following:
         {
             "label": "Clean Debug",
             "type": "shell",
-            "command": "make clean",
+            "command": "make DEBUG=1 clean",
             "windows": {
-                "command": "mingw32-make clean"
+                "command": "mingw32-make.exe DEBUG=1 clean"
             },
             "options": {
-                "cwd": "${workspaceRoot}/Debug"
+                "cwd": "${workspaceRoot}"
             },
             "group": "build",
             "problemMatcher": []
@@ -331,12 +359,12 @@ Replace the contents of this file with the following:
         {
             "label": "Clean Release",
             "type": "shell",
-            "command": "make clean",
+            "command": "make DEBUG=0 clean",
             "windows": {
-                "command": "mingw32-make clean"
+                "command": "mingw32-make.exe DEBUG=0 clean"
             },
             "options": {
-                "cwd": "${workspaceRoot}/Release"
+                "cwd": "${workspaceRoot}"
             },
             "group": "build",
             "problemMatcher": []
@@ -344,12 +372,29 @@ Replace the contents of this file with the following:
         {
             "label": "Make Debug Firmware",
             "type": "shell",
-            "command": "make -j8 all",
+            "command": "make -j12 DEBUG=1",
             "windows": {
-                "command": "mingw32-make -j8 all"
+                "command": "mingw32-make.exe -j12 DEBUG=1"
             },
             "options": {
-                "cwd": "${workspaceRoot}/Debug"
+                "cwd": "${workspaceRoot}"
+            },
+            "group": "build",
+            "presentation": {
+                "reveal": "always",
+                "clear": true
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "Make Release Firmware",
+            "type": "shell",
+            "command": "make -j12 DEBUG=0",
+            "windows": {
+                    "command": "mingw32-make.exe -j12 DEBUG=0"
+            },
+            "options": {
+                "cwd": "${workspaceRoot}"
             },
             "group": {
                 "kind": "build",
@@ -362,34 +407,61 @@ Replace the contents of this file with the following:
             "problemMatcher": []
         },
         {
-            "label": "Make Release Firmware",
-            "type": "shell",
-            "command": "make -j8 all",
-            "windows": {
-                "command": "mingw32-make -j8 all"
-            },
-            "options": {
-                "cwd": "${workspaceRoot}/Release"
-            },
-            "group": "build",
-            "problemMatcher": []
-        },
-        {
-            "label": "Load Debug Firmware",
-            "type": "shell",
-            "command": "openocd -f interface/stlink.cfg -f target/klx.cfg -c \"program i6.elf verify reset exit\"",
-            "options": {
-                "cwd": "${workspaceRoot}/Debug"
-            },
-            "group": "build",
-            "problemMatcher": []
-        },
-        {
-            "label": "Load Release Firmware",
+            "label": "OpenOCD Flash Debug Firmware",
             "type": "shell",
             "command": "openocd -f interface/stlink.cfg -f target/klx.cfg -c \"program fs-i6.elf verify reset exit\"",
             "options": {
-                "cwd": "${workspaceRoot}/Release"
+                "cwd": "${workspaceRoot}/gcc_debug"
+            },
+            "group": "build",
+            "problemMatcher": []
+        },
+        {
+            "label": "OpenOCD Flash Release Firmware",
+            "type": "shell",
+            "command": "openocd -f interface/stlink.cfg -f target/klx.cfg -c \"program fs-i6.elf verify reset exit\"",
+            "options": {
+                "cwd": "${workspaceRoot}/gcc_release"
+            },
+            "group": "build",
+            "problemMatcher": []
+        },
+        {
+            "label": "JLink Flash Release Firmware",
+            "type": "shell",
+            "windows": {
+                "options": {
+                    "shell": {
+                        "executable": "cmd.exe",
+                        "args": [
+                            "/d", "/c"
+                        ]
+                    }
+                },
+                "command": "JLink -CommanderScript ../.vscode/load-release.jlink",
+            },
+            "options": {
+                "cwd": "${workspaceRoot}/gcc_release",
+            },
+            "group": "build",
+            "problemMatcher": []
+        },
+        {
+            "label": "JLink Flash Debug Firmware",
+            "type": "shell",
+            "windows": {
+                "options": {
+                    "shell": {
+                        "executable": "cmd.exe",
+                        "args": [
+                            "/d", "/c"
+                        ]
+                    }
+                },
+                "command": "JLink -CommanderScript ../.vscode/load-release.jlink",
+            },
+            "options": {
+                "cwd": "${workspaceRoot}/gcc_debug",
             },
             "group": "build",
             "problemMatcher": []

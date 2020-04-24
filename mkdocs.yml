@@ -1,7 +1,9 @@
-site_name: FS-i6 SilverLite
+site_name: SilverLite FS-i6 Firmware
 nav:
-    - Home: index.md
-    - Setup: devEnvSetup.md
+    - Introduction: index.md
+    - Flashing: Flashing.md
+    - How to use: Manual.md
+    - Setting up your development environment: devEnvSetup.md
 
 
 
