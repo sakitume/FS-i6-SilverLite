@@ -15,7 +15,7 @@ SilverLite FS-i6 is primarily based upon. However this requires a hardware modif
 module be installed. The internal A7105 transceiver module is left alone and intact, but the firmware simply ignores it.
 
 # Multiprotocol module
-In addition to the Bayang protocol, SilverFlite FS-i6 can also work with a [multiprotocol module](Multiprotocol.md)
+In addition to the Bayang protocol, SilverFlite FS-i6 can also work with a [multiprotocol module](https://sakitume.github.io/SilverLite-FS-i6/Multiprotocol/)
 connected via serial (trainer port on back of the i6). This restores the FlySky protocol as well as introduces the huge variety
 of additional protocols provided by [Pascal's module](https://github.com/pascallanger/DIY-Multiprotocol-TX-Module).
 
