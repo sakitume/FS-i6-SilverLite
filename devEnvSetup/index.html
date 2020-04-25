@@ -32,30 +32,33 @@
         <meta name="lang:search.tokenizer" content="[\s\-]+">
       
       <link rel="shortcut icon" href="../assets/images/favicon.png">
-      <meta name="generator" content="mkdocs-1.0.4, mkdocs-material-3.2.0">
+      <meta name="generator" content="mkdocs-1.0.4, mkdocs-material-4.4.1">
     
     
       
-        <title>Setup - FS-i6 SilverLite</title>
+        <title>Setting up your development environment - SilverLite FS-i6 Firmware</title>
       
     
     
-      <link rel="stylesheet" href="../assets/stylesheets/application.572ca0f0.css">
+      <link rel="stylesheet" href="../assets/stylesheets/application.30686662.css">
       
       
     
     
-      <script src="../assets/javascripts/modernizr.8c900955.js"></script>
+      <script src="../assets/javascripts/modernizr.74668098.js"></script>
     
     
       
         <link href="https://fonts.gstatic.com" rel="preconnect" crossorigin>
-        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,400i,700|Roboto+Mono">
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,400i,700|Roboto+Mono&display=fallback">
         <style>body,input{font-family:"Roboto","Helvetica Neue",Helvetica,Arial,sans-serif}code,kbd,pre{font-family:"Roboto Mono","Courier New",Courier,monospace}</style>
       
     
     <link rel="stylesheet" href="../assets/fonts/material-icons.css">
     
+    
+    
+      
     
     
   </head>
@@ -81,7 +84,7 @@
   <nav class="md-header-nav md-grid">
     <div class="md-flex">
       <div class="md-flex__cell md-flex__cell--shrink">
-        <a href=".." title="FS-i6 SilverLite" class="md-header-nav__button md-logo">
+        <a href=".." title="SilverLite FS-i6 Firmware" class="md-header-nav__button md-logo">
           
             <i class="md-icon"></i>
           
@@ -93,22 +96,21 @@
       <div class="md-flex__cell md-flex__cell--stretch">
         <div class="md-flex__ellipsis md-header-nav__title" data-md-component="title">
           
-            
-              <span class="md-header-nav__topic">
-                FS-i6 SilverLite
-              </span>
-              <span class="md-header-nav__topic">
-                Setup
-              </span>
-            
+            <span class="md-header-nav__topic">
+              SilverLite FS-i6 Firmware
+            </span>
+            <span class="md-header-nav__topic">
+              
+                Setting up your development environment
+              
+            </span>
           
         </div>
       </div>
       <div class="md-flex__cell md-flex__cell--shrink">
         
+          <label class="md-icon md-icon--search md-header-nav__button" for="__search"></label>
           
-            <label class="md-icon md-icon--search md-header-nav__button" for="__search"></label>
-            
 <div class="md-search" data-md-component="search" role="dialog">
   <label class="md-search__overlay" for="__search"></label>
   <div class="md-search__inner" role="search">
@@ -131,7 +133,6 @@
     </div>
   </div>
 </div>
-          
         
       </div>
       
@@ -153,12 +154,12 @@
                   <div class="md-sidebar__inner">
                     <nav class="md-nav md-nav--primary" data-md-level="0">
   <label class="md-nav__title md-nav__title--site" for="__drawer">
-    <a href=".." title="FS-i6 SilverLite" class="md-nav__button md-logo">
+    <a href=".." title="SilverLite FS-i6 Firmware" class="md-nav__button md-logo">
       
         <i class="md-icon"></i>
       
     </a>
-    FS-i6 SilverLite
+    SilverLite FS-i6 Firmware
   </label>
   
   <ul class="md-nav__list" data-md-scrollfix>
@@ -169,8 +170,32 @@
 
 
   <li class="md-nav__item">
-    <a href=".." title="Home" class="md-nav__link">
-      Home
+    <a href=".." title="Introduction" class="md-nav__link">
+      Introduction
+    </a>
+  </li>
+
+    
+      
+      
+      
+
+
+  <li class="md-nav__item">
+    <a href="../Flashing/" title="Flashing" class="md-nav__link">
+      Flashing
+    </a>
+  </li>
+
+    
+      
+      
+      
+
+
+  <li class="md-nav__item">
+    <a href="../Manual/" title="How to use" class="md-nav__link">
+      How to use
     </a>
   </li>
 
@@ -189,10 +214,145 @@
       
     
     
-    <a href="./" title="Setup" class="md-nav__link md-nav__link--active">
-      Setup
+      <label class="md-nav__link md-nav__link--active" for="__toc">
+        Setting up your development environment
+      </label>
+    
+    <a href="./" title="Setting up your development environment" class="md-nav__link md-nav__link--active">
+      Setting up your development environment
     </a>
     
+      
+<nav class="md-nav md-nav--secondary">
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">Table of contents</label>
+    <ul class="md-nav__list" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#the-easy-way" title="The easy way" class="md-nav__link">
+    The easy way
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#the-hard-way" title="The hard way" class="md-nav__link">
+    The hard way
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#developing-with-vscode" title="Developing with VSCode" class="md-nav__link">
+    Developing with VSCode
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#what-well-need" title="What we'll need" class="md-nav__link">
+    What we'll need
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#installing-the-tools" title="Installing the tools" class="md-nav__link">
+    Installing the tools
+  </a>
+  
+    <nav class="md-nav">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#install-arm-gnu-toolchain" title="Install arm gnu toolchain" class="md-nav__link">
+    Install arm gnu toolchain
+  </a>
+  
+    <nav class="md-nav">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#windows-installation" title="Windows installation" class="md-nav__link">
+    Windows installation
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#mac-os-installation" title="Mac OS installation" class="md-nav__link">
+    Mac OS installation
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#install-mingw-w64-for-windows-machines-only" title="Install MinGW-W64 (for Windows machines only)" class="md-nav__link">
+    Install MinGW-W64 (for Windows machines only)
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#installing-openocd-on-windows" title="Installing OpenOCD on Windows" class="md-nav__link">
+    Installing OpenOCD on Windows
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#installing-openocd-on-mac-os" title="Installing OpenOCD on Mac OS" class="md-nav__link">
+    Installing OpenOCD on Mac OS
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+      
+      
+      
+      
+    </ul>
+  
+</nav>
+    
+  </li>
+
+    
+      
+      
+      
+
+
+  <li class="md-nav__item">
+    <a href="../Multiprotocol/" title="Multiprotocol module" class="md-nav__link">
+      Multiprotocol module
+    </a>
+  </li>
+
+    
+      
+      
+      
+
+
+  <li class="md-nav__item">
+    <a href="../Acknowledgements/" title="Acknowledgements" class="md-nav__link">
+      Acknowledgements
+    </a>
   </li>
 
     
@@ -213,6 +373,104 @@
     
   
   
+    <label class="md-nav__title" for="__toc">Table of contents</label>
+    <ul class="md-nav__list" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#the-easy-way" title="The easy way" class="md-nav__link">
+    The easy way
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#the-hard-way" title="The hard way" class="md-nav__link">
+    The hard way
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#developing-with-vscode" title="Developing with VSCode" class="md-nav__link">
+    Developing with VSCode
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#what-well-need" title="What we'll need" class="md-nav__link">
+    What we'll need
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#installing-the-tools" title="Installing the tools" class="md-nav__link">
+    Installing the tools
+  </a>
+  
+    <nav class="md-nav">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#install-arm-gnu-toolchain" title="Install arm gnu toolchain" class="md-nav__link">
+    Install arm gnu toolchain
+  </a>
+  
+    <nav class="md-nav">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#windows-installation" title="Windows installation" class="md-nav__link">
+    Windows installation
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#mac-os-installation" title="Mac OS installation" class="md-nav__link">
+    Mac OS installation
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#install-mingw-w64-for-windows-machines-only" title="Install MinGW-W64 (for Windows machines only)" class="md-nav__link">
+    Install MinGW-W64 (for Windows machines only)
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#installing-openocd-on-windows" title="Installing OpenOCD on Windows" class="md-nav__link">
+    Installing OpenOCD on Windows
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#installing-openocd-on-mac-os" title="Installing OpenOCD on Mac OS" class="md-nav__link">
+    Installing OpenOCD on Mac OS
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+      
+      
+      
+      
+    </ul>
+  
 </nav>
                   </div>
                 </div>
@@ -226,20 +484,44 @@
                 
                 <h1 id="setting-up-your-development-environment">Setting up your development environment</h1>
 <p>This page will walk you through the steps of setting up your development environment so that you can build and deploy this project onto your FlySky FS-i6 transmitter.</p>
+<p>For editing, compiling and flashing the firmware you have two choices:</p>
+<ul>
+<li>Install and use <a href="https://www.nxp.com/design/software/development-software/mcuxpresso-software-and-tools/mcuxpresso-integrated-development-environment-ide:MCUXpresso-IDE">MCUXpresso Integrated Development Environment (IDE)</a></li>
+<li>Install the indvidual tools/systems (arm compiler toolchain, make, openocd, vscode, etc) and configure them accordingly.</li>
+</ul>
+<blockquote>
+<p>Note: I once had this project set up to also use Keil MDK (free evaluation version) but the code size of this project now exceeds the 32k limit of Keil. The project files are still in the repo and can probably be updated to work (assuming you have an upgraded Keil without the size limit).</p>
+</blockquote>
+<h2 id="the-easy-way">The easy way</h2>
+<p>Installing and using MCUXpresso is by far the simplest solution. It is "A free-of-charge, code size unlimited, easy-to-use IDE for Kinetis and LPC MCUs, and i.MX RT crossover MCUs". Visit the NXP website <a href="https://www.nxp.com/design/software/development-software/mcuxpresso-software-and-tools/mcuxpresso-integrated-development-environment-ide:MCUXpresso-IDE">here</a> to download the latest version.</p>
+<blockquote>
+<p>Note: You will need to register with NXP in order to download MCUXpresso.</p>
+</blockquote>
+<p>MCUXpresso is based on Eclipse with various plugins preinstalled and customized. The repo contains a <code>.project</code> and a <code>.cproject</code> file that MCUXpresso should be able to open.
+I'll leave it to you to figure out how to use MCUXpresso. With it you should be able to build (compile) the project, flash the firmware (via ST-Link or J-Link), and even debug the code.</p>
+<h2 id="the-hard-way">The hard way</h2>
+<p>The other choice (installing the discrete tools) is a lot more work but something I feel is worth it. By doing so, it sets up your development computer so that you can develop for many more platforms and hardware devices. </p>
+<p>The tools/systems you'll be installing will consist of:
+* A code editor (Visual Studio Code is what I'll suggest and describe here)
+* A compiler toolchain
+* <code>make</code> as your build system
+* OpenOCD. A software tool for flashing firmware via ST-Link adapter</p>
 <p>It should be possible to develop on Mac OS, Linux and Windows platforms. This is due to using a variety of open source tools and technologies that are supported on all of these operating systems.</p>
 <blockquote>
 <p>Note: The specific examples provided here will often be written from the perspective of using a Windows development PC. I hope to update this document in the future to provide more specific examples for Mac OS and Linux platforms.</p>
 </blockquote>
-<h1 id="developing-with-vscode">Developing with VSCode</h1>
-<p>I really like Visual Studio Code. It's readily available for Mac OS, Windows and Linux. Plus it's very fast and extensible!</p>
+<h2 id="developing-with-vscode">Developing with VSCode</h2>
+<p>I really like Visual Studio Code. It's readily available for Mac OS, Windows and Linux. Plus it's very fast and extensible!
+I use it not only for editing the code, but also the documentation. And because it has integrated terminal windows I also
+use it for building and monitoring.</p>
 <p>It can be an excellent (and lightweight) development envrironment for embedded devices. I've used it with great success when
-developing for ESP8266, ESP32, Arduino (AVR), STM32, etc.</p>
+developing for ESP8266, ESP32, Arduino (AVR), STM32, etc. I often use it with Platform IO (but not so with this project).</p>
 <p>I'll describe how to set up VSCode and associated tools so that we can develop for the (ARM cortex m0+ based) Kinetis KL16 micro used
 on the FlySky FS-i6 transmitter.</p>
 <blockquote>
 <p>Note: Some of what is described here was learned from this (most excellent) article: <a href="https://hbfsrobotics.com/blog/configuring-vs-code-arm-development-stm32cubemx">"Using Visual Studio Code with STM32CubeMX for ARM Development"</a>. It's worth the time to read it for yourself.</p>
 </blockquote>
-<h1 id="what-well-need">What we'll need</h1>
+<h2 id="what-well-need">What we'll need</h2>
 <p>Here are the list of software tools we'll need for this project.</p>
 <ul>
 <li><a href="https://developer.arm.com/tools-and-software/open-source-software/developer-tools/gnu-toolchain/gnu-rm/downloads">ARM gnu toolchain</a></li>
@@ -484,12 +766,12 @@ you actually have installed (hint: the <code>8.3.1</code> might need to be chang
         {
             &quot;label&quot;: &quot;Clean Debug&quot;,
             &quot;type&quot;: &quot;shell&quot;,
-            &quot;command&quot;: &quot;make clean&quot;,
+            &quot;command&quot;: &quot;make DEBUG=1 clean&quot;,
             &quot;windows&quot;: {
-                &quot;command&quot;: &quot;mingw32-make clean&quot;
+                &quot;command&quot;: &quot;mingw32-make.exe DEBUG=1 clean&quot;
             },
             &quot;options&quot;: {
-                &quot;cwd&quot;: &quot;${workspaceRoot}/Debug&quot;
+                &quot;cwd&quot;: &quot;${workspaceRoot}&quot;
             },
             &quot;group&quot;: &quot;build&quot;,
             &quot;problemMatcher&quot;: []
@@ -497,12 +779,12 @@ you actually have installed (hint: the <code>8.3.1</code> might need to be chang
         {
             &quot;label&quot;: &quot;Clean Release&quot;,
             &quot;type&quot;: &quot;shell&quot;,
-            &quot;command&quot;: &quot;make clean&quot;,
+            &quot;command&quot;: &quot;make DEBUG=0 clean&quot;,
             &quot;windows&quot;: {
-                &quot;command&quot;: &quot;mingw32-make clean&quot;
+                &quot;command&quot;: &quot;mingw32-make.exe DEBUG=0 clean&quot;
             },
             &quot;options&quot;: {
-                &quot;cwd&quot;: &quot;${workspaceRoot}/Release&quot;
+                &quot;cwd&quot;: &quot;${workspaceRoot}&quot;
             },
             &quot;group&quot;: &quot;build&quot;,
             &quot;problemMatcher&quot;: []
@@ -510,12 +792,29 @@ you actually have installed (hint: the <code>8.3.1</code> might need to be chang
         {
             &quot;label&quot;: &quot;Make Debug Firmware&quot;,
             &quot;type&quot;: &quot;shell&quot;,
-            &quot;command&quot;: &quot;make -j8 all&quot;,
+            &quot;command&quot;: &quot;make -j12 DEBUG=1&quot;,
             &quot;windows&quot;: {
-                &quot;command&quot;: &quot;mingw32-make -j8 all&quot;
+                &quot;command&quot;: &quot;mingw32-make.exe -j12 DEBUG=1&quot;
             },
             &quot;options&quot;: {
-                &quot;cwd&quot;: &quot;${workspaceRoot}/Debug&quot;
+                &quot;cwd&quot;: &quot;${workspaceRoot}&quot;
+            },
+            &quot;group&quot;: &quot;build&quot;,
+            &quot;presentation&quot;: {
+                &quot;reveal&quot;: &quot;always&quot;,
+                &quot;clear&quot;: true
+            },
+            &quot;problemMatcher&quot;: []
+        },
+        {
+            &quot;label&quot;: &quot;Make Release Firmware&quot;,
+            &quot;type&quot;: &quot;shell&quot;,
+            &quot;command&quot;: &quot;make -j12 DEBUG=0&quot;,
+            &quot;windows&quot;: {
+                    &quot;command&quot;: &quot;mingw32-make.exe -j12 DEBUG=0&quot;
+            },
+            &quot;options&quot;: {
+                &quot;cwd&quot;: &quot;${workspaceRoot}&quot;
             },
             &quot;group&quot;: {
                 &quot;kind&quot;: &quot;build&quot;,
@@ -528,34 +827,61 @@ you actually have installed (hint: the <code>8.3.1</code> might need to be chang
             &quot;problemMatcher&quot;: []
         },
         {
-            &quot;label&quot;: &quot;Make Release Firmware&quot;,
-            &quot;type&quot;: &quot;shell&quot;,
-            &quot;command&quot;: &quot;make -j8 all&quot;,
-            &quot;windows&quot;: {
-                &quot;command&quot;: &quot;mingw32-make -j8 all&quot;
-            },
-            &quot;options&quot;: {
-                &quot;cwd&quot;: &quot;${workspaceRoot}/Release&quot;
-            },
-            &quot;group&quot;: &quot;build&quot;,
-            &quot;problemMatcher&quot;: []
-        },
-        {
-            &quot;label&quot;: &quot;Load Debug Firmware&quot;,
-            &quot;type&quot;: &quot;shell&quot;,
-            &quot;command&quot;: &quot;openocd -f interface/stlink.cfg -f target/klx.cfg -c \&quot;program i6.elf verify reset exit\&quot;&quot;,
-            &quot;options&quot;: {
-                &quot;cwd&quot;: &quot;${workspaceRoot}/Debug&quot;
-            },
-            &quot;group&quot;: &quot;build&quot;,
-            &quot;problemMatcher&quot;: []
-        },
-        {
-            &quot;label&quot;: &quot;Load Release Firmware&quot;,
+            &quot;label&quot;: &quot;OpenOCD Flash Debug Firmware&quot;,
             &quot;type&quot;: &quot;shell&quot;,
             &quot;command&quot;: &quot;openocd -f interface/stlink.cfg -f target/klx.cfg -c \&quot;program fs-i6.elf verify reset exit\&quot;&quot;,
             &quot;options&quot;: {
-                &quot;cwd&quot;: &quot;${workspaceRoot}/Release&quot;
+                &quot;cwd&quot;: &quot;${workspaceRoot}/gcc_debug&quot;
+            },
+            &quot;group&quot;: &quot;build&quot;,
+            &quot;problemMatcher&quot;: []
+        },
+        {
+            &quot;label&quot;: &quot;OpenOCD Flash Release Firmware&quot;,
+            &quot;type&quot;: &quot;shell&quot;,
+            &quot;command&quot;: &quot;openocd -f interface/stlink.cfg -f target/klx.cfg -c \&quot;program fs-i6.elf verify reset exit\&quot;&quot;,
+            &quot;options&quot;: {
+                &quot;cwd&quot;: &quot;${workspaceRoot}/gcc_release&quot;
+            },
+            &quot;group&quot;: &quot;build&quot;,
+            &quot;problemMatcher&quot;: []
+        },
+        {
+            &quot;label&quot;: &quot;JLink Flash Release Firmware&quot;,
+            &quot;type&quot;: &quot;shell&quot;,
+            &quot;windows&quot;: {
+                &quot;options&quot;: {
+                    &quot;shell&quot;: {
+                        &quot;executable&quot;: &quot;cmd.exe&quot;,
+                        &quot;args&quot;: [
+                            &quot;/d&quot;, &quot;/c&quot;
+                        ]
+                    }
+                },
+                &quot;command&quot;: &quot;JLink -CommanderScript ../.vscode/load-release.jlink&quot;,
+            },
+            &quot;options&quot;: {
+                &quot;cwd&quot;: &quot;${workspaceRoot}/gcc_release&quot;,
+            },
+            &quot;group&quot;: &quot;build&quot;,
+            &quot;problemMatcher&quot;: []
+        },
+        {
+            &quot;label&quot;: &quot;JLink Flash Debug Firmware&quot;,
+            &quot;type&quot;: &quot;shell&quot;,
+            &quot;windows&quot;: {
+                &quot;options&quot;: {
+                    &quot;shell&quot;: {
+                        &quot;executable&quot;: &quot;cmd.exe&quot;,
+                        &quot;args&quot;: [
+                            &quot;/d&quot;, &quot;/c&quot;
+                        ]
+                    }
+                },
+                &quot;command&quot;: &quot;JLink -CommanderScript ../.vscode/load-release.jlink&quot;,
+            },
+            &quot;options&quot;: {
+                &quot;cwd&quot;: &quot;${workspaceRoot}/gcc_debug&quot;,
             },
             &quot;group&quot;: &quot;build&quot;,
             &quot;problemMatcher&quot;: []
@@ -693,7 +1019,7 @@ Press <code>F1</code> key and type <code>preferences workspace</code>. Select <c
     <div class="md-footer-nav">
       <nav class="md-footer-nav__inner md-grid">
         
-          <a href=".." title="Home" class="md-flex md-footer-nav__link md-footer-nav__link--prev" rel="prev">
+          <a href="../Manual/" title="How to use" class="md-flex md-footer-nav__link md-footer-nav__link--prev" rel="prev">
             <div class="md-flex__cell md-flex__cell--shrink">
               <i class="md-icon md-icon--arrow-back md-footer-nav__button"></i>
             </div>
@@ -702,11 +1028,25 @@ Press <code>F1</code> key and type <code>preferences workspace</code>. Select <c
                 <span class="md-footer-nav__direction">
                   Previous
                 </span>
-                Home
+                How to use
               </span>
             </div>
           </a>
         
+        
+          <a href="../Multiprotocol/" title="Multiprotocol module" class="md-flex md-footer-nav__link md-footer-nav__link--next" rel="next">
+            <div class="md-flex__cell md-flex__cell--stretch md-footer-nav__title">
+              <span class="md-flex__ellipsis">
+                <span class="md-footer-nav__direction">
+                  Next
+                </span>
+                Multiprotocol module
+              </span>
+            </div>
+            <div class="md-flex__cell md-flex__cell--shrink">
+              <i class="md-icon md-icon--arrow-forward md-footer-nav__button"></i>
+            </div>
+          </a>
         
       </nav>
     </div>
@@ -722,20 +1062,15 @@ Press <code>F1</code> key and type <code>preferences workspace</code>. Select <c
           Material for MkDocs</a>
       </div>
       
-        
-      
     </div>
   </div>
 </footer>
       
     </div>
     
-      <script src="../assets/javascripts/application.b41f3d20.js"></script>
+      <script src="../assets/javascripts/application.c648116f.js"></script>
       
       <script>app.initialize({version:"1.0.4",url:{base:".."}})</script>
-      
-    
-    
       
     
   </body>
