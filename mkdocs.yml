@@ -4,7 +4,9 @@ nav:
     - Flashing: Flashing.md
     - How to use: Manual.md
     - Setting up your development environment: devEnvSetup.md
+    - NRF24L01 module: NRF24L01.md
     - Multiprotocol module: Multiprotocol.md
+    - Channel configuration: ChannelConfig.md
     - Acknowledgements: Acknowledgements.md
 
 
