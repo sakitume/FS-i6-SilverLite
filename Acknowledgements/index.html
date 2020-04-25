@@ -218,8 +218,32 @@
 
 
   <li class="md-nav__item">
+    <a href="../NRF24L01/" title="NRF24L01 module" class="md-nav__link">
+      NRF24L01 module
+    </a>
+  </li>
+
+    
+      
+      
+      
+
+
+  <li class="md-nav__item">
     <a href="../Multiprotocol/" title="Multiprotocol module" class="md-nav__link">
       Multiprotocol module
+    </a>
+  </li>
+
+    
+      
+      
+      
+
+
+  <li class="md-nav__item">
+    <a href="../ChannelConfig/" title="Channel configuration" class="md-nav__link">
+      Channel configuration
     </a>
   </li>
 
@@ -263,6 +287,13 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#my-experiences-with-these-open-source-projects" title="My experiences with these open source projects" class="md-nav__link">
+    My experiences with these open source projects
+  </a>
+  
+</li>
+      
       
       
       
@@ -297,6 +328,13 @@
         <li class="md-nav__item">
   <a href="#open-source-software" title="Open Source Software" class="md-nav__link">
     Open Source Software
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#my-experiences-with-these-open-source-projects" title="My experiences with these open source projects" class="md-nav__link">
+    My experiences with these open source projects
   </a>
   
 </li>
@@ -340,11 +378,30 @@ our community of builders, hackers and hobbyists!</p>
 <p>I was able to reference or even use some really helpful open source code to help with my development. Some of it was previously mentioned but I want to
 spend some time to list some other sources I found to be useful.</p>
 <ul>
-<li>GEM (Good enough menu) system. See: https://github.com/Spirik/GEM</li>
-<li>JeeH by Jean-Claude Wippler. See: https://platformio.org/lib/show/3082/JeeH and https://git.jeelabs.org/jcw/jeeh</li>
-<li>DIY Multiprotocol TX Module. See: https://github.com/pascallanger/DIY-Multiprotocol-TX-Module</li>
-<li>nRF24L01 multi-protocol RC transmitter. See: https://github.com/goebish/nrf24_multipro</li>
+<li>GEM (Good enough menu) system. See: <a href="https://github.com/Spirik/GEM">https://github.com/Spirik/GEM</a></li>
+<li>JeeH by Jean-Claude Wippler. See: <a href="https://platformio.org/lib/show/3082/JeeH and https://git.jeelabs.org/jcw/jeeh">https://platformio.org/lib/show/3082/JeeH and https://git.jeelabs.org/jcw/jeeh</a></li>
+<li>DIY Multiprotocol TX Module. See: <a href="https://github.com/pascallanger/DIY-Multiprotocol-TX-Module">https://github.com/pascallanger/DIY-Multiprotocol-TX-Module</a></li>
+<li>nRF24L01 multi-protocol RC transmitter. See: <a href="https://github.com/goebish/nrf24_multipro">https://github.com/goebish/nrf24_multipro</a></li>
 </ul>
+<h2 id="my-experiences-with-these-open-source-projects">My experiences with these open source projects</h2>
+<p>I entered the hobby of whoops in the summer of 2019 when I purchased a Furibee F36 on Amazon for $20. It was super awesome! However controlling
+it with the toy transmitter was awkward. Adding stick extensions helped but I then discovered you could use hobby grade transmitters, in
+conjunction with an adapter module to control these toys. However the Furibee isn't supported by these adapter modules. That's when I
+discovered the Eachine E010 and E011 and then I also learned about the BWhoop B03 Pro. These quads can be flashed with <a href="https://github.com/silver13/BoldClash-BWHOOP-B-03">Silverware</a> as well as <a href="https://github.com/NotFastEnuf/NFE_Silverware">NFE Silverware</a>. And more importantly they use a Bayang protocol
+that these protocol adapters support.</p>
+<p>I purchased a FlySky FS-i6 because it is the cheapest decent transmitter you can buy. It's actually pretty darn good for the money. About $50 on Amazon or
+if you don't mind waiting a little it is as low as $28 dollars on xt-xinte. I ended buying one from Bangood along with an <a href="https://www.banggood.com/IRangeX-iRX6-Multiprotocol-TX-Module-for-Flysky-FS-i6-i6x-Transmitter-p-1161199.html">iRangeX IRX6 multiprotocol module</a>.</p>
+<p>This is where Goebish's amazing NRF24L01 module project comes in! I learned that the IRX6 is using his module firmware. This was awesome!
+This meant I had a chance at modifying/hacking this IRX6 module. But I soon found that it would be a little more difficult since the tiny module
+doesn't have any breakout pads for programming the ATMEGA328 processor.</p>
+<p>No worries, I had Goebish's code to work with so I hacked an old VGA adapter cable onto a spare NodeMCU board and was able to adapt Goebish's code to work with the ESP8266.
+It worked great! And I learned a whole lot. Again, <strong>this was due to amazing people sharing</strong> their work. Thanks, Goebish!</p>
+<p>But one of the features I wanted was to have access to more of the switches on the i6, but the stock firmware only outputs 6 channels. Again, open source software community to the rescue! I discovered there was a custom firmware replacement that could give you 8 channels out of the PPM signal pin on the trainer port. It worked great!</p>
+<p>After looking at <a href="https://github.com/qba667/FlySkyI6&gt;">that project</a> in more detail I began to wonder if I could forego the external microprocessor and just
+install the NRF24L01 directly into the i6. This would of course require custom firmeware and enough GPIO pins I could hijack/repurpose for the software SPI
+implementation (to interface with the NRF24L01).</p>
+<p>After some more Googling I discovered Nathan Tsoi's <a href="https://nathan.vertile.com/blog/2016/07/09/flysky-i6-radio-setup-and-hacking-guide/">project documentation</a> where he attempted to do something similar. I forked his <a href="https://github.com/nathantsoi/fs-i6-test">github project</a> and started hacking away.</p>
+<p>I cannot say it often enough, "Thank you" to all who open source their projects and share. I hope by releasing <a href="https://github.com/sakitume/SilverLite-FS-i6">SilverLite FS-i6 firmware</a> and <a href="https://github.com/sakitume/SilverLite-FC">SilverLite FC firmware</a> I can do my small part at giving back.</p>
                 
                   
                 
@@ -365,7 +422,7 @@ spend some time to list some other sources I found to be useful.</p>
     <div class="md-footer-nav">
       <nav class="md-footer-nav__inner md-grid">
         
-          <a href="../Multiprotocol/" title="Multiprotocol module" class="md-flex md-footer-nav__link md-footer-nav__link--prev" rel="prev">
+          <a href="../ChannelConfig/" title="Channel configuration" class="md-flex md-footer-nav__link md-footer-nav__link--prev" rel="prev">
             <div class="md-flex__cell md-flex__cell--shrink">
               <i class="md-icon md-icon--arrow-back md-footer-nav__button"></i>
             </div>
@@ -374,7 +431,7 @@ spend some time to list some other sources I found to be useful.</p>
                 <span class="md-footer-nav__direction">
                   Previous
                 </span>
-                Multiprotocol module
+                Channel configuration
               </span>
             </div>
           </a>
