@@ -22,6 +22,7 @@ I'll leave it to you to figure out how to use MCUXpresso. With it you should be 
 The other choice (installing the discrete tools) is a lot more work but something I feel is worth it. By doing so, it sets up your development computer so that you can develop for many more platforms and hardware devices. 
 
 The tools/systems you'll be installing will consist of:
+
 * A code editor (Visual Studio Code is what I'll suggest and describe here)
 * A compiler toolchain
 * `make` as your build system
