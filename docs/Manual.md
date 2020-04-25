@@ -33,7 +33,7 @@ and enter "Use" mode. Alternatively you can long press the "Cancel" button to ex
 and enter the main menu.
 
 ## The Main Menu
-![Main Menu](images/MainMenu_1.jpg)
+![Main Menu](images/Select_model.jpg)
 
 The main menu is where you can edit models and select one to use. You can also use this menu to
 configure and review the sticks and aux channels.
@@ -146,6 +146,7 @@ and enter a bind mode or press "Cancel" button to abort.
 ![Bind_Alert](images/Bind_Alert.jpg)
 
 
+> Note: The bind mode only lasts for a little less than a second. This seems long enough for both Bayang and FlySky receivers.
 
 ## Beeps
 
