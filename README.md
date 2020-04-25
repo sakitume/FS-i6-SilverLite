@@ -1,30 +1,24 @@
-# FS-i6 SilverLite
+# Custom firmware for the FlySky FS-i6
 
-An experiment in developing custom firmware for the FlySky FS-i6 transmitter.
+[SilverLite FS-i6 firmware](https://github.com/sakitume/SilverLite-FS-i6) is a firmware
+**replacement** for the **FlySky-i6** transmitter (and not the FlySky FS-i6S or the FlySky FS-i6X).
+This custom firmware was designed for my particular use case: controlling 65mm/75mm whoops and micro (100mm) sized quadcopters.
+The features that are available along with the user interface are therefore rather limited. It does just
+what I need and not much more.
 
-# Background
+# Silverware
+This firmware is primarily designed to interface with flight controllers running [Silverware](http://sirdomsen.diskstation.me/dokuwiki/doku.php) or variations of that
+software: [BWhoop Silverware](https://github.com/silver13/BoldClash-BWHOOP-B-03), [SilF4ware](https://www.rcgroups.com/forums/showthread.php?3294959-SilF4ware-an-STM32F4-port-of-SilverWare), [NFE Silverware](https://github.com/NotFastEnuf/NFE_Silverware), NFE Silverware with SilverLite extensions (a fork I made but haven't released), and [SilverLite](https://github.com/sakitume/SilverLite-FC). 
 
-The first two commits of this repo were obtained by forking the [F6-i6 Test](https://github.com/nathantsoi/fs-i6-test) repo by Nathan Tsoi.
-This provided me a test bed for building a bare bones `.elf` that I could flash onto my FS-i6 transmitter. While it may not do anything 
-except blink the backlight on the LCD display screen, it was a huge help providing me the necessary drivers, header files, etc that one
-needs for targetting a microcontroller that I was completely unfamiliar with.
+All of these Silveware based flight controllers provide support for a Bayang protocol. This is the protocol that
+SilverLite FS-i6 is primarily based upon. However this requires a hardware modification to the FlySky-i6 so that an NRF24L01 transceiver
+module be installed. The internal A7105 transceiver module is left alone and intact, but the firmware simply ignores it.
 
-Another huge resource was the [FlySkyI6](https://github.com/qba667/FlySkyI6) repo from Jakub (qba667). 
+# Multiprotocol module
+In addition to the Bayang protocol, SilverFlite FS-i6 can also work with a [multiprotocol module](Multiprotocol.md)
+connected via serial (trainer port on back of the i6). This restores the FlySky protocol as well as introduces the huge variety
+of additional protocols provided by [Pascal's module](https://github.com/pascallanger/DIY-Multiprotocol-TX-Module).
 
-And of course I must also mention this repo: <https://github.com/benb0jangles/FlySky-i6-Mod-> from Ben (Benbojangles)
+# Documentation
 
-I also came across some great information shared by [Thom](https://basejunction.wordpress.com/). Some of the early work investigating
-the FS-i6 likely stems from here.
-
-A big brother to the FlySky FS-i6 is the FS-i6s as well as the Turnigy Evolution. Both of these use an stm32 chip instead of the Kinetis
-found on the FS-i6. For these transmitters you really must take a look at the amazing breadth of information shared by Simon Schulz (fishpepper)
-and particularly his [OpenGround project](https://fishpepper.de/projects/openground/).
-
-These are just some of the resources I came across that I found so helpful. I know that there are *many* more contributors (to understanding
-the FS-i6) that I am either unaware of, or unable to identify and provide credit to. For example there are hundreds of pages of discussion
-on [rcgroups.com](https://www.rcgroups.com/forums/showthread.php?2486545-FlySky-FS-i6-8-channels-firmware-patch%21) regarding custom firmware
-patches for the FS-i6. A careful review of all of those posts would probably help identify other great contributors to this effort.
-
-To all of those that I mentioned, as well as those I'm unaware of: "Thank you very much". Your sharing of knowledge adds so much to
-our community of builders, hackers and hobbyists!
-
+Documentation for [SilverLite FS-i6 firmware](https://github.com/sakitume/SilverLite-FS-i6) can be found [here](https://sakitume.github.io/SilverLite-FS-i6/)

@@ -14,16 +14,12 @@ All of these Silveware based flight controllers provide support for a Bayang pro
 SilverLite FS-i6 is primarily based upon. However this requires a hardware modification to the FlySky-i6 so that an NRF24L01 transceiver
 module be installed. The internal A7105 transceiver module is left alone and intact, but the firmware simply ignores it.
 
-In addition to the Bayang protocol, SilverFlite FS-i6 can also work with a [multiprotocol module](https://github.com/pascallanger/DIY-Multiprotocol-TX-Module)
+In addition to the Bayang protocol, SilverFlite FS-i6 can also work with a [multiprotocol module](Multiprotocol.md)
 connected via serial (trainer port on back of the i6). This restores the FlySky protocol as well as introduces the huge variety
-of additional protocols provided by Pascal's module.
+of additional protocols provided by [Pascal's module](https://github.com/pascallanger/DIY-Multiprotocol-TX-Module).
 
 > Note: I'd like to someday re-enable support for the internal A7105 module (FlySky protocol) but have
 not had the time to do so. And since I already have a multiprotocol module installed I'm not really
 inclined to do this anytime soon.
 
-
-# Quick Start
-
-The navigation bar on the left provides a list of topics you'll likely be interested in. It is suggested you read these sections:
 
