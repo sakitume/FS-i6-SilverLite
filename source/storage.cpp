@@ -64,7 +64,8 @@ static void setDefaults()
     {
         ModelDesc_t &model = storage.model[i];
         model.timer = 4 * 60;
-        strcpy(model.name, "TinyWhoop");
+        strcpy(model.name, "Model?");
+        model.name[5] = '0' + i;    // Change the '?' in "Model?" to be '0' thru '9'
 
         model.mpm_protocol = kBayangProtocol;
         model.mpm_sub_protocol = 0;    // 0 == Bayang
