@@ -13,6 +13,7 @@
 #include "drv_time.h"
 #include "GEM.h"
 #include "tx_interface.h"
+#include "switchID.h"
 
 //------------------------------------------------------------------------------
 extern GEM gGEM;
@@ -340,7 +341,16 @@ static void gui_process_logic() {
     // Count down when throttle is past zero and TX is running
     if (txRunning)
     {
-        uint8_t isArmed = tx_is_armed();
+        // Assume we're armed
+        uint8_t isArmed = true;
+
+        // But lets check to see if user specified an arming switch that we can check
+        const ModelDesc_t &model = storage.model[storage.current_model];
+        if (model.armSwitch != kSw_None)
+        {
+            isArmed = switchIsActive(model.armSwitch);
+        }
+
         enum { kThrottleThreshold = 30 };   // TODO
         if ((adc_get_channel_calibrated(ADC_ID_THROTTLE) >= kThrottleThreshold) && isArmed) {
             // do timer logic, handle countdown

@@ -20,6 +20,8 @@ struct ModelDesc_t
     // Bayang channels
     uint8_t bayangChans[_CH_Max];
 
+    uint8_t armSwitch;
+
     // Multiprotocol params
     uint8_t mpm_protocol;
     uint8_t mpm_sub_protocol;

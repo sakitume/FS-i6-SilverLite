@@ -132,13 +132,6 @@ uint16_t tx_get_pid(int row, int col)
 }
 
 //------------------------------------------------------------------------------
-uint8_t tx_is_armed()
-{
-    return button_active(kBtn_SwA);
-}
-
-
-//------------------------------------------------------------------------------
 void tx_update()
 {
 #if defined(__USING_INTERNAL_TRX__)

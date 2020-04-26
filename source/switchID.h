@@ -1,6 +1,8 @@
 #ifndef __SWITCHID_H__
 #define __SWITCHID_H__
 
+#include <stdint.h>
+
 enum ESwitchID
 {
     kSw_None,
@@ -25,5 +27,6 @@ enum ESwitchID
 
 extern const char *gSwitchNames[_kSw_Max];
 
+int switchIsActive(uint8_t id); // id should be a ESwitchID value
 
 #endif // __SWITCHID_H__

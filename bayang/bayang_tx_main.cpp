@@ -28,9 +28,8 @@
 #include "debug.h"
 #include "buttons.h"
 #include "adc.h"
-
-//------------------------------------------------------------------------------
-extern uint8_t tx_is_armed();
+#include "storage.h"
+#include "switchID.h"
 
 //------------------------------------------------------------------------------
 void Bayang_tx_reset(enum EProtocol protocol, uint8_t options)
@@ -91,43 +90,50 @@ enum
 //------------------------------------------------------------------------------
 void Bayang_tx_update()
 {
-    // Also, I'm using these settings when I build SilverWare NFE
-    //
-    //#define ARMING CHAN_5     BAYANG_FLAG_INVERT (packet[3]), SwA
-    //#define IDLE_UP CHAN_9    BAYANG_FLAG_HEADLESS (packet[2]), SwD
-    //#define LEVELMODE CHAN_6  BAYANG_FLAG_FLIP (packet[2]), SwB: Position 1
-    //#define RACEMODE  CHAN_7  BAYANG_FLAG_SNAPSHOT (packet[2]), SwC: Position 2
-    //#define HORIZON   CHAN_8  BAYANG_FLAG_VIDEO (packet[2]), SwC: Position 3
-    
-    // ADC_ID_SwB == SwB: Position 1 == <100(46), Position 2 == >923(1023)
-    // ADC_ID_SwC == SwC: Position 1 == 0, Position 2 == 512, Position 3 == 1023
-
+    // Bayang aux channels (flag bits in rxdata[2] and rxdata[3])
     txPkt_Flags2 = 0;
-    if (button_active(kBtn_SwD))
+    txPkt_Flags3 = 0;
+    const uint8_t *mapping = storage.model[storage.current_model].bayangChans;
+    for (int i=0; i<_CH_Max; i++)
     {
-        txPkt_Flags2 |= BAYANG_FLAG_HEADLESS;
+        const uint8_t sw = mapping[i];
+        if (sw != kSw_None)
+        {
+            // txPkt_Flags2==rxdata[2]
+            //  CH_VID, CH_PIC, CH_FLIP, CH_HEADFREE, CH_RTH
+            // txPkt_Flags3==rxdata[3]
+            //  CH_INV, CH_TO, CH_EMG
+            const bool isActive = switchIsActive(sw);
+            switch (i)
+            {
+                case CH_INV:
+                    if (isActive) txPkt_Flags3 |= BAYANG_FLAG_INVERT;
+                    break;
+                case CH_VID:
+                    if (isActive) txPkt_Flags2 |= BAYANG_FLAG_VIDEO;
+                    break;
+                case CH_PIC:
+                    if (isActive) txPkt_Flags2 |= BAYANG_FLAG_SNAPSHOT;
+                    break;
+                case CH_TO:
+                    if (isActive) txPkt_Flags3 |= BAYANG_FLAG_TAKE_OFF;
+                    break;
+                case CH_EMG:
+                    if (isActive) txPkt_Flags3 |= BAYANG_FLAG_EMG_STOP;
+                    break;
+                case CH_FLIP:
+                    if (isActive) txPkt_Flags2 |= BAYANG_FLAG_FLIP;
+                    break;
+                case CH_HEADFREE:
+                    if (isActive) txPkt_Flags2 |= BAYANG_FLAG_HEADLESS;
+                    break;
+                case CH_RTH:
+                    if (isActive) txPkt_Flags2 |= BAYANG_FLAG_RTH;
+                    break;
+            }
+        }
     }
-    if (adc_get_channel_calibrated(ADC_ID_SwB) < 100)   // SwB: Position 1
-    {
-        txPkt_Flags2 |= BAYANG_FLAG_FLIP;       // CHAN_6, LEVELMODE
-    }
-    uint16_t SwC = adc_get_channel_calibrated(ADC_ID_SwC);
-    if (SwC >= 923)         // SwC: Position 3
-    {
-        txPkt_Flags2 |= BAYANG_FLAG_VIDEO;      // CHAN_8, HORIZON
-    }
-    else if (SwC >= 412)         // SwC: Position 2
-    {
-        txPkt_Flags2 |= BAYANG_FLAG_SNAPSHOT;   // CHAN_7, RACEMODE
-    }
-    if (button_active(kBtn_SwD))
-    {
-        txPkt_Flags2 |= BAYANG_FLAG_HEADLESS;   // CHAN_9, IDLE_UP
-    }
-
-
-    txPkt_Flags3 = tx_is_armed() ? BAYANG_FLAG_INVERT : 0;
-
+    
     // AETR channel values
     for (int i=0; i<4; i++)
     {

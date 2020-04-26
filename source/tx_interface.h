@@ -19,8 +19,6 @@ uint16_t tx_get_rssi_fc();
 //  kd[roll, pitch, yaw]
 uint16_t tx_get_pid(int row, int col);
 
-uint8_t tx_is_armed();
-
 void tx_update();
 void tx_start();
 void tx_stop();
