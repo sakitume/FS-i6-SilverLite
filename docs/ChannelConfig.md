@@ -50,7 +50,6 @@ Examining NFS Silverware rx code verified that these channels will be available 
 * `CH_TO`
 * `CH_EMG`
 * `CH_FLIP`
-* `CH_EXPERT`
 * `CH_HEADFREE`
 * `CH_RTH`
 

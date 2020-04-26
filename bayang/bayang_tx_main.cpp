@@ -45,19 +45,19 @@ void Bayang_tx_reset(enum EProtocol protocol, uint8_t options)
 enum
 {
     // flags going to packet[2]
-    BAYANG_FLAG_RTH      = 0x01,
-    BAYANG_FLAG_HEADLESS = 0x02,
-    BAYANG_FLAG_FLIP     = 0x08,
-    BAYANG_FLAG_VIDEO    = 0x10,
-    BAYANG_FLAG_SNAPSHOT = 0x20,
+    BAYANG_FLAG_RTH      = 0x01,    // CH_RTH (3)
+    BAYANG_FLAG_HEADLESS = 0x02,    // CH_HEADFREE (2)
+    BAYANG_FLAG_FLIP     = 0x08,    // CH_FLIP (0)
+    BAYANG_FLAG_VIDEO    = 0x10,    // CH_VID (7)
+    BAYANG_FLAG_SNAPSHOT = 0x20,    // CH_PIC (8)
 };
 
 enum
 {
     // flags going to packet[3]
-    BAYANG_FLAG_EMG_STOP = 0x04,
-    BAYANG_FLAG_INVERT   = 0x80,
-    BAYANG_FLAG_TAKE_OFF = 0x20
+    BAYANG_FLAG_EMG_STOP = 0x04,    // CH_EMG (10)
+    BAYANG_FLAG_INVERT   = 0x80,    // CH_INV (6)
+    BAYANG_FLAG_TAKE_OFF = 0x20     // CH_TO (11)
 };
 
 // From Silverware (NFE fork). When "USE_DEVO" is defined:
