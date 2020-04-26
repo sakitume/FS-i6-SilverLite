@@ -57,6 +57,7 @@ static ERenderMode txRenderMode;
 static void startTX();
 static void stopTX();
 static void resetTX();
+static void ReloadModelTimer();
 
 //------------------------------------------------------------------------------
 class CShortLongPress
@@ -192,6 +193,8 @@ void CDialogBind::close(bool wasOkay)
 {
     if (wasOkay)
     {
+        sound_play_bind();
+        ReloadModelTimer();
         resetTX();
     }
     CDialogLongPress::close(wasOkay);
