@@ -5,6 +5,8 @@
 
 #if defined(__cplusplus)
 
+#include "bayang_chan.h"    // for _CH_Max
+
 #define STORAGE_VERSION_ID 0x03
 #define STORAGE_MODEL_NAME_LEN 11
 #define STORAGE_MODEL_MAX_COUNT 10
@@ -14,6 +16,9 @@ struct ModelDesc_t
     enum        {   kModelNameLen = 10  };
     char        name[kModelNameLen];
     uint16_t    timer;
+
+    // Bayang channels
+    uint8_t bayangChans[_CH_Max];
 
     // Multiprotocol params
     uint8_t mpm_protocol;

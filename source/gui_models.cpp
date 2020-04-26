@@ -200,6 +200,10 @@ static void applyModelName()
     storage_save();
 }
 
+extern void gui_init_bayang_chans(GEMPage &parentMenuPage);
+extern GEMPage menuPageBayangChans;  // gui_config_chans_bayang.cpp
+GEMItem menuItem_ConfigBayangChans("Bayang Channels", menuPageBayangChans);
+
 void gui_init_edit_model()
 {
     // Need to initialize the variables that our various menu items reference
@@ -213,5 +217,9 @@ void gui_init_edit_model()
     menuPageEditModel.addMenuItem(miProtocolOption);
     menuPageEditModel.addMenuItem(miAutoBind);
     menuPageEditModel.addMenuItem(miRXNum);
+
+    gui_init_bayang_chans(menuPageEditModel);
+    menuPageEditModel.addMenuItem(menuItem_ConfigBayangChans);
+
     menuPageEditModel.setParentMenuPage(menuPageMain);
 }

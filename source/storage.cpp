@@ -67,6 +67,8 @@ static void setDefaults()
         strcpy(model.name, "Model?");
         model.name[5] = '0' + i;    // Change the '?' in "Model?" to be '0' thru '9'
 
+        setupDefaultMapping(model.bayangChans);
+
         model.mpm_protocol = kBayangProtocol;
         model.mpm_sub_protocol = 0;    // 0 == Bayang
         model.mpm_option = 1;          // 1 == Bayang telemetry
@@ -79,7 +81,8 @@ static void setDefaults()
 //------------------------------------------------------------------------------
 uint8_t storage_init()
 {
-    static_assert(sizeof(storage) < 256, "FlashStorage_t is too big");
+    // We use last sector of flash memory for storage. Each sector is 1024 bytes in length
+    static_assert(sizeof(storage) < 1024, "FlashStorage_t is too big");
 
     valid = false;
     int result = flash_read(&storage, sizeof(storage));

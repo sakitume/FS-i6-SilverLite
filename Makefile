@@ -89,6 +89,7 @@ SOURCES =  \
 	${SRC_DIR}/font.c \
 	${SRC_DIR}/font.h \
 	${SRC_DIR}/gui_calibrate.cpp \
+	${SRC_DIR}/gui_config_chans_bayang.cpp \
 	${SRC_DIR}/gui_main.cpp \
 	${SRC_DIR}/gui_models.cpp \
 	${SRC_DIR}/gui_select_model.cpp \
@@ -105,6 +106,8 @@ SOURCES =  \
 	${SRC_DIR}/sound.h \
 	${SRC_DIR}/storage.cpp \
 	${SRC_DIR}/storage.h \
+	${SRC_DIR}/switchID.cpp \
+	${SRC_DIR}/switchID.h \
 	${SRC_DIR}/timer.cpp \
 	${SRC_DIR}/timer.h \
 	${SRC_DIR}/tx_interface.cpp \
@@ -122,6 +125,8 @@ SOURCES =  \
 SOURCES +=  \
 	${BAYANG_DIR}/bayang.cpp \
 	${BAYANG_DIR}/bayang.h \
+	${BAYANG_DIR}/bayang_chan.h \
+	${BAYANG_DIR}/bayang_chan.cpp \
 	${BAYANG_DIR}/bayang_rx.cpp \
 	${BAYANG_DIR}/bayang_tx.cpp \
 	${BAYANG_DIR}/bayang_tx_main.cpp \

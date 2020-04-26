@@ -113,6 +113,9 @@ class GEM {
                                                          // Accepts GEM_KEY_NONE, GEM_KEY_UP, GEM_KEY_RIGHT, GEM_KEY_DOWN, GEM_KEY_LEFT, GEM_KEY_CANCEL, GEM_KEY_OK values
     AppContext context;                                  // Currently set context
     void clearContext();                                 // Clear context
+
+    int inline getValueSelectIndex() const { return _valueSelectNum; }
+
   private:
     GLCD& _glcd;
     byte _menuPointerType;
