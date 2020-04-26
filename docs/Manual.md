@@ -22,7 +22,7 @@ dismiss the alert dialog and return to "Use" mode.
 ![Cancel to exit](images/Cancel_To_Exit_Alert.jpg)
 
 ## Safe start
-When entering "Use" mode (whether from powerup or from main menu), if the `SwA` or `SwD` switches are "Up", 
+When entering "Use" mode (whether from powerup or from main menu), if the `SwA` or `SwD` switches are "Down" (position 2), 
 or the throttle stick is not fully down, the TX will not arm and an "Alert" dialog is displayed instead.
 
 ![Alert dialog](images/Alert_Dialog.jpg)
@@ -72,7 +72,7 @@ To edit this model select and activate the "Edit current model" option.
 
 ![Edit current model](images/Edit_current_model.jpg)
 
-This will the "Edit model" submenu. This has two screens that will let you edit various properties of the model.
+This will switch to the "Edit model" submenu. This submenu has two screens that will let you edit various properties of the model.
 
 ![Edit model page 1](images/Edit_Model_1.jpg)
 
@@ -80,7 +80,7 @@ The first page has the menu options:
 
 * Name
     * Model names are limited to 9 characters in length. Upper case and lower case letters are allowed: `a..z`, `A..Z`.
-    Numbers `0..9` are allowed. And the space, hyphen and underscore characters: ` `, `-`, `_`.
+    Numbers `0..9` are allowed. And the space and hyphen characters: `" "`, `"-"`.
 * Seconds:
     * This is the number of seconds used for the flight countdown timer.
 * Protocol:
