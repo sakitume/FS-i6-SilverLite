@@ -163,3 +163,9 @@ If I remember correctly I think they are:
 * Double-beeps during last 15 seconds of flight timer to signal that the timer is close to expiring.
 * More beeps (I forget what they sound like) when quadcopter battery voltage (as reported by telemetry) drops below some hardcoded value in the code
 
+## PID Tuning
+
+TODO: Placeholder. Need to describe PID tuning but it is currently in a state of flux.
+So a screenshot for now.
+
+![PID Tuning](images/PID_Tuning.jpg)
