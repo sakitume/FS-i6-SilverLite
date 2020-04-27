@@ -11,6 +11,22 @@ extern GEMPage menuPageMain;
 
 GEMPage menuPageEditModel("Edit Model");
 
+// gui_config_chans_bayang.cpp
+extern void gui_init_bayang_chans(GEMPage &parentMenuPage);
+extern GEMPage menuPageBayangChans;
+GEMItem menuItem_ConfigBayangChans("Bayang Channels", menuPageBayangChans);
+
+extern GEMSelect selectSwitch;
+
+static void saveArmSwitch();
+static uint8_t armSwitch;
+GEMItem menuItem_ArmSwitch("Arm Switch:", armSwitch, selectSwitch, saveArmSwitch);
+static void saveArmSwitch()
+{
+    ModelDesc_t &model = storage.model[storage.current_model];
+    model.armSwitch = armSwitch;
+    storage_save();
+}
 
 static void applyProtocol();
 static uint8_t protocol;
@@ -207,6 +223,10 @@ void gui_init_edit_model_properties()
     protocolOption = model.mpm_option;
     autoBind = model.mpm_auto_bind ? 1 : 0;
     rxNum = model.mpm_rx_num;
+
+    armSwitch = model.armSwitch;
+    extern void gui_init_edit_model_properties_bayang_chans();
+    gui_init_edit_model_properties_bayang_chans();
 }
 
 static void applyModelName()
@@ -224,14 +244,6 @@ static void applyModelName()
 }
 
 
-
-
-// gui_config_chans_bayang.cpp
-extern void gui_init_bayang_chans(GEMPage &parentMenuPage);
-extern GEMItem menuItem_ArmSwitch;
-extern GEMPage menuPageBayangChans;
-GEMItem menuItem_ConfigBayangChans("Bayang Channels", menuPageBayangChans);
-
 void gui_init_edit_model()
 {
     // Need to initialize the variables that our various menu items reference
@@ -245,10 +257,10 @@ void gui_init_edit_model()
     menuPageEditModel.addMenuItem(miProtocolOption);
     menuPageEditModel.addMenuItem(miAutoBind);
     menuPageEditModel.addMenuItem(miRXNum);
+    menuPageEditModel.addMenuItem(menuItem_ArmSwitch);
 
     gui_init_bayang_chans(menuPageEditModel);
     menuPageEditModel.addMenuItem(menuItem_ConfigBayangChans);
-    menuPageEditModel.addMenuItem(menuItem_ArmSwitch);
 
     menuPageEditModel.setParentMenuPage(menuPageMain);
 }

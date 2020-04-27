@@ -8,12 +8,11 @@
 #include "bayang_chan.h"
 
 extern GEM gGEM;
-GEMPage menuPageBayangChans("Bayang Channel");
 
 static void saveAction();
 static SelectOptionByte selectSwitchOptions[_kSw_Max];
-static GEMSelect selectSwitch(sizeof(selectSwitchOptions)/sizeof(selectSwitchOptions[0]), selectSwitchOptions);
 static uint8_t BayangChanToAuxChanMap[_CH_Max];
+GEMSelect selectSwitch(sizeof(selectSwitchOptions)/sizeof(selectSwitchOptions[0]), selectSwitchOptions);
 
 
 static GEMItem miSelect_CH_INV(gBayangChanNames[CH_INV], BayangChanToAuxChanMap[CH_INV], selectSwitch, saveAction);
@@ -24,6 +23,18 @@ static GEMItem miSelect_CH_EMG(gBayangChanNames[CH_EMG], BayangChanToAuxChanMap[
 static GEMItem miSelect_CH_FLIP(gBayangChanNames[CH_FLIP], BayangChanToAuxChanMap[CH_FLIP], selectSwitch, saveAction);
 static GEMItem miSelect_CH_HEADFREE(gBayangChanNames[CH_HEADFREE], BayangChanToAuxChanMap[CH_HEADFREE], selectSwitch, saveAction);
 static GEMItem miSelect_CH_RTH(gBayangChanNames[CH_RTH], BayangChanToAuxChanMap[CH_RTH], selectSwitch, saveAction);
+GEMPage menuPageBayangChans("Bayang Channels");
+
+// Called by gui_init_edit_model_properties()
+// whenever a new model is selected to be edited
+void gui_init_edit_model_properties_bayang_chans()
+{
+    const uint8_t *mapping = storage.model[storage.current_model].bayangChans;
+    for (int i=0; i<_CH_Max; i++)
+    {
+        BayangChanToAuxChanMap[i] = mapping[i];
+    }
+}
 
 void gui_init_bayang_chans(GEMPage &parentMenuPage)
 {
@@ -32,12 +43,6 @@ void gui_init_bayang_chans(GEMPage &parentMenuPage)
         SelectOptionByte &opt = selectSwitchOptions[i];
         opt.name = gSwitchNames[i];
         opt.val_byte = i;
-    }
-
-    const uint8_t *mapping = storage.model[storage.current_model].bayangChans;
-    for (int i=0; i<_CH_Max; i++)
-    {
-        BayangChanToAuxChanMap[i] = mapping[i];
     }
 
     // Note: The order these are added must match the EBayangCHan enumeration list
@@ -61,16 +66,3 @@ static void saveAction()
     storage_save();
 }
 
-
-
-
-static void saveArmSwitch();
-static uint8_t armSwitch;
-GEMItem menuItem_ArmSwitch("Arm Switch", armSwitch, selectSwitch, saveArmSwitch);
-
-static void saveArmSwitch()
-{
-    ModelDesc_t &model = storage.model[storage.current_model];
-    model.armSwitch = armSwitch;
-    storage_save();
-}
