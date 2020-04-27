@@ -110,6 +110,10 @@ The second page of the "Edit model" menu has these options:
     * This is used by the external Multiprotocol Module
 * RX Num:
     * This is used by the external Multiprotocol Module
+* Arm Switch:
+    * This is only used by the flight countdown timer. Timer is paused if arm switch is in off position.
+* [Bayang Channels](#bayang-channels)
+    * This takes you to another menu screen where you can specify which FlySky FS-i6 switches correspond to [Bayang auxliary channels](#bayang-channels).
 
 ### Use model
 The third option on the main menu is "Use model". Select and activate this option to begin using the currently selected model.
@@ -156,12 +160,53 @@ beeps are enabled or not.
 
 ![Beeps](images/Beeps.png)
 
-
-
 If I remember correctly I think they are:
 
 * Double-beeps during last 15 seconds of flight timer to signal that the timer is close to expiring.
 * More beeps (I forget what they sound like) when quadcopter battery voltage (as reported by telemetry) drops below some hardcoded value in the code
+
+## Bayang Channels
+
+The Bayang Channels submenu is used to configure which FlySky FS-i6 switches (and their respective positions) map to various Bayang auxliary channels.
+These Bayang auxiliary channels are defined in the Silverware source code (see the `defines.h` file). There are a total of 8 Bayang auxiliary channels that you can work with. 
+
+* `CH_INV`
+* `CH_VID`
+* `CH_PIC`
+* `CH_TO`
+* `CH_EMG`
+* `CH_FLIP`
+* `CH_HEADFREE`
+* `CH_RTH`
+
+> Note: Silverware defines an additional `CH_EXPERT` channel but its usage is a bit awkward so I don't expose it in SilverLite
+
+It is important for you to understand which of these channels is used by your Silverware flight controller, and for what purpose.
+This requires a careful review/study of the Silveware source code, usually the `config.h` file.
+
+For my BWhoop B03 Pro whoops that run [NFE Silverware](https://github.com/NotFastEnuf/NFE_Silverware) I edited my Silveware `config.h`
+file so that the features (listed below) are mapped to a Bayang aux channel which in turn is mapped to a TX switch.
+
+| Feature      | Channel      | Switch |
+| ------------ | ------------ | ------ |
+| ARMING       | CH_INV       | SwA(2) |
+| LEVELMODE    | CH_FLIP      | SwB(1) |
+| RACEMODE     | CH_PIC       | SwC(2) |
+| HORIZON      | CH_VID       | SwC(3) |
+| CH_HEADFREE  | IDLE_UP      | SwD(2) |
+
+
+![Bayang Channels 1](images/Bayang_Channels_1.jpg)
+![Bayang Channels 2](images/Bayang_Channels_2.jpg)
+
+To change any of the switch assigments use the "Up" and "Down" buttons to select a channel then
+press the "OK" button to begin editing that channel: Use the "Up"/"Down" buttons to select a
+switch and its position, or chose "None" to indicate that channel isn't used.
+
+> Note: The `SwC` switch is a three position switch. So in addition to the position 1, 2 and 3
+options you can also select the 1+2 or 2+3 options. For example, `SwC1+2` means if the switch
+is in either position 1 or 2 then turn on the assigned aux channel.
+
 
 ## PID Tuning
 
