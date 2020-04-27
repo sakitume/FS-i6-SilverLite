@@ -297,6 +297,13 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#bayang-channels" title="Bayang Channels" class="md-nav__link">
+    Bayang Channels
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#pid-tuning" title="PID Tuning" class="md-nav__link">
     PID Tuning
   </a>
@@ -471,6 +478,13 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#bayang-channels" title="Bayang Channels" class="md-nav__link">
+    Bayang Channels
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#pid-tuning" title="PID Tuning" class="md-nav__link">
     PID Tuning
   </a>
@@ -601,6 +615,14 @@ enabled when SilverLite was built.</li>
 <li>This is used by the external Multiprotocol Module</li>
 </ul>
 </li>
+<li>Arm Switch:<ul>
+<li>This is only used by the flight countdown timer. Timer is paused if arm switch is in off position.</li>
+</ul>
+</li>
+<li><a href="#bayang-channels">Bayang Channels</a><ul>
+<li>This takes you to another menu screen where you can specify which FlySky FS-i6 switches correspond to <a href="#bayang-channels">Bayang auxliary channels</a>.</li>
+</ul>
+</li>
 </ul>
 <h3 id="use-model">Use model</h3>
 <p>The third option on the main menu is "Use model". Select and activate this option to begin using the currently selected model.</p>
@@ -636,6 +658,72 @@ beeps are enabled or not.</p>
 <li>Double-beeps during last 15 seconds of flight timer to signal that the timer is close to expiring.</li>
 <li>More beeps (I forget what they sound like) when quadcopter battery voltage (as reported by telemetry) drops below some hardcoded value in the code</li>
 </ul>
+<h2 id="bayang-channels">Bayang Channels</h2>
+<p>The Bayang Channels submenu is used to configure which FlySky FS-i6 switches (and their respective positions) map to various Bayang auxliary channels.
+These Bayang auxiliary channels are defined in the Silverware source code (see the <code>defines.h</code> file). There are a total of 8 Bayang auxiliary channels that you can work with. </p>
+<ul>
+<li><code>CH_INV</code></li>
+<li><code>CH_VID</code></li>
+<li><code>CH_PIC</code></li>
+<li><code>CH_TO</code></li>
+<li><code>CH_EMG</code></li>
+<li><code>CH_FLIP</code></li>
+<li><code>CH_HEADFREE</code></li>
+<li><code>CH_RTH</code></li>
+</ul>
+<blockquote>
+<p>Note: Silverware defines an additional <code>CH_EXPERT</code> channel but its usage is a bit awkward so I don't expose it in SilverLite</p>
+</blockquote>
+<p>It is important for you to understand which of these channels is used by your Silverware flight controller, and for what purpose.
+This requires a careful review/study of the Silveware source code, usually the <code>config.h</code> file.</p>
+<p>For my BWhoop B03 Pro whoops that run <a href="https://github.com/NotFastEnuf/NFE_Silverware">NFE Silverware</a> I edited my Silveware <code>config.h</code>
+file so that the features (listed below) are mapped to a Bayang aux channel which in turn is mapped to a TX switch.</p>
+<table>
+<thead>
+<tr>
+<th>Feature</th>
+<th>Channel</th>
+<th>Switch</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>ARMING</td>
+<td>CH_INV</td>
+<td>SwA(2)</td>
+</tr>
+<tr>
+<td>LEVELMODE</td>
+<td>CH_FLIP</td>
+<td>SwB(1)</td>
+</tr>
+<tr>
+<td>RACEMODE</td>
+<td>CH_PIC</td>
+<td>SwC(2)</td>
+</tr>
+<tr>
+<td>HORIZON</td>
+<td>CH_VID</td>
+<td>SwC(3)</td>
+</tr>
+<tr>
+<td>CH_HEADFREE</td>
+<td>IDLE_UP</td>
+<td>SwD(2)</td>
+</tr>
+</tbody>
+</table>
+<p><img alt="Bayang Channels 1" src="../images/Bayang_Channels_1.jpg" />
+<img alt="Bayang Channels 2" src="../images/Bayang_Channels_2.jpg" /></p>
+<p>To change any of the switch assigments use the "Up" and "Down" buttons to select a channel then
+press the "OK" button to begin editing that channel: Use the "Up"/"Down" buttons to select a
+switch and its position, or chose "None" to indicate that channel isn't used.</p>
+<blockquote>
+<p>Note: The <code>SwC</code> switch is a three position switch. So in addition to the position 1, 2 and 3
+options you can also select the 1+2 or 2+3 options. For example, <code>SwC1+2</code> means if the switch
+is in either position 1 or 2 then turn on the assigned aux channel.</p>
+</blockquote>
 <h2 id="pid-tuning">PID Tuning</h2>
 <p>TODO: Placeholder. Need to describe PID tuning but it is currently in a state of flux.
 So a screenshot for now.</p>
