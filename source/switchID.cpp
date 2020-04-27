@@ -5,17 +5,17 @@
 const char *gSwitchNames[_kSw_Max] =
 {
     "None",
-    "SwA-1",
-    "SwA-2",
-    "SwB-1",
-    "SwB-2",
-    "SwC-1",
-    "SwC-2",
-    "SwC-3",
-    "SwC-1+2",
-    "SwC-2+3",
-    "SwD-1",
-    "SwD-2"
+    "SwA1",
+    "SwA2",
+    "SwB1",
+    "SwB2",
+    "SwC1",
+    "SwC2",
+    "SwC3",
+    "SwC1+2",
+    "SwC2+3",
+    "SwD1",
+    "SwD2"
 };
 
 int switchIsActive(uint8_t id)
