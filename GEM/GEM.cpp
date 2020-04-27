@@ -420,7 +420,7 @@ void GEM::nextEditValueCursorPosition() {
   if ((_editValueCursorPosition != _menuItemValueLength - 1) && (_editValueCursorPosition != _editValueLength - 1) && (_valueString[_editValueCursorPosition] != '\0')) {
     _editValueCursorPosition++;
   }
-  if ((_editValueVirtualCursorPosition != _editValueLength - 1) && (_valueString[_editValueVirtualCursorPosition] != '\0')) {
+  if ((_editValueVirtualCursorPosition != _editValueLength - 1) && (_valueString[_editValueVirtualCursorPosition+1] != '\0')) {
     _editValueVirtualCursorPosition++;
     if (_editValueCursorPosition == _menuItemValueLength - 1) {
       clearValueVisibleRange();
