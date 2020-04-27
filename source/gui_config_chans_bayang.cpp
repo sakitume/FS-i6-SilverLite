@@ -61,3 +61,16 @@ static void saveAction()
     storage_save();
 }
 
+
+
+
+static void saveArmSwitch();
+static uint8_t armSwitch;
+GEMItem menuItem_ArmSwitch("Arm Switch", armSwitch, selectSwitch, saveArmSwitch);
+
+static void saveArmSwitch()
+{
+    ModelDesc_t &model = storage.model[storage.current_model];
+    model.armSwitch = armSwitch;
+    storage_save();
+}

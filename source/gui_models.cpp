@@ -200,8 +200,13 @@ static void applyModelName()
     storage_save();
 }
 
+
+
+
+// gui_config_chans_bayang.cpp
 extern void gui_init_bayang_chans(GEMPage &parentMenuPage);
-extern GEMPage menuPageBayangChans;  // gui_config_chans_bayang.cpp
+extern GEMItem menuItem_ArmSwitch;
+extern GEMPage menuPageBayangChans;
 GEMItem menuItem_ConfigBayangChans("Bayang Channels", menuPageBayangChans);
 
 void gui_init_edit_model()
@@ -220,6 +225,7 @@ void gui_init_edit_model()
 
     gui_init_bayang_chans(menuPageEditModel);
     menuPageEditModel.addMenuItem(menuItem_ConfigBayangChans);
+    menuPageEditModel.addMenuItem(menuItem_ArmSwitch);
 
     menuPageEditModel.setParentMenuPage(menuPageMain);
 }
