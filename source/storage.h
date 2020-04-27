@@ -8,7 +8,6 @@
 #include "bayang_chan.h"    // for _CH_Max
 
 #define STORAGE_VERSION_ID 0x03
-#define STORAGE_MODEL_NAME_LEN 11
 #define STORAGE_MODEL_MAX_COUNT 10
 
 struct ModelDesc_t 

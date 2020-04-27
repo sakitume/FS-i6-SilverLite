@@ -175,10 +175,29 @@ static void applySubprotocol()
     storage_save();
 }
 
+
+static void copyNameWithPadding(char *dst, int dstBuffSize, const char *src)
+{
+    for (int i=0; i<dstBuffSize-1; i++)
+    {
+        char ch = *src;
+        if (!ch)
+        {
+            ch = ' ';
+        }
+        else
+        {
+            src++;
+        }
+        dst[i] = ch;
+    }
+    dst[dstBuffSize-1] = '\0';
+}
+
 void gui_init_edit_model_properties()
 {
     ModelDesc_t &model = storage.model[storage.current_model];
-    strncpy(modelName, model.name, GEM_STR_LEN - 1);
+    copyNameWithPadding(modelName, ModelDesc_t::kModelNameLen, model.name);
     secondsTimer = model.timer;
     protocol = model.mpm_protocol;
     updateSubprotocolParams(protocol);
@@ -190,13 +209,17 @@ void gui_init_edit_model_properties()
     rxNum = model.mpm_rx_num;
 }
 
-
-
 static void applyModelName()
 {
-    char *dst = storage.model[storage.current_model].name;
-    strncpy(dst, modelName, sizeof(storage.model[0].name)-1);
-    dst[sizeof(storage.model[0].name)-1] = 0;
+    ModelDesc_t &model = storage.model[storage.current_model];
+    copyNameWithPadding(model.name, ModelDesc_t::kModelNameLen, modelName);
+
+    // TODO, XXX: More weirdness with GEM. It will remove trailing whitespace
+    // of the model name that was just edited. This will cause problems when
+    // we try to re-edit this same model. So copy the name over once again
+    // and ensure the whitespace padding is added
+    copyNameWithPadding(modelName, ModelDesc_t::kModelNameLen, model.name);
+
     storage_save();
 }
 

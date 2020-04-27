@@ -69,8 +69,7 @@ static void setDefaults()
         // Note: Due to weirdness with GEM and how it edits strings we need 
         // to make sure name is padded with spaces
         const char *srcName = "Model?";
-        const int kNameMax = sizeof(storage.model)/sizeof(storage.model[0]);
-        for (int j=0; j<kNameMax; j++)
+        for (int j=0; j<ModelDesc_t::kModelNameLen; j++)
         {
             char ch = *srcName;
             if (!ch)
@@ -87,7 +86,7 @@ static void setDefaults()
             }
             model.name[j] = ch;
         }
-        model.name[kNameMax-1] = '\0';
+        model.name[ModelDesc_t::kModelNameLen-1] = '\0';
 
         setupDefaultMapping(model.bayangChans);
 
