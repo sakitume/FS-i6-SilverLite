@@ -64,8 +64,30 @@ static void setDefaults()
     {
         ModelDesc_t &model = storage.model[i];
         model.timer = 4 * 60;
-        strcpy(model.name, "Model?");
-        model.name[5] = '0' + i;    // Change the '?' in "Model?" to be '0' thru '9'
+
+        // Set name to: "Model0"..."Model9"
+        // Note: Due to weirdness with GEM and how it edits strings we need 
+        // to make sure name is padded with spaces
+        const char *srcName = "Model?";
+        const int kNameMax = sizeof(storage.model)/sizeof(storage.model[0]);
+        for (int j=0; j<kNameMax; j++)
+        {
+            char ch = *srcName;
+            if (!ch)
+            {
+                ch = ' ';
+            }
+            else
+            {
+                srcName++;
+                if (ch == '?')
+                {
+                    ch = '0' + i;
+                }
+            }
+            model.name[j] = ch;
+        }
+        model.name[kNameMax-1] = '\0';
 
         setupDefaultMapping(model.bayangChans);
 
