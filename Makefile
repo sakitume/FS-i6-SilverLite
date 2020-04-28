@@ -100,6 +100,8 @@ SOURCES =  \
 	${SRC_DIR}/main.cpp \
 	${SRC_DIR}/multiprotocol.cpp \
 	${SRC_DIR}/multiprotocol.h \
+	${SRC_DIR}/silverlite_data.h \
+	${SRC_DIR}/silverlite_data.cpp \
 	${SRC_DIR}/screen.c \
 	${SRC_DIR}/screen.h \
 	${SRC_DIR}/sound.cpp \

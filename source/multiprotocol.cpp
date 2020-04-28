@@ -12,6 +12,7 @@
 #include "adc.h"
 #include "buttons.h"
 #include "storage.h"
+#include "silverlite_data.h"
 
 #define MPM_UART UART2
 #define MPM_UART_CLK_FREQ CLOCK_GetFreq(BUS_CLK)
@@ -50,6 +51,8 @@ static bool bTXEnabled = false;
 
 #define MULTI_CHANS 16
 #define MULTI_CHAN_BITS 11
+
+extern void HandleSilverLitePacket(const uint8_t* packet);
 
 //--[ Forward Declarations] ----------------------------------------------------
 static void ProcessTelemetry(uint8_t telemetryType, const uint8_t* data, uint8_t dataLen);
@@ -534,6 +537,7 @@ enum MultiPacketTypes
 	MULTI_TELEMETRY_AFHDS2A_AC		= 12,
 	MULTI_TELEMETRY_RX_CHANNELS		= 13,
 	MULTI_TELEMETRY_HOTT			= 14,
+	MULTI_TELEMETRY_SILVERLITE		= 15,
 };
 
 static void ProcessTelemetry(uint8_t telemetryType, const uint8_t* data, uint8_t dataLen)
@@ -683,6 +687,10 @@ static void ProcessTelemetry(uint8_t telemetryType, const uint8_t* data, uint8_t
             }
         }
     }
+    else if (telemetryType == MULTI_TELEMETRY_SILVERLITE)
+    {
+        HandleSilverLitePacket(data);
+    }
 }
 
 unsigned multiprotocol_get_telemetry(int id)
@@ -695,6 +703,16 @@ unsigned multiprotocol_get_telemetry(int id)
         }
     }
     return 0;
+}
+
+uint16_t multiprotocol_get_pid(int row, int col)
+{
+    switch (row)
+    {
+        case 0: return gSilverLiteData.P[col];
+        case 1: return gSilverLiteData.I[col];
+        case 2: return gSilverLiteData.D[col];
+    }
 }
 
 void multiprotocol_enable(void)

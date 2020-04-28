@@ -4,6 +4,7 @@
 #include "config.h"
 #include "multiprotocol_enums.h"
 #include "buttons.h"
+#include "silverlite_data.h"
 
 #if defined(__USING_INTERNAL_TRX__)
     #include "bayang.h"
@@ -126,6 +127,10 @@ uint16_t tx_get_pid(int row, int col)
                 case 2: return gSilverLiteData.D[col];
             }
         }
+    }
+    else
+    {
+        return multiprotocol_get_pid(row, col);
     }
 #endif
     return 0;

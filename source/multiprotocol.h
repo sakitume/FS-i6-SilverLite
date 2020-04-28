@@ -12,7 +12,7 @@ void multiprotocol_disable(void);
 void multiprotocol_rebind(void);
 
 unsigned multiprotocol_get_telemetry(int id);
-unsigned multiprotocol_get_telemetry(int id);
+uint16_t multiprotocol_get_pid(int row, int col);
 
 enum e_Protocols
 {

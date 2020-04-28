@@ -22,6 +22,7 @@
 
 #include "bayang_common.h"
 #include "bayang.h"
+#include "silverlite_data.h"
 
 #include "console.h"
 #include "screen.h"
