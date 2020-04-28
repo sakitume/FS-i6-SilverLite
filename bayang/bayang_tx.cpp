@@ -322,6 +322,8 @@ static bool CheckForTelemetry()
 //------------------------------------------------------------------------------
 static void HandleBayangPacket(const uint8_t* packet)
 {
+    gSilverLiteData.tlmCount++;
+
     gSilverLiteData.vbattFilt   = ((packet[3] & 0x7) << 8) | packet[4];
     gSilverLiteData.vbattComp   = ((packet[5] & 0x7) << 8) | packet[6];
     gSilverLiteData.pktsPerSec  = packet[7];

@@ -1,6 +1,7 @@
-# This is a placeholder
+# This is a work in progress
 
 * Describe how multiprotocol module is supported via serial (trainer port).
+* Describe modifying a Jumper T-16 internal module for use with this firmware
 * Describe how list of available protocols is currently limited due to menu system awkwardness
 * TODO: Mapping of i6 aux channels to multiprotocol channels
 

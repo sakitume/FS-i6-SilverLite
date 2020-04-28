@@ -4,6 +4,7 @@
 //#include "fsl_dmamux.h"
 #include "fsl_uart.h"
 #include "multiprotocol.h"
+#include "multiprotocol_enums.h"
 #include "drv_time.h"
 
 #include <stdio.h>  // printf
@@ -685,33 +686,46 @@ static void ProcessTelemetry(uint8_t telemetryType, const uint8_t* data, uint8_t
             {
                 telemetryFrame[i] = data[i];
             }
+
+//------------------------------------------------------------------------------
+// Multiprotocol telemetry data
+//
+// data[1] = v_lipo1;  // uncompensated battery volts*100/2
+// data[2] = v_lipo2;  // compensated battery volts*100/2
+// data[3] = RX_RSSI;  // reception in packets / sec
+// data[4] = TX_RSSI;
+// data[5] = RX_LQI;
+// data[6] = TX_LQI;
+//
+// For FlySky protocol, above yields:
+// data[1], data[2] (Batt): 86, 00
+// data[3], data[4] (RSSI): CC, F8
+// data[5], data[6] (LQI):  00, 00
+//
+// For Bayang protocol, above yields:
+// data[1], data[2] (Batt): 15, 9B
+// data[3], data[4] (RSSI): AA, 00
+// data[5], data[6] (LQI):  AA, 55
+
+            // Get current model so we can use its multiprotocol config
+            const ModelDesc_t &model = storage.model[storage.current_model];
+            if (model.mpm_protocol == PROTO_BAYANG)
+            {
+                gSilverLiteData.vbattComp = gSilverLiteData.vbattFilt = telemetryFrame[2] * 2;
+                gSilverLiteData.pktsPerSec = telemetryFrame[5] * 2;
+            }
+            else
+            {
+                gSilverLiteData.vbattComp = gSilverLiteData.vbattFilt = telemetryFrame[1];
+                gSilverLiteData.pktsPerSec = telemetryFrame[3];
+            }
+            gSilverLiteData.lastUpdate = millis_this_frame();
+            gSilverLiteData.tlmCount++;
         }
     }
     else if (telemetryType == MULTI_TELEMETRY_SILVERLITE)
     {
         HandleSilverLitePacket(data);
-    }
-}
-
-unsigned multiprotocol_get_telemetry(int id)
-{
-    if (bTXEnabled)
-    {
-        if ((unsigned)id < (sizeof(telemetryFrame)/sizeof(telemetryFrame[0])))
-        {
-            return telemetryFrame[id];
-        }
-    }
-    return 0;
-}
-
-uint16_t multiprotocol_get_pid(int row, int col)
-{
-    switch (row)
-    {
-        case 0: return gSilverLiteData.P[col];
-        case 1: return gSilverLiteData.I[col];
-        case 2: return gSilverLiteData.D[col];
     }
 }
 

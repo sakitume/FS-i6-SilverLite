@@ -33,7 +33,14 @@ struct SilverLiteData_t
     //  offsetof(SilverLiteData_t, flags) + sizeof(((SilverLiteData_t*)0)->flags)
 
     // Used internally (did not come from telemetry packet)
-    bool    telemetryChanged;
+    uint32_t secondsTimestamp;  // millisecond timestamp used to perform actions every 1000 milliseconds
+    uint32_t lastUpdate;        // set to millis_this_frame() when this structure is updated
+    uint32_t lastPIDUpdate;     // set to millis_this_frame() when PID arrays are updated
+    uint16_t tlmPPS;            // telemetry packets per second
+    uint16_t tlmCount;          // incremented every time telemetry is received
+
+    void reset();
+    void update();
 };
 extern struct SilverLiteData_t gSilverLiteData;
 

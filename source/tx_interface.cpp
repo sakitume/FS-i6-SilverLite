@@ -14,26 +14,6 @@
 #endif
 
 //------------------------------------------------------------------------------
-// Multiprotocol telemetry data
-//
-// data[1] = v_lipo1;  // uncompensated battery volts*100/2
-// data[2] = v_lipo2;  // compensated battery volts*100/2
-// data[3] = RX_RSSI;  // reception in packets / sec
-// data[4] = TX_RSSI;
-// data[5] = RX_LQI;
-// data[6] = TX_LQI;
-//
-// For FlySky protocol, above yields:
-// data[1], data[2] (Batt): 86, 00
-// data[3], data[4] (RSSI): CC, F8
-// data[5], data[6] (LQI):  00, 00
-//
-// For Bayang protocol, above yields:
-// data[1], data[2] (Batt): 15, 9B
-// data[3], data[4] (RSSI): AA, 00
-// data[5], data[6] (LQI):  AA, 55
-
-//------------------------------------------------------------------------------
 static bool usingInternal()
 {
     const ModelDesc_t &model = storage.model[storage.current_model];
@@ -41,27 +21,23 @@ static bool usingInternal()
 }
 
 //------------------------------------------------------------------------------
+static bool silverLiteDataIsRecent()
+{
+    // return true if gSilverLiteData was updated within the last 100 milliseconds
+    return (millis_this_frame() - gSilverLiteData.lastUpdate) <= 100;
+}
+
+//------------------------------------------------------------------------------
 // Voltage of flight controller
 uint16_t tx_get_fc_voltage()
 {
-#if defined(__USING_INTERNAL_TRX__)
-    if (usingInternal())
+    //
+    if (silverLiteDataIsRecent())
     {
 //      return gSilverLiteData.vbattFilt;
         return gSilverLiteData.vbattComp;
     }
-#endif    
-
-    //
-    const ModelDesc_t &model = storage.model[storage.current_model];
-    if (model.mpm_protocol == PROTO_BAYANG)
-    {
-        return multiprotocol_get_telemetry(2) * 2;
-    }
-    else
-    {
-        return multiprotocol_get_telemetry(1);
-    }
+    return 0;
 }
 
 //------------------------------------------------------------------------------
@@ -77,68 +53,46 @@ uint16_t tx_get_rssi_tx()
 #endif    
 
     //
-    const ModelDesc_t &model = storage.model[storage.current_model];
-    if (model.mpm_protocol == PROTO_BAYANG)
+    if (silverLiteDataIsRecent())
     {
-        return multiprotocol_get_telemetry(6) * 2;
+//        return gSilverLiteData.tlmCount;
+        return gSilverLiteData.tlmPPS;
     }
-    else
-    {
-        return multiprotocol_get_telemetry(4) * 2;
-    }
+    return 0;
 }
 
 //------------------------------------------------------------------------------
 // RSSI reported by flight controller
 uint16_t tx_get_rssi_fc()
 {
-#if defined(__USING_INTERNAL_TRX__)
-    if (usingInternal())
+    if (silverLiteDataIsRecent())
     {
-        // If timeout value hasn't expired then we can return PPS
-        return gTXContext.telemetryTimeout ? gSilverLiteData.pktsPerSec : 0;
+        return gSilverLiteData.pktsPerSec;
     }
-#endif
-    //
-    const ModelDesc_t &model = storage.model[storage.current_model];
-    if (model.mpm_protocol == PROTO_BAYANG)
-    {
-        return multiprotocol_get_telemetry(5) * 2;
-    }
-    else
-    {
-        return multiprotocol_get_telemetry(3);
-    }
+    return 0;
 }
 
 //------------------------------------------------------------------------------
 uint16_t tx_get_pid(int row, int col)
 {
-#if defined(__USING_INTERNAL_TRX__)
-    if (usingInternal())
+    // if gSilverLiteData PID data was updated within the last 100 milliseconds
+    if ((millis_this_frame() - gSilverLiteData.lastPIDUpdate) <= 100)
     {
-        // If timeout value hasn't expired then we can return pid value
-        if (gTXContext.telemetryTimeout)
+        switch (row)
         {
-            switch (row)
-            {
-                case 0: return gSilverLiteData.P[col];
-                case 1: return gSilverLiteData.I[col];
-                case 2: return gSilverLiteData.D[col];
-            }
+            case 0: return gSilverLiteData.P[col];
+            case 1: return gSilverLiteData.I[col];
+            case 2: return gSilverLiteData.D[col];
         }
     }
-    else
-    {
-        return multiprotocol_get_pid(row, col);
-    }
-#endif
     return 0;
 }
 
 //------------------------------------------------------------------------------
 void tx_update()
 {
+    gSilverLiteData.update();
+
 #if defined(__USING_INTERNAL_TRX__)
     if (usingInternal())
     {
@@ -178,6 +132,8 @@ static void internalReset(bool bInitialize)
 //------------------------------------------------------------------------------
 void tx_start()
 {
+    gSilverLiteData.reset();
+
 #if defined(__USING_INTERNAL_TRX__)
     if (usingInternal())
     {
@@ -204,6 +160,7 @@ void tx_stop()
 //------------------------------------------------------------------------------
 void tx_reset()
 {
+    gSilverLiteData.reset();
 #if defined(__USING_INTERNAL_TRX__)
     if (usingInternal())
     {
