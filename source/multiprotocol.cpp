@@ -14,6 +14,7 @@
 #include "buttons.h"
 #include "storage.h"
 #include "silverlite_data.h"
+#include "switchID.h"
 
 #define MPM_UART UART2
 #define MPM_UART_CLK_FREQ CLOCK_GetFreq(BUS_CLK)
@@ -57,6 +58,7 @@ extern void HandleSilverLitePacket(const uint8_t* packet);
 
 //--[ Forward Declarations] ----------------------------------------------------
 static void ProcessTelemetry(uint8_t telemetryType, const uint8_t* data, uint8_t dataLen);
+static void mapSwitchesToMPMChans(uint16_t adc_data[], const uint8_t *mapping);
 
 
 //------------------------------------------------------------------------------
@@ -376,15 +378,50 @@ So something like this will be needed
             //  2 adc channels (SwB, SwC): ADC_ID_SwB, ADC_ID_SwC
             //  2 digital channels (SwA, SwD)
             //
-            uint16_t adc_data[10];
-            for (int i = ADC_ID_AILERON; i <= ADC_ID_SwC; i++) 
+            // Multiprotocol module expects 16 channels of input data
+            uint16_t adc_data[MULTI_CHANS];
+
+            // Populate first 4 mpm channels with AETR data
+            int ch;
+            for (ch = ADC_ID_AILERON; ch <= ADC_ID_RUDDER; ch++) 
             {
                 // ADC value will be between 0x0 to 0xFFF inclusive
-                int value = adc_get_channel_calibrated_unscaled(i);
-                adc_data[i] = value;
+                int value = adc_get_channel_calibrated_unscaled(ch);
+                adc_data[ch] = value;
             }
-            adc_data[8] = button_active(kBtn_SwA) ? 4095 : 0;
-            adc_data[9] = button_active(kBtn_SwD) ? 4095 : 0;
+
+            if (model.mpm_protocol == kBayangProtocol)
+            {
+                // Mapping switches to Bayang channels, default MPM channels to 0
+                // then call mapSwitchesToMPMChans() to honor the model's switch mapping
+                for (; ch < MULTI_CHANS; ch++)
+                {
+                    adc_data[ch] = 0;
+                }
+                mapSwitchesToMPMChans(adc_data, model.bayangChans);
+            }
+            else
+            {
+                // Copy rest of our ADC channels to MPM channels
+                //  2 adc channels (VrA, VrB): ADC_ID_CH0, ADC_ID_CH1
+                //  2 adc channels (SwB, SwC): ADC_ID_SwB, ADC_ID_SwC
+                for (; ch <= ADC_ID_SwC; ch++) 
+                {
+                    // ADC value will be between 0x0 to 0xFFF inclusive
+                    int value = adc_get_channel_calibrated_unscaled(ch);
+                    adc_data[ch] = value;
+                }
+
+                // Then copy SwA and SwB states
+                adc_data[ch++] = button_active(kBtn_SwA) ? 4095 : 0;
+                adc_data[ch++] = button_active(kBtn_SwD) ? 4095 : 0;
+
+                // Zero out the remaining
+                for (; ch < MULTI_CHANS; ch++)
+                {
+                    adc_data[ch] = 0;
+                }
+            }
 
             // Multiprotocol module expects 16 channels to be provided
             const uint16_t SwC = adc_get_channel_calibrated(ADC_ID_SwC);
@@ -394,77 +431,7 @@ So something like this will be needed
             	// 0	-100%
             	// 2048    0%
             	// 4095	+100%
-                int value = (i < 10) ? adc_data[i] : 0;
-
-                if (model.mpm_protocol == kBayangProtocol)
-                {
-                    // The following channels correspond to various
-                    // Bayang flags that we care about
-                    enum
-                    {
-                        CH5_SW  = 4,
-                        CH7_SW  = 6,
-                        CH8_SW  = 7,
-                        CH9_SW  = 8,
-                        CH10_SW = 9,
-                        CH11_SW = 10,
-
-                        CH14_ANALOG = 13,
-                        CH15_ANALOG = 14
-                    };
-
-                    // On my NFE Silverware quads I setup ARMING, IDLE_UP, etc
-                    // to virtual channels (CHAN_5, etc) which in turn are initialized
-                    // from Bayang flags. The comments below (above each case
-                    // statement) describe how I expect things to be mapped.
-                    switch (i)
-                    {
-                        //#define ARMING CHAN_5     BAYANG_FLAG_INVERT, SwA
-                        case CH10_SW:
-                            value = button_active(kBtn_SwA) ? 4095 : 0;
-                            break;
-
-                        //#define IDLE_UP CHAN_9    BAYANG_FLAG_HEADLESS, SwD
-                        case CH9_SW:
-                            value = button_active(kBtn_SwD) ? 4095 : 0;
-                            break;
-
-                        //#define LEVELMODE CHAN_6  BAYANG_FLAG_FLIP, SwB: Position 1
-                        case CH5_SW:
-                            value = (adc_get_channel_calibrated(ADC_ID_SwB) < 100) ? 4095 : 0;
-                            break;
-
-                        //#define RACEMODE  CHAN_7  BAYANG_FLAG_SNAPSHOT, SwC: Position 2
-                        case CH7_SW:
-                            value = (SwC >= 412) ? 4095 : 0;
-                            break;
-
-                        //#define HORIZON   CHAN_8  BAYANG_FLAG_VIDEO, SwC: Position 3
-                        case CH8_SW:
-                            value = (SwC >= 923) ? 4095 : 0;
-                            break;
-
-                        // Disable dyntrim (because I don't know what it does exactly and it seems wrong to have it on based on code in Silverware)
-                        case CH11_SW:
-                            value = 4095;
-                            break;
-
-                        case CH14_ANALOG:
-                            if (model.mpm_option & 2)   // 2 == BAYANG_OPTION_FLAG_ANALOGAUX
-                            {
-                                value = adc_data[ADC_ID_CH0];   // VrA
-                            }
-                            break;
-
-                        case CH15_ANALOG:
-                            if (model.mpm_option & 2)   // 2 == BAYANG_OPTION_FLAG_ANALOGAUX
-                            {
-                                value = adc_data[ADC_ID_CH1];   // VrB
-                            }
-                            break;
-                    }
-                }
-                
+                int value = adc_data[i];
 
                 // Channel value constrained to 11 bits (0 to 2047 inclusive)
                 //	0		-125%
@@ -488,6 +455,40 @@ So something like this will be needed
             }
 
             sendXfer.dataSize = p - sendXfer.data;
+        }
+    }
+}
+
+// Maps EBayangChan to Multiprotocol module channels
+static uint8_t BayangChanToMPMChan[] =
+{
+    9,      // CH_INV
+    7,      // CH_VID
+    6,      // CH_PIC
+    11,     // CH_TO
+    12,     // CH_EMG
+    4,      // CH_FLIP
+    8,      // CH_HEADFREE
+    5       // CH_RTH
+};
+static void mapSwitchesToMPMChans(uint16_t adc_data[], const uint8_t *mapping)
+{
+    // Disable dyntrim (because I don't know what it does exactly and it seems wrong 
+    // to have it on based on code in Silverware)
+    adc_data[10]    = 4095;
+
+    // MPM expects analog values for CH_14, CH_15 so we'll use VrA and VrB
+    // Note: They're only used if the bayang analog aux option (flag 2) is set
+    adc_data[13] = adc_get_channel_calibrated_unscaled(ADC_ID_CH0);
+    adc_data[14] = adc_get_channel_calibrated_unscaled(ADC_ID_CH1);
+
+    for (int i=0; i<_CH_Max; i++)
+    {
+        uint8_t sw = mapping[i];
+        if (sw != kSw_None)
+        {
+            uint8_t mpmChan = BayangChanToMPMChan[i];
+            adc_data[mpmChan] = switchIsActive(sw) ? 4095 : 0;
         }
     }
 }

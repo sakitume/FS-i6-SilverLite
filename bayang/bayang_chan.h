@@ -3,7 +3,12 @@
 
 #include <stdint.h>
 
-// These are the auxiliary bayang channels in no particular order
+// These are the auxiliary bayang channels originally defined in no particular order
+// *BUT* their order is important as mapping tables like BayangChanToMPMChan[] and
+// gBayangChanNames[] depend on it
+//
+// So if you reorder or redefine this be sure to update BayangChanToMPMChan[], gBayangChanNames[]
+//
 enum EBayangChan
 {
     CH_INV,
