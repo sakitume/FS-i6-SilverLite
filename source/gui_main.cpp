@@ -13,6 +13,11 @@
 #include "drv_time.h"
 #include "GEM.h"
 
+#define __LOG_LOOPTIME__
+#if defined(__LOG_LOOPTIME__)
+#include "bayang_common.h"
+#endif
+
 static GLCD gGLCD;
 GEM gGEM(gGLCD);
 
@@ -81,6 +86,35 @@ void gui_init()
 #endif    
 }
 
+#if defined(__LOG_LOOPTIME__)
+//------------------------------------------------------------------------------
+static void checkLoopTime()
+{
+    static uint32_t lastLoop;
+    static uint32_t lastSec;
+    uint32_t now = micros_this_frame();
+    static uint32_t longest;
+    if ((now - lastSec) > 1000000)
+    {
+        debug_put_uint16(longest);
+        debug(", ");
+        debug_put_uint16(gTXContext.irqTime);
+        debug_put_newline();
+        lastSec = now;
+        longest = 0;
+    }
+    else
+    {
+        uint32_t delta = now - lastLoop;
+        if (delta > longest)
+        {
+            longest = delta;
+        }
+    }
+    lastLoop = now;
+}
+#endif
+
 //------------------------------------------------------------------------------
 void gui_loop()
 {
@@ -89,6 +123,7 @@ void gui_loop()
     uint32_t    autoRepeatTime = 0;
     while (1)
     {
+        checkLoopTime();
 
         // Call the required update functions of various systems
         extern void required_updates();
