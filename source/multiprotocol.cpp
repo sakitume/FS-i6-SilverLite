@@ -184,37 +184,14 @@ void multiprotocol_update(void)
     }
 
     // If TX is idle
-    if (!txOnGoing)
+    if (!txOnGoing && (kStatus_UART_TxIdle == g_uartHandle.txState))
     {
-        // If we have data ready for transmission
-        if (sendXfer.dataSize)
-        {
-            // Send the data
-            txOnGoing = true;
-            UART_TransferSendNonBlocking(MPM_UART, &g_uartHandle, &sendXfer);
-            sendXfer.dataSize = 0;
-        }
-    }
-
-    // If TX is idle
-    if (!txOnGoing)
-    {
-#if 1        
-        bool bTimeToSend = false;
+        // If it has been at least 1 millisecond since we last sent a packet
         uint32_t    now = micros_this_frame();
         static uint32_t lastTX = 0;
-        if ((now - lastTX) >= 2000)
-        {
-            bTimeToSend = true;
-        }
-
-        if (bTimeToSend)
+        if ((now - lastTX) >= 1000)
         {
             lastTX = now;
-#else
-        if (bTXEnabled)
-        {
-#endif        
 
             uint8_t *p = sendXfer.data;
             uint8_t data;
@@ -424,7 +401,6 @@ So something like this will be needed
             }
 
             // Multiprotocol module expects 16 channels to be provided
-            const uint16_t SwC = adc_get_channel_calibrated(ADC_ID_SwC);
             for (int i = 0; i < MULTI_CHANS; i++) 
             {
                 // adc_data[] values:
@@ -454,7 +430,10 @@ So something like this will be needed
                 }
             }
 
+            // Send the data
+            txOnGoing = true;
             sendXfer.dataSize = p - sendXfer.data;
+            UART_TransferSendNonBlocking(MPM_UART, &g_uartHandle, &sendXfer);
         }
     }
 }
@@ -621,6 +600,8 @@ static void ProcessTelemetry(uint8_t telemetryType, const uint8_t* data, uint8_t
     for(;j<8;j++)
         Serial_write(0x00);
 #endif
+
+#if 0
         debug("Flags: ");
         uint8_t flags = data[0];
         debug_put_hex8(flags);
@@ -635,6 +616,7 @@ static void ProcessTelemetry(uint8_t telemetryType, const uint8_t* data, uint8_t
         name[i] = 0;
         debug(name);
         debug_put_newline();
+#endif        
     }
     else if (telemetryType == MULTI_TELEMETRY_HUB)
     {
