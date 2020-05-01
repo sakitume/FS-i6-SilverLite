@@ -322,6 +322,7 @@ static bool CheckForTelemetry()
 //------------------------------------------------------------------------------
 static void HandleBayangPacket(const uint8_t* packet)
 {
+    gSilverLiteData.lastUpdate = millis_this_frame();
     gSilverLiteData.tlmCount++;
 
     gSilverLiteData.vbattFilt   = ((packet[3] & 0x7) << 8) | packet[4];
