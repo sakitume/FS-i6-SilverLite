@@ -23,10 +23,11 @@ extern uint16_t Bayang_count;
 //------------------------------------------------------------------------------
 extern uint8_t packet[BAYANG_PACKET_SIZE];
 
-extern uint8_t txPkt_Flags2;    // Used for packet[2]
-extern uint8_t txPkt_Flags3;    // Used for packet[3]
-extern uint16_t txPkt_Sticks[4];// in AETR order
-extern uint16_t txPkt_AuxAnalog[2]; // auxiliary analog channels
+// These are written to by foreground task and read by ISR handler
+extern volatile uint8_t txPkt_Flags2;       // Used for packet[2]
+extern volatile uint8_t txPkt_Flags3;       // Used for packet[3]
+extern volatile uint16_t txPkt_Sticks[4];   // in AETR order
+extern volatile uint16_t txPkt_AuxAnalog[2];// auxiliary analog channels
 
 //------------------------------------------------------------------------------
 uint8_t Bayang_checksum();

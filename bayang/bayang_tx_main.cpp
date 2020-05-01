@@ -92,8 +92,8 @@ enum
 void Bayang_tx_update()
 {
     // Bayang aux channels (flag bits in rxdata[2] and rxdata[3])
-    txPkt_Flags2 = 0;
-    txPkt_Flags3 = 0;
+    uint8_t flags2 = 0;
+    uint8_t flags3 = 0;
     const uint8_t *mapping = storage.model[storage.current_model].bayangChans;
     for (int i=0; i<_CH_Max; i++)
     {
@@ -108,32 +108,37 @@ void Bayang_tx_update()
             switch (i)
             {
                 case CH_INV:
-                    if (isActive) txPkt_Flags3 |= BAYANG_FLAG_INVERT;
+                    if (isActive) flags3 |= BAYANG_FLAG_INVERT;
                     break;
                 case CH_VID:
-                    if (isActive) txPkt_Flags2 |= BAYANG_FLAG_VIDEO;
+                    if (isActive) flags2 |= BAYANG_FLAG_VIDEO;
                     break;
                 case CH_PIC:
-                    if (isActive) txPkt_Flags2 |= BAYANG_FLAG_SNAPSHOT;
+                    if (isActive) flags2 |= BAYANG_FLAG_SNAPSHOT;
                     break;
                 case CH_TO:
-                    if (isActive) txPkt_Flags3 |= BAYANG_FLAG_TAKE_OFF;
+                    if (isActive) flags3 |= BAYANG_FLAG_TAKE_OFF;
                     break;
                 case CH_EMG:
-                    if (isActive) txPkt_Flags3 |= BAYANG_FLAG_EMG_STOP;
+                    if (isActive) flags3 |= BAYANG_FLAG_EMG_STOP;
                     break;
                 case CH_FLIP:
-                    if (isActive) txPkt_Flags2 |= BAYANG_FLAG_FLIP;
+                    if (isActive) flags2 |= BAYANG_FLAG_FLIP;
                     break;
                 case CH_HEADFREE:
-                    if (isActive) txPkt_Flags2 |= BAYANG_FLAG_HEADLESS;
+                    if (isActive) flags2 |= BAYANG_FLAG_HEADLESS;
                     break;
                 case CH_RTH:
-                    if (isActive) txPkt_Flags2 |= BAYANG_FLAG_RTH;
+                    if (isActive) flags2 |= BAYANG_FLAG_RTH;
                     break;
             }
         }
     }
+
+    // Assign the tkPkt_??? variables atomically (rather than in the loop above)
+    // because they are accessed by an interrupt subroutine handler 
+    txPkt_Flags2 = flags2;
+    txPkt_Flags3 = flags3;
     
     // AETR channel values
     for (int i=0; i<4; i++)

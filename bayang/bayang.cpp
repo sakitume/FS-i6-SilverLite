@@ -35,10 +35,12 @@ uint8_t Bayang_rf_channels[BAYANG_RF_NUM_CHANNELS] = {0,};
 uint8_t Bayang_rx_tx_addr[BAYANG_ADDRESS_LENGTH];
 
 uint8_t packet[BAYANG_PACKET_SIZE];
-uint8_t txPkt_Flags2;       // Used for packet[2]
-uint8_t txPkt_Flags3;       // Used for packet[3]
-uint16_t txPkt_Sticks[4];   // in AETR order
-uint16_t txPkt_AuxAnalog[2];    // auxiliary analog channels
+
+// These are written to by foreground task and read by ISR handler
+volatile uint8_t txPkt_Flags2;          // Used for packet[2]
+volatile uint8_t txPkt_Flags3;          // Used for packet[3]
+volatile uint16_t txPkt_Sticks[4];      // in AETR order
+volatile uint16_t txPkt_AuxAnalog[2];   // auxiliary analog channels
 
 //------------------------------------------------------------------------------
 uint8_t Bayang_checksum()
