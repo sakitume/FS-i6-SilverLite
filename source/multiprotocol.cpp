@@ -184,7 +184,7 @@ void multiprotocol_update(void)
     }
 
     // If TX is idle
-    if (!txOnGoing && (kStatus_UART_TxIdle == g_uartHandle.txState))
+    if (!txOnGoing)
     {
         // If it has been at least 1 millisecond since we last sent a packet
         uint32_t    now = micros_this_frame();
