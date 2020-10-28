@@ -143,7 +143,11 @@ void Bayang_tx_isr(unsigned long /*millis*/)
             }
         }
 
-        gTXContext.irqTime = micros() - us_now;
+        uint32_t deltaTime = micros() - us_now;
+        if (deltaTime > gTXContext.irqTime)
+        {
+            gTXContext.irqTime = deltaTime;
+        }
         gTXContext.irqHits++;
     }
 }

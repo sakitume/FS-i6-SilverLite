@@ -51,9 +51,9 @@ struct TXContext_t
     int8_t      sendInterval;       // Interval in milliseconds between sending TX packets
     int8_t      intervalCounter;    // Countdown timer used by ISR
     uint32_t    txSendCount;        // number of TX packets sent
-    uint32_t    txSendTime;         // time in micros it takes to send packet
+    uint32_t    txSendTime;         // time in micros it takes to send packet (893 to 894 microseconds)
     uint32_t    telemetryRxTime;    // time in micros it takes to receive telemetry packet
-    uint32_t    irqTime;            // time it took for most recent irq handler to complete
+    uint32_t    irqTime;            // longest time it took for irq handler to complete (898 to 899 microseconds)
     uint32_t    irqHits;            // incremented every time ISR his executed
     uint32_t    resetTime;          // How long it took to perform a protocol reset
     uint16_t    telemetryTimeout;   // if non-zero, decremented every millisecond. Reloaded if telemetry recevied
