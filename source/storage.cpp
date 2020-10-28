@@ -4,10 +4,13 @@
 #include <string.h>
 #include "multiprotocol.h"
 
-#define __HARDWARE_TIMER_WORKAROUND__
-#if defined(__HARDWARE_TIMER_WORKAROUND__)    
-    #include "timer.h"  // TODO, XXX: Hack workaround
+// Disabling timer and adc interrupts seems to be needed otherwise
+// calls to flash_write() seem to sporadically fail
+#define __IRQ_WORKAROUND__
+#if defined(__IRQ_WORKAROUND__)    
+    #include "timer.h"
     #include "delay.h"
+    #include "adc.h"
 #endif
 
 //------------------------------------------------------------------------------
@@ -124,8 +127,9 @@ uint8_t storage_init()
 //------------------------------------------------------------------------------
 void storage_save()
 {
-#if defined(__HARDWARE_TIMER_WORKAROUND__)    
+#if defined(__IRQ_WORKAROUND__)    
     timer_stop_hardware();
+    adc_suspend_irq();
 
     // After a fair amount of usage I did encounter resets during a storage_save()
     // so I'm thinking a short delay to let the timer truly stop is worth performing
@@ -136,17 +140,28 @@ void storage_save()
     
     storage.checksum = storage_calc_crc();
 
-    int result = flash_write(&storage, sizeof(storage));
-    if (result != sizeof(storage))
+    // Even with disabling interrupts I'll occassionally encounter write failures.
+    // I think this tends to happen when running the TX on lower voltage (say
+    // below 5 volts). And these failures corrupt the storage which resets all my saved data!
+    // So we'll perform a few retries to try and work around that
+    const int kMaxRetries = 4;
+    for (int i=0; i<kMaxRetries; i++)
     {
-        //XXX printf("storage_save(): flash_write error");
-    }
-    else
-    {
-        storage_take_snapshot();
+        int result = flash_write(&storage, sizeof(storage));
+        if (result != sizeof(storage))
+        {
+            //XXX printf("storage_save(): flash_write error");
+            delay_ms(50);
+        }
+        else
+        {
+            storage_take_snapshot();
+            break;
+        }
     }
 
-#if defined(__HARDWARE_TIMER_WORKAROUND__)    
+#if defined(__IRQ_WORKAROUND__)
+    adc_resume_irq();
     timer_start_hardware();
 #endif    
 }

@@ -44,6 +44,9 @@ int adc_init(void);
 void adc_update(void);  // currently takes 183 microseconds
 void adc_test(void);
 
+void adc_suspend_irq(void);
+void adc_resume_irq(void);
+
 uint16_t adc_get_channel_raw(int id);
 uint16_t adc_get_channel_calibrated(int id);
 uint16_t adc_get_channel_calibrated_unscaled(int id);

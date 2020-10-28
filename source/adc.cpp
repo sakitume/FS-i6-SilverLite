@@ -24,10 +24,9 @@
 #include "fsl_port.h"
 #include "delay.h"
 #include "storage.h"
+#include "drv_time.h"
 
-static uint16_t adc_data[ADC_CHANNEL_COUNT];
-
-static uint16_t adc_battery_voltage_raw_filtered;
+static volatile uint16_t adc_data[ADC_CHANNEL_COUNT];
 
 static const uint8_t adac_channels[] = {
 	7,  // ADC0_SE7b, Ch1 Roll (Aileron)
@@ -42,6 +41,10 @@ static const uint8_t adac_channels[] = {
 };
 
 static bool bNeedRecalibrate;
+static bool gIRQEnabled;
+static bool gIRQSuspendState;
+static uint8_t gIRQSuspendCnt;
+static volatile uint8_t currChan = 0;
 
 //------------------------------------------------------------------------------
 // Forward declarations
@@ -54,7 +57,6 @@ int adc_init(void)
 	debug("adc: init\n"); 
     debug_flush();
 
-	adc_battery_voltage_raw_filtered = 0;
     for (int i = 0; i < ADC_CHANNEL_COUNT; i++) 
     {
         adc_data[i] = 0;
@@ -82,42 +84,122 @@ static void adc_init_internal(void)
 	PORT_SetPinMux(PORTE, 29, kPORT_PinDisabledOrAnalog); /* PORTE29 (pin 17) is configured as ADC0_SE4b */
 
 	adc16_config_t config = {
-		kADC16_ReferenceVoltageSourceVref,
-		kADC16_ClockSourceAlt0,
-		false,
-		kADC16_ClockDivider2,
-		kADC16_Resolution12or13Bit,
-		kADC16_LongSampleCycle6,
-		true,
-		false,
-		true //not sure
+		kADC16_ReferenceVoltageSourceVref,  // referenceVoltageSource, Select the reference voltage source.
+		kADC16_ClockSourceAlt0,             // clockSource, Select the input clock source to converter.
+		false,                              // enableAsynchronousClock, Enable the asynchronous clock output
+		kADC16_ClockDivider2,               // clockDivider, Select the divider of input clock source
+		kADC16_Resolution12or13Bit,         // resolution, Select the sample resolution mode
+		kADC16_LongSampleCycle6,            // longSampleMode, Select the long sample mode
+		true,                               // enableHighSpeed, Enable the high-speed mode
+		false,                              // enableLowPower, Enable low power
+		true                                // enableContinuousConversion, Enable continuous conversion mode
 	};
 	//ADC16_Init(ADC0, &config);
 	//ADC16_SetChannelMuxMode(ADC0, kADC16_ChannelMuxB);
-	ADC0->CFG1 = 52;
-	ADC0->CFG2 = 22;
-	ADC0->SC2 = 0;
-	//ADC0->SC3 = 133;
+	ADC0->CFG1 = 0x34;
+
+
+    // ADC0_SC2 register fields:
+    // MUXSEL=1     ADxxb channels are selected
+    // ADACKEN=1    Async clock and clock output is enabled regardless of the state of ADC
+    // ADHSC=1      High-speed conversion sequence selected with 2 additional ADCK cycles to total conversion time
+    // ADLSTS=2     6 extra ADCK cycles; 10 ADCK cycles total sample time
+	ADC0->CFG2 = 0x16;
+
+    // ADC0_SC2 register fields:
+    // ADTRG=0  (Software trigger selected)
+    // ACFE=0   (Compare function disabled)
+    // ACFGT=0  (n/a)
+    // ACREN=0  (Range function disabled)
+    // DMAEN=0  (DMA is disabled)
+    // REFSEL=0 (Default voltage ref)
+	ADC0->SC2 = 0;      
+
+    // ADC0_SC3 register fields:
+    // ADCO=0   (Single conversion)
+    // AVGE=1   (Hardware function enabled)
+    // AVGS=1   (8 samples averaged)
 	ADC0->SC3 = 5;
+
 	ADC16_DoAutoCalibration(ADC0);
+
+    EnableIRQ(ADC0_IRQn);
+    gIRQEnabled = true;
+    gIRQSuspendCnt = 0;
+
+    // Start ADC conversion
+    ADC0->SC1[0] = adac_channels[0] | ADC_SC1_AIEN_MASK;
 }
 
-void adc_update(void){
-	for(int i =0; i < ADC_CHANNEL_COUNT; i++){
-		if(i == 5) ADC0->CFG2 &= 0xFFFFFFEF; //select ADxxa
-		else ADC0->CFG2 |= 0x10; //select ADxxb
-		ADC0->SC1[0] = (adac_channels[i] | 0x40) & ADC_SC1_ADCH_MASK;
-		//Write to SC1A to start conversion
-		while (ADC0->SC2 & ADC_SC2_ADACT_MASK);
-		while (!(ADC0->SC1[0] & ADC_SC1_COCO_MASK));
-		adc_data[i] = ADC0->R[0];
-	}
+void adc_update(void)
+{
+    // nothing to do
+}
 
-    adc_battery_voltage_raw_filtered = adc_data[6];
+//------------------------------------------------------------------------------
+// Call this to suspend ADC interrupts, they can be later restored via
+// adc_resume_irq()
+void adc_suspend_irq(void)
+{
+    gIRQSuspendCnt++;
+    if (gIRQSuspendCnt == 1)
+    {
+        gIRQSuspendState = gIRQEnabled;
+        if (gIRQEnabled)
+        {
+            DisableIRQ(ADC0_IRQn);
+        }
+
+    }
+}
+
+//------------------------------------------------------------------------------
+// Re-enables IRQ if they were enabled at the time the first adc_suspend_irq()
+// was executed. 
+void adc_resume_irq(void)
+{
+    gIRQSuspendCnt--;
+    if (gIRQSuspendCnt == 0)
+    {
+        if (gIRQSuspendState)
+        {
+            gIRQSuspendState = false;
+            EnableIRQ(ADC0_IRQn);
+
+            // Start ADC conversion
+            if (currChan == 5) ADC0->CFG2 &= 0xFFFFFFEF;    // select ADxxa
+            else ADC0->CFG2 |= 0x10;                        // select ADxxb
+            ADC0->SC1[0] = adac_channels[currChan] | ADC_SC1_AIEN_MASK;
+        }
+    }
+}
+
+//------------------------------------------------------------------------------
+// IRQ handler for ADC conversion complete
+// This seems to average somewhere around 44 conversions per millisecond
+extern "C" void ADC0_IRQHandler(void)
+{
+    register int chan = currChan;
+    adc_data[chan] = ADC0->R[0];    // this will also clear the COCO (and interrupt) flag
+    if (++chan >= ADC_CHANNEL_COUNT)
+    {
+        chan = 0;
+    }
+
+    if (chan == 5) ADC0->CFG2 &= 0xFFFFFFEF;    // select ADxxa
+    else ADC0->CFG2 |= 0x10;                    // select ADxxb
+    ADC0->SC1[0] = adac_channels[chan] | ADC_SC1_AIEN_MASK;
+    currChan = chan;
 }
 
 //------------------------------------------------------------------------------
 void adc_test(void) {
+    static uint32_t last;
+    uint32_t now = millis_this_frame();
+    uint32_t delta = now - last;
+    last = now;
+
+
         console_clear();
         debug("ADC TEST");
         debug_put_newline();
@@ -162,7 +244,7 @@ uint32_t adc_get_battery_voltage(void) {
     // 1230 = 12.3 V
     // raw data is 0 .. 4095 ~ 0 .. 3300mV
     // Vadc = raw * 3300 / 4095
-    uint32_t raw = adc_battery_voltage_raw_filtered;
+    uint32_t raw = adc_data[6];;
 #if 0    
     // the voltage divider is 5.1k / 10k
     // Vadc = Vbat * R2 / (R1+R2) = Vbat * 51/ 151
