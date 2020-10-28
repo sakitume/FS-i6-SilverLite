@@ -13,6 +13,8 @@
 #include "drv_time.h"
 #include "GEM.h"
 
+// If you define __LOG_LOOPTIME__, you can push up on the throttle and pitch trim
+// buttons and view the max looptime and tx irq time in the log
 #define __LOG_LOOPTIME__
 #if defined(__LOG_LOOPTIME__)
 #include "bayang_common.h"
@@ -98,7 +100,9 @@ static void checkLoopTime()
     {
         debug_put_uint16(longest);
         debug(", ");
-        debug_put_uint16(gTXContext.irqTime);
+        debug_put_uint16(gTXContext.irqTime); gTXContext.irqTime = 0;
+        debug(", ");
+        debug_put_uint16(gTXContext.txSendTime);
         debug_put_newline();
         lastSec = now;
         longest = 0;
@@ -123,7 +127,9 @@ void gui_loop()
     uint32_t    autoRepeatTime = 0;
     while (1)
     {
+#if defined(__LOG_LOOPTIME__)
         checkLoopTime();
+#endif        
 
         // Call the required update functions of various systems
         extern void required_updates();
