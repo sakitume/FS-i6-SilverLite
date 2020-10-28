@@ -34,8 +34,8 @@ uint16_t tx_get_fc_voltage()
     //
     if (silverLiteDataIsRecent())
     {
-//      return gSilverLiteData.vbattFilt;
-        return gSilverLiteData.vbattComp;
+        return gSilverLiteData.vbattFilt;
+//        return gSilverLiteData.vbattComp;
     }
     return 0;
 }
