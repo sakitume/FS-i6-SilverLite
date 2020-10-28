@@ -15,9 +15,9 @@
 
 // If you define __LOG_LOOPTIME__, you can push up on the throttle and pitch trim
 // buttons and view the max looptime and tx irq time in the log
-#define __LOG_LOOPTIME__
+//#define __LOG_LOOPTIME__
 #if defined(__LOG_LOOPTIME__)
-#include "bayang_common.h"
+    #include "bayang_common.h"
 #endif
 
 static GLCD gGLCD;
